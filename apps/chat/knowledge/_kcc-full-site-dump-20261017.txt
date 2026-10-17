@@ -1,0 +1,1631 @@
+﻿================================================================
+KABANKALAN CATHOLIC COLLEGE, INC. (KCC) - FULL SITE TEXT DUMP
+https://kcc.edu.ph
+Kabankalan City, Negros Occidental, Philippines
+================================================================
+Extraction date : 2026-10-17
+Method          : public sitemap crawl (10 pages) + client JS bundles +
+                  public Convex read API (perceptive-minnow-23.convex.cloud)
+Pages covered   : Home, About, Programs, Basic Education, Senior High,
+                  Admissions, Campus Life, News (8 articles), Contact, Handbook
+----------------------------------------------------------------
+KEY FACTS (as published on site):
+  Name          : Kabankalan Catholic College, Inc. (KCC)
+  Founded       : 1927 (as "Kabankalan Institute"; formerly Kabankalan Academy)
+  Location      : Guanzon St., Brgy. 1, Kabankalan City, Negros Occidental
+  Phone         : (032) 4712-479
+  Email         : kcc_1927@yahoo.com
+  Office Hours  : 8:00 AM - 12:NN and 1:00 - 5:00 PM
+  Facebook      : https://www.facebook.com/KCCInc1927
+  Motto         : "Teach Ye All Nations" - Matthew 28:19
+  Tagline       : Catholic Education: Our Identity, Our Mission
+  Student body  : Elementary (K-6), Junior High (7-10), Senior High (11-12), College
+  Handbook PDF  : https://kcc.edu.ph/documents/handbook-basic-2026-2027-with-cover.pdf
+================================================================
+
+
+################################################################
+SECTION 1 - INSTITUTION OVERVIEW (HOME PAGE)
+################################################################
+
+[Badge] Est. 1927 - Kabankalan City, Negros Occidental
+[Opening quote] "Teach Ye All Nations" - Matthew 28:19
+[Sub-line] A Christ-centered learning community committed to academic
+excellence, faith formation, and service since 1927.
+
+ABOUT US - "A Legacy of Faith & Education"
+Founded in 1927, Kabankalan Catholic College has served as the home of
+Catholic education in Kabankalan City, Negros Occidental. For close to a
+century, KCC has shaped graduates who carry with them strong academics,
+solid values, and a heart for service.
+Quote: "Teach Ye All Nations"
+
+STATISTICS (shown on home page):
+  Year Founded      : 1927
+  Programs Offered  : 32 (count of program records)
+  Years of Excellence: dynamic (current year - 1927)
+
+THE FOUR PILLARS - "What We Stand For"
+  I.   Academic Excellence    - Rigorous academics that challenge students to
+       think critically and develop a genuine love for learning.
+  II.  Faith Formation        - Deepening faith through Catholic tradition,
+       prayer, and a personal relationship with God.
+  III. Community Service      - Reaching out to those in need, putting the
+       Gospel into practice through hands-on service.
+  IV.  Holistic Development   - Shaping students who are not only skilled and
+       knowledgeable but also grounded in strong values.
+
+EDUCATION FOR EVERY STAGE:
+  - Tertiary (College): Degree programs in Business, IT, Accountancy,
+    Education, and Criminology.
+  - Grades 11-12 (Senior High): Academic Track (STEM, ABM, HUMSS, GAS)
+    and TVL Track strands.
+  - K to Grade 10 (Basic Education): Elementary and Junior High School
+    departments with strong Catholic foundations.
+
+NEWS TEASER: "What's new at KCC - announcements, events, and stories from
+our community."
+
+FOOTER:
+  A Catholic school in Kabankalan City forming students who are grounded in
+  faith, strong in academics, and ready to serve.
+  Guanzon St., Brgy. 1, Kabankalan City, Negros Occidental
+  Office hours: 8:00 AM - 12:NN and 1:00 - 5:00 PM
+  Quick Links: About KCC, News & Updates, Handbook
+  Mission blockquote (repeated in footer)
+  Follow us on Facebook (facebook.com/KCCInc1927)
+  (c) Kabankalan Catholic College, Inc. All rights reserved.
+  "Teach Ye All Nations" - Mt 28:19
+
+HEADER NAVIGATION:
+  Home | About | Academics (College Programs - Degree programs & courses;
+  Senior High School - Academic & TVL tracks; Basic Education - Elementary &
+  Junior High) | News | Admissions | Campus Life | Contact | [Enroll Now]
+
+
+################################################################
+SECTION 2 - ABOUT KCC (https://kcc.edu.ph/about)
+################################################################
+
+Page subtitle: Close to a hundred years of forming minds, hearts, and lives
+in Kabankalan City.
+
+--- 2.1 SCHOOL PHILOSOPHY ("Our Guiding Credo") ---
+"Teach ye all nations."
+- The School Motto
+
+--- 2.2 VISION ("Our Compass") ---
+Kabankalan Catholic College, Inc., as builder of the future, is a
+Christ-centered learning community of accountable and socially responsible
+individuals, that leads positive change, responds to and serves the mission
+of the Diocese, the nation, and the world.
+
+--- 2.3 MISSION ---
+KCC commits to provide quality and inclusive Catholic education, rooted in
+the Gospel and driven by innovative research and meaningful community
+engagements, empowering its members to become effective agents of societal
+transformation.
+
+--- 2.4 CORE VALUES ---
+Kindness
+  A KCCian upholds a deep sense of unity and empathy, embodying shared
+  purpose and mutual support within the school and wider community.
+Christ-Centeredness
+  A KCCian is grounded in the living faith in God, guided by Gospel values
+  that inspire words and actions in everyday life.
+Creativity
+  A KCCian embraces innovation in the pursuit of new ideas through research
+  and creative problem-solving for the service of Church and society.
+Integrity
+  A KCCian is committed to moral responsibility and academic honesty,
+  exemplifying Gospel-rooted principles in academic works, personal choices,
+  and leadership.
+Accountability
+  A KCCian takes ownership of his/her decisions and actions, contributing
+  responsibly to society and upholding the standards of a globally
+  competent individual.
+Nurturing
+  A KCCian cares for God's creation as responsible steward entrusted to
+  protect, sustain, and honor the world He has made.
+Synodality
+  A KCCian journeys together with others in communion, fostering
+  collaboration and active participation in the mission of the Church and
+  community.
+
+--- 2.5 A BRIEF HISTORY OF KABANKALAN CATHOLIC COLLEGE, INC. ---
+(Formerly Kabankalan Academy)
+
+1927 - Founding as Kabankalan Institute
+  In 1927 a group of incorporators gathered to establish a secondary school
+  named Kabankalan Institute which was later changed to Kabankalan Private
+  Academy.
+
+1940-1946 - First Commencement & The War Years
+  The first commencement exercises of the school was in 1940. Classes were
+  suspended during the Second World War (1941-1944) and were resumed in the
+  school year 1945-1946. The Board of Trustees got a permit to open a Junior
+  Normal College which lasted only for three years due to poor enrollment.
+
+1953 - Columban Fathers Acquire the Academy
+  In 1953, the Columban Fathers through Fr. Thomas J. Cronin, parish priest
+  of Kabankalan, thought of putting up a new school but later negotiated to
+  buy Kabankalan Academy. However, most of the stockholders donated their
+  shares in exchange for scholarship privileges.
+
+Columban Era - Transfer to the Church Site & Directorship Practice
+  When the Columban Fathers took over, the first decision they made was to
+  transfer the site of the school to the space near the church. The school
+  directorship under the Columban Fathers was not a permanent position. The
+  change of the directorship went with the reshuffling of the parish priest.
+  This was the standing regulation among the Columban Fathers.
+
+1963-1964 - College & Elementary Departments Open
+  Through the untiring efforts of Fr. Cronin, a general college and an
+  elementary education was opened in the school year 1963-1964. Two years
+  after, he was able to get the services of the St. Paul Sisters of Chartres,
+  to assist in the management of the school. Their experience in school
+  management was an asset. Through them, Kabankalan College became the
+  center of learning in the southern part of Negros Occidental.
+
+1983 - Diocesan Administration Begins
+  The College department was built on a hectare of land donated by the Zayco
+  family. In 1983 the management services of the Sisters of St. Paul
+  terminated and the school administration shifted to the hands of the
+  Diocesan priests headed by Msgr. Josefino I. Iledan as President and
+  assisted by the Presentation Sisters.
+
+1987 - The Great Fire & Reconstruction
+  On March 14, 1987, while the town was celebrating its 80th Foundation Day,
+  a fire of dubious origin razed the high school building, the parish convent
+  and the Old Catholic church to the ground. The catastrophe brought untold
+  financial losses to the school. Massive rehabilitation and reconstruction
+  were immediately instituted as the school faced the opening of the next
+  school year. Meanwhile the high school department was temporarily relocated
+  to the College campus while the permanent three-storey building on the
+  newly acquired lot adjacent to the College was under construction.
+
+Campus Expansion - St. Columban Arts Center & Annex
+  An additional phase to the physical structure of the college is the
+  St. Columban Arts Center which serves as the socio-cultural venue not only
+  for the students but also for the community. Behind is the annex, a
+  concrete building that houses the new college canteen and the textbook
+  center on the ground floor and the College library on the upper floor.
+
+1988 - New Diocese & Religious of the Good Shepherd
+  In 1988, Kabankalan was made a new Diocese with Most Reverend Vicente M.
+  Navarra, D.D. as its First Bishop. That year, the College obtained the
+  services of the Religious of the Good Shepherd who served for a year. For
+  8 years the senior academic positions were taken by the lay members of the
+  academic community.
+
+1996 - Carmelite Sisters Invited
+  In 1996, the Carmelite Sisters of Our Lady (Carm, O.L.) were invited by
+  Most Rev. Vicente Navarra, D.D., Bishop of Kabankalan at the same time
+  Chairman of the Board of Trustees, to assist Msgr. Rogelio B. Cruz, the
+  School President, in the management of the school.
+
+2003-2011 - Bishop Buzon's Era & New Leadership
+  Most Reverend Patricio A. Buzon, SDB, D.D., was installed as the second
+  Bishop of the Diocese of Kabankalan in 2003. In 2005, he administered the
+  School as the Chairman of the Board of Trustees and as School President.
+  Under his management, the KCC-Technological Center situated in Barangay
+  Talubangi, Kabankalan City was established in 2009. In 2011, Rev. Fr.
+  Radny T. Bayog, PhD, was appointed as School President of KCC.
+
+2018-2019 - Bishop Galbines & First Alumnus President
+  In 2018, Most Rev. Louie P. Galbines, SThD, D.D. was installed as the
+  third Bishop of the Diocese of Kabankalan. He also served as the Chairman
+  of the school's Board of Trustees. In 2019, Rev. Fr. Eugene D. Lucerna II,
+  PhD, RPsy, RGC was appointed as School President. He was the first alumnus
+  (KCC High School Batch 1996) to take over the aforementioned leadership
+  position.
+
+2025 - Fr. Richard L. Lachica Appointed
+  On April 15, 2025, Bishop Galbines appointed Rev. Fr. Richard L. Lachica,
+  MAEd, as the new school president starting Academic Year 2025-2026.
+
+--- 2.6 THE SCHOOL SEAL ("Identity & Meaning" / "The Emblem, Decoded") ---
+The Twelve Waves
+  The twelve (12) waves at the rim of the logo represent the twelve (12)
+  apostles tasked by Christ to teach and evangelize.
+The Motto
+  The school motto "TEACH YE ALL NATIONS" expresses KCC's untiring response
+  to Christ's call for evangelization. Every KCCian should then strive to be
+  a model Christian and true patriot. In this way, they will be honest and
+  responsible citizens.
+The Two Stars
+  The two stars in the seal symbolize the guiding light of Catholic
+  Education. One star represents KCC's identity, being rooted in Catholic
+  faith and values. The other star represents its mission, to spread
+  knowledge, truth, and service to others.
+The Philippine Map
+  The Philippine map, specifically the island of Negros, represents the
+  immediate world KCC aims to evangelize. The other islands represent the
+  world which KCC hopes to reach out to.
+Dark Blue & Gold
+  The dark blue and gold seal symbolizes wisdom, integrity, and excellence.
+  Dark blue represents knowledge and moral strength, while gold embodies the
+  eternal light of Christ, guiding the KCCians to success and dignity. This
+  version highlights KCC's prestige and commitment to form graduates who
+  embody truth and honor.
+
+--- 2.7 ALMA MATER HYMN ("Sung as One") ---
+Composer : Sr. Marie Josephine Antonio, SPC
+Lyrics   : Miss Ester Besas
+
+Alma Mater Dear, all hail to you!
+All hail to you.
+Kabankalan Catholic College
+Our haven of pain, of joy and glory
+To your teachings and ideals
+We'll ever cling
+Amidst the toils and trials life may bring
+Guardian and light of our young lives
+Struggles and pains and frustrations
+Are to us the pillars to lean on.
+For in your portals and inspirations
+We've built our hopes, our dreams and our ambitions,
+Even when we'll leave you dear school
+Beautiful memories will linger on.
+
+
+################################################################
+SECTION 3 - ACADEMICS: COLLEGE PROGRAMS (https://kcc.edu.ph/programs)
+################################################################
+
+Page intro: From business and IT to education and criminology, KCC prepares
+students for the careers they want to pursue.
+Subtitle  : Our college programs combine strong academics with Catholic
+values to prepare graduates for professional life.
+
+ACADEMIC UNITS (college groupings):
+  - College of Management, Accountancy and Technology (CMAT)
+  - College of Education, Arts and Sciences (CEAS)
+  - College of Criminology
+
+College degree programs (13):
+  CMAT:
+  1. BS in Business Administration (BSBA)
+     Majors: Financial Management, Marketing Management
+     Careers: Financial Analyst, Marketing Manager, HR Specialist,
+     Entrepreneur, Business Consultant
+  2. BS in Information Technology (BSIT)
+     Careers: Software Developer, Network Administrator, Database
+     Administrator, IT Consultant, Web Developer
+  3. BS in Accountancy (BSA)
+     Careers: Certified Public Accountant, External Auditor, Tax Consultant,
+     Financial Controller, Government Auditor
+  4. BS in Accounting Information System (BSAIS)
+     Careers: IT Auditor, Systems Analyst, ERP Consultant, Database
+     Administrator, Financial Systems Manager
+  5. BS in Management Accounting (BSMA)
+     Careers: Management Accountant, Cost Analyst, Budget Manager, Financial
+     Planner, Business Consultant
+  6. BS in Tourism Management (BSTM)
+     Careers: Tour Operations Manager, Hotel Manager, Travel Consultant,
+     Event Coordinator, Tourism Officer
+  CEAS:
+  7. Bachelor of Elementary Education (BEEd)
+     Majors: General Education
+     Careers: Elementary School Teacher, Education Specialist, Curriculum
+     Developer, School Administrator
+  8. Bachelor of Secondary Education (BSEd)
+     Majors: English, Filipino, Values Education, Science, Mathematics
+     Careers: High School Teacher, Subject Coordinator, Education Researcher,
+     Guidance Counselor
+  9. Bachelor of Early Childhood Education (BECEd)
+     Careers: Preschool Teacher, Early Childhood Specialist, Child
+     Development Worker, Daycare Center Manager
+  10. Bachelor of Physical Education (BPEd)
+     Careers: PE Teacher, Sports Coach, Fitness Instructor, Athletic
+     Director, Sports Development Officer
+  11. Bachelor of Arts in Philosophy (AB Philosophy)
+     Careers: Philosophy Professor, Seminary Studies, Ethics Consultant,
+     Writer/Journalist, Law School Preparation
+  12. BS in Psychology
+     Careers: Psychologist, Guidance Counselor, Human Resource Officer,
+     Behavioral Therapist, Research Analyst
+  College of Criminology:
+  13. BS in Criminology
+     Careers: Police Officer, Criminal Investigator, Forensic Analyst,
+     Corrections Officer, Security Consultant
+
+Full descriptions for every program: see the NEWS/PROGRAMS DATA section
+(Section 10) and Appendix.
+
+
+################################################################
+SECTION 4 - BASIC EDUCATION (https://kcc.edu.ph/basic-education)
+(ELEMENTARY K-6 + JUNIOR HIGH SCHOOL)
+################################################################
+
+ELEMENTARY (K-6) HIGHLIGHTS:
+  Strong Academic Foundation - A comprehensive K-6 curriculum aligned with
+  DepEd standards, integrating Catholic values in every subject area.
+  Faith Formation - Regular liturgical celebrations, prayer services, and
+  Christian Living classes that nurture spiritual growth from an early age.
+  Arts & Creativity - Programs in visual arts, music, and performing arts
+  that develop creative expression and artistic appreciation.
+  Math & Science - Engaging math and science instruction using hands-on
+  activities and inquiry-based learning approaches.
+  Language Proficiency - Strong emphasis on English and Filipino
+  communication skills, with reading enrichment programs.
+  Character Development - Values education integrated across all learning
+  areas, building responsible and compassionate young learners.
+
+JUNIOR HIGH SCHOOL (7-10) HIGHLIGHTS:
+  Holistic Curriculum - A well-rounded JHS program following the K-12
+  Enhanced Basic Education curriculum with Catholic integration.
+  STEM Readiness - Strong foundation in Science, Technology, Engineering,
+  and Mathematics to prepare students for SHS tracks.
+  Research & Innovation - Introduction to basic research methodologies,
+  encouraging curiosity and scientific inquiry among students.
+  Co-Curricular Activities - Scouting, campus journalism, sports, quiz bees,
+  and various competitions at division and regional levels.
+  Spiritual Programs - Retreats, recollections, masses, and community
+  outreach that form students in Christian service and values.
+  Student Leadership - Supreme Student Government and class organizations
+  that develop leadership skills and civic responsibility.
+
+SUBJECTS / LEARNING AREAS (JHS):
+  - Araling Panlipunan
+  - MAPEH (Music, Arts, PE, Health)
+  - Edukasyon sa Pagpapakatao (EsP)
+  - Technology and Livelihood Education (TLE)
+  - Christian Living / Religious Education
+
+WHY KCC BASIC EDUCATION:
+  - DepEd-aligned K-12 curriculum
+  - Small class sizes for personalized learning
+  - Dedicated and experienced faculty
+  - Safe and nurturing campus environment
+  - Regular spiritual formation activities
+  - Co-curricular and extracurricular programs
+  - Parent involvement and engagement
+
+
+################################################################
+SECTION 5 - SENIOR HIGH SCHOOL (https://kcc.edu.ph/senior-high)
+################################################################
+
+Header   : Grades 11 & 12 - Charting Your Path to the Future
+Overview : KCC Senior High School has both Academic and TVL tracks so
+students can follow the path that fits their interests and goals. Every
+track includes Catholic values formation and activities that develop the
+whole person.
+
+ACADEMIC TRACK - "For students headed to college or university."
+  STEM - Science, Technology, Engineering, and Mathematics
+    For students who intend to pursue college degrees in the sciences,
+    engineering, technology, mathematics, and related fields. Focuses on
+    advanced math, sciences, and research.
+    Key subjects: Pre-Calculus, Basic Calculus, General Biology, General
+    Chemistry, General Physics, Research/Capstone
+    College paths: Engineering, Medicine, IT/Computer Science,
+    Architecture, Research
+  ABM - Accountancy, Business, and Management
+    Designed for students who plan to pursue business-related courses in
+    college such as business administration, accountancy, marketing, and
+    entrepreneurship.
+    Key subjects: Fundamentals of ABM, Business Mathematics, Business
+    Finance, Organization & Management, Applied Economics, Principles of
+    Marketing
+    College paths: Accountancy, Business Administration, Entrepreneurship,
+    Marketing, Economics
+  HUMSS - Humanities and Social Sciences
+    For students who wish to take up journalism, communication arts,
+    liberal arts, education, and other social science programs in college.
+    Key subjects: Creative Writing, Creative Nonfiction, Introduction to
+    World Religions, Trends, Networks, & Critical Thinking, Philippine
+    Politics & Governance, Community Engagement
+    College paths: Education, Psychology, Mass Communication, Public
+    Administration
+  GAS - General Academic Strand
+    A flexible strand for students who are still undecided on their college
+    course. It covers a broad range of subjects from different academic
+    tracks.
+    Key subjects: Humanities, Social Sciences, Electives from other strands
+    College paths: Any college program, Liberal Arts, Business
+
+TECHNICAL PROFESSIONAL TRACK (TVL) - "For students who want hands-on skills
+for work, business, or further technical training."
+  ICT - Information and Communications Technology
+    Equips students with skills in computer systems, programming, web
+    development, and digital technologies.
+    Skills: Computer Programming, Web Development, Computer Systems
+    Servicing, Digital Literacy
+  Home Economics
+    Develops practical skills in food service, dressmaking, beauty care, and
+    other home-based livelihood areas.
+    Skills: Food & Beverage Service, Bread & Pastry Production, Cookery,
+    Household Services
+  Industrial Arts
+    Trains students in technical and mechanical skills for industrial and
+    construction-related careers.
+    Skills: Electrical Installation, Plumbing, Carpentry, Automotive
+    Servicing
+
+Paths after SHS: College, Employment, Entrepreneurship (buttons: Apply for
+SHS / Talk to a Counselor)
+"Not sure which strand is right for you? Our guidance counselors can help
+you figure it out."
+
+
+################################################################
+SECTION 6 - ADMISSIONS (https://kcc.edu.ph/admissions)
+################################################################
+
+Header : Start Your Journey With Us
+Intro  : Everything you need to know about enrolling at KCC - steps,
+requirements, and what to expect.
+
+FOUR STEPS TO ENROLLMENT:
+  1. Submit Requirements - Prepare and submit your application form along
+     with the required documents.
+  2. Entrance Examination - Take the entrance examination to assess your
+     academic readiness.
+  3. Interview - Attend a brief interview with the admissions committee.
+  4. Enrollment - Complete your enrollment and officially become a KCC
+     student.
+
+ADMISSION REQUIREMENTS ("Documentary Checklist" - Bring on enrollment):
+  1. Completed Application Form
+  2. Report Card / Form 138
+  3. Certificate of Good Moral Character
+  4. PSA Birth Certificate
+  5. 2x2 ID Photos (4 pieces)
+  6. Honorable Dismissal (for transferees)
+
+"Now Accepting - Enrollment is Open!"
+Secure your slot for the upcoming academic year. Visit the Registrar's
+Office or contact us for more details.
+[Contact Admissions]
+
+
+################################################################
+SECTION 7 - CONTACT (https://kcc.edu.ph/contact)
+################################################################
+
+Header   : Get In Touch / Contact Us
+Intro    : Have questions about enrollment, programs, or campus life?
+We're happy to help.
+
+WHERE TO FIND US ("Visit, Call, or Write" / Est. 1927):
+  Address       : Guanzon St., Brgy. 1
+                  Kabankalan City, Negros Occidental
+  Phone         : (032) 4712-479
+  Email         : kcc_1927@yahoo.com
+  Office Hours  : 8:00 AM - 12:NN and 1:00 - 5:00 PM
+  Facebook      : facebook.com/KCCInc1927
+  Drop by, call, or send us an email. We're here to help.
+
+INQUIRIES WELCOME - Send Us a Message
+Write to us and we'll get back to you soon.
+Form fields: Full Name, Email Address, Subject, Message [Send Message]
+On success: Message sent successfully! We'll get back to you soon.
+
+
+################################################################
+SECTION 8 - STUDENT HANDBOOK (https://kcc.edu.ph/handbook)
+################################################################
+
+Title : KCC Student Handbook - Basic Education Student Handbook 2026-2027
+View  : embedded PDF viewer (Open the PDF in a new tab / Download PDF)
+PDF   : https://kcc.edu.ph/documents/handbook-basic-2026-2027-with-cover.pdf
+Description: View student policies, guidelines, and basic education
+handbook information for Kabankalan Catholic College, Inc.
+
+
+################################################################
+SECTION 9 - CAMPUS LIFE (https://kcc.edu.ph/campus-life)
+################################################################
+
+Intro: Campus life at KCC goes beyond the classroom - friendships are made,
+faith is strengthened, and memories are built.
+Title: Life at KCC
+
+GALLERY CATEGORIES & EVENTS (as published on the site):
+
+ACADEMIC EVENTS:
+  - CMAT Pinning 2025: The Rite of Pinning for the College of Management,
+    Accountancy, and Technology marks a significant milestone in our
+    students' academic journey. This ceremony honors their dedication,
+    perseverance, and readiness to embrace their roles as future
+    professionals and leaders.
+  - Criminology Reception Rites: Built through discipline, courage, and
+    brotherhood. KCC Criminology Class Makisig undergoes their Reception
+    Rites - a test of strength, resilience, and commitment to the path of
+    future public servants.
+
+BOARD EXAM TOPNOTCHER:
+  - KCC Alumna Paltu-ob Ranks 8th in March 2026 LEPT: Kabankalan Catholic
+    College, Inc. (KCC) celebrates another academic milestone after alumna
+    Kristel Clair T. Paltu-ob, LPT secures a spot among the top examinees in
+    the March 2026 Licensure Examination for Professional Teachers (LEPT).
+    Paltu-ob ranked eighth nationwide after earning a 93.20% rating in the
+    board examination, bringing pride and recognition to the KCC community.
+    Her achievement highlights years of dedication and commitment to the
+    teaching profession, further reflecting the institution's pursuit of
+    academic excellence. The college commends Paltu-ob for her perseverance
+    and hard work, describing her accomplishment as both a personal success
+    and a significant achievement for the school. KCC also expresses
+    confidence that she will continue to make meaningful contributions in
+    the field of education as she begins her professional journey as a
+    licensed educator. Her success now serves as an inspiration to aspiring
+    teachers and students, showing that determination and discipline can lead
+    to remarkable achievements on the national stage. The KCC community
+    extends its congratulations to Paltu-ob for bringing honor to the
+    institution through her outstanding performance in the March 2026 LEPT.
+
+COMMUNITY AND OUTREACH PROGRAMS:
+  - Blood Donation Activity In Connection With The 129th Philippines Army
+    Founding Anniversary
+  - Dinalagan 2025: The Kabankalan Catholic College KCC Counseling and
+    Testing Office successfully spearheaded DINALAGAN 2025: A Run for Mental
+    Health Awareness, held on October 11, 2025. This meaningful event aimed
+    to promote mental health awareness and overall well-being within the
+    community. With every step, participants ran not just for fitness, but
+    for a cause - to remind everyone that mental health truly matters.
+
+CULTURAL AND ARTS:
+  - Elementary United Nations Day: Our little KCCians proudly showcased
+    cultures from around the world during the KCC United Nations Day!
+  - KADICOSCA Meet 2026
+  - Laragway 2025 Mr And Ms KCC: The stage was on fire, the cheers were
+    roaring, and the crown now belongs to two outstanding KCCians!
+    Congratulations, Trixie Figueroa of STEM and Angelo Gabriel Cabanero of
+    Junior High School, the newly crowned LARAGWAY 2025 Mr. & Miss KCC.
+
+SPIRITUAL ACTIVITIES:
+  - Blessing Of The New CEAS Building: Through God's abundant grace,
+    Kabankalan Catholic College, Inc. joyfully celebrates the Blessing of
+    the New CEAS Building today, January 16, 2026. This two-storey academic
+    facility, featuring an integrated swimming pool, marks a significant
+    milestone in the institution's journey. It stands as a testament to
+    KCC's commitment to academic excellence, holistic formation, and the
+    continuous enhancement of learning environments that nurture both mind
+    and character. The new CEAS Building reflects the shared vision,
+    dedication, and generous support of the administration, faculty, staff,
+    benefactors, and partners, as KCC continues to provide quality,
+    values-driven education in service of the community and for the greater
+    glory of God. The blessing ceremony was presided over by Most Rev. Louie
+    P. Galbines, SThD, DD, together with the KCC administrators and faculty.
+  - Blessing Of The New CMAT Building: This morning, Kabankalan Catholic
+    College joyfully celebrated the blessing of its new building for the
+    College of Management, Accountancy, and Technology (CMAT). The rite of
+    blessing marks not only the dedication of a new facility but also a
+    renewed commitment to excellence in education and service. With
+    gratitude and faith, we entrust this building to the Lord's guidance,
+    that it may become a home of learning, growth, and opportunities for
+    generations of KCCians. All Hail, KCC! To God be the glory!
+  - Holy Mass 11th Educators Congress: A blessed opening for the 11th
+    Educators Congress with a Holy Mass led by Rev. Fr. Emmanuel G. Magno,
+    PhL, together with the parochial schools of the Diocese of Kabankalan.
+  - Holy Spirit Mass: The Kabankalan Catholic College community came
+    together in faith and thanksgiving for the Holy Spirit Mass with the
+    theme: "Come Holy Spirit, Lead Us, Pilgrims of Hope." Held at the
+    St. Columban Arts Center, the celebration marked a meaningful start of
+    the academic year as we entrust our journey to the guidance of the Holy
+    Spirit. The event also included the introduction of the faculty, staff,
+    and personnel of the institution. May the Spirit continue to strengthen
+    us in knowledge, character, and competence. All Hail, KCC!
+  - Nativity Of Mama Mary: KCC celebrates with deep gratitude the Nativity
+    of Mama Mary! The morning Mass, led by Rev. Fr. Freddie Delatado,
+    brought together the Elementary and High School departments in prayer.
+    In the afternoon, the College Department united in worship during the
+    Mass celebrated by our School President, Rev. Fr. Richard Lachica. May
+    the birth of our Blessed Mother inspire us to live with faith, humility,
+    and love.
+
+SPORTS AND ATHLETICS:
+  - District Sports Meet 2025: Photos captured during the Opening Program
+    of the District Sports Meet 2025 at the St. Columban Arts Center,
+    Kabankalan Catholic College, Inc.
+  - KADICOSCA 2026 Knights: Charging forward - KCC Knights stand strong for
+    District 2 at the City Sports Meet 2025! Happening this December 10-13.
+  - KADICOSCA Updates: KCC Knights Reclaim KADICOSCA '26 Basketball Glory -
+    The KCC Men's Basketball team reclaimed championship title after
+    dethroning defending champions, the BCC Stewards, in a nail-biting 75-69
+    victory held this morning, April 23, at the CCC covered court. From the
+    opening quarter to halftime, BCC Stewards displayed strong effort to
+    keep their opponet at bay, controlling the tempo of the game with scores
+    25-13 and 38-32, respectively. By third quarter, Knights mounted a
+    strong comeback. Their relentless effort to regain the momentum secured
+    them a seven-points advantage, 57-50. In the final decisive quarter,
+    both team traded baskets, but knights held their composure and sealed
+    the game, 75-69. This feat marks the Knights unwavering determination
+    and fervent desire to bring the title back to their alma mater.
+    Congratulations, KCC Knights! (via Reymie Mark Silvera / photo by
+    Mariebeth Villasana / layout by Justine Macion)
+
+
+################################################################
+SECTION 10 - PROGRAMS: FULL RECORDS (live site data via Convex API)
+################################################################
+
+=== PROGRAMS TOTAL: 32 ===
+LEVEL: college = 13
+LEVEL: shs-academic = 4
+LEVEL: shs-tvl = 3
+LEVEL: elementary = 6
+LEVEL: jhs = 6
+
+TITLE: Bachelor of Science in Business Administration
+LEVEL: college | TAG: College of Management, Accountancy and Technology
+MAJORS: Financial Management, Marketing Management
+CAREERS: Financial Analyst, Marketing Manager, HR Specialist, Entrepreneur, Business Consultant
+DESC: The BSBA program prepares students for careers in business and management. Students develop competencies in financial analysis, marketing strategy, organizational management, and entrepreneurship.
+---
+
+TITLE: Bachelor of Science in Information Technology
+LEVEL: college | TAG: College of Management, Accountancy and Technology
+CAREERS: Software Developer, Network Administrator, Database Administrator, IT Consultant, Web Developer
+DESC: The BSIT program develops future-ready IT professionals with skills in software development, networking, database management, and emerging technologies. Students gain hands-on experience in building real-world applications.
+---
+
+TITLE: Bachelor of Elementary Education
+LEVEL: college | TAG: College of Education, Arts and Sciences
+MAJORS: General Education
+CAREERS: Elementary School Teacher, Education Specialist, Curriculum Developer, School Administrator
+DESC: The BEEd program prepares dedicated and competent educators for elementary education. The curriculum provides strong pedagogical foundations and content knowledge for effective teaching of young learners.
+---
+
+TITLE: Bachelor of Secondary Education
+LEVEL: college | TAG: College of Education, Arts and Sciences
+MAJORS: English, Filipino, Values Education, Science, Mathematics
+CAREERS: High School Teacher, Subject Coordinator, Education Researcher, Guidance Counselor
+DESC: The BSEd program trains future secondary school teachers with specializations in various fields of study. Graduates are equipped with advanced subject matter knowledge and teaching methodologies.
+---
+
+TITLE: Bachelor of Science in Criminology
+LEVEL: college | TAG: College of Criminology
+CAREERS: Police Officer, Criminal Investigator, Forensic Analyst, Corrections Officer, Security Consultant
+DESC: The BS Criminology program trains future law enforcement professionals with a strong foundation in criminal justice, forensic science, and law enforcement administration.
+---
+
+TITLE: STEM
+LEVEL: shs-academic | TAG: Academic Track
+CAREERS: Engineering, Medicine, IT/Computer Science, Architecture, Research
+DESC: For students who intend to pursue college degrees in the sciences, engineering, technology, mathematics, and related fields. Focuses on advanced math, sciences, and research.
+---
+
+TITLE: ABM
+LEVEL: shs-academic | TAG: Academic Track
+CAREERS: Accountancy, Business Administration, Entrepreneurship, Marketing, Economics
+DESC: Designed for students who plan to pursue business-related courses in college such as business administration, accountancy, marketing, and entrepreneurship.
+---
+
+TITLE: HUMSS
+LEVEL: shs-academic | TAG: Academic Track
+CAREERS: Education, Law, Psychology, Mass Communication, Public Administration
+DESC: For students who wish to take up journalism, communication arts, liberal arts, education, and other social science programs in college.
+---
+
+TITLE: GAS
+LEVEL: shs-academic | TAG: Academic Track
+CAREERS: Any college program, Liberal Arts, Education, Business, Social Sciences
+DESC: A flexible strand for students who are still undecided on their college course. It covers a broad range of subjects from different academic tracks.
+---
+
+TITLE: ICT
+LEVEL: shs-tvl | TAG: Technical Professional Track
+DESC: Equips students with skills in computer systems, programming, web development, and digital technologies.
+---
+
+TITLE: Home Economics
+LEVEL: shs-tvl | TAG: Technical Professional Track
+DESC: Develops practical skills in food service, dressmaking, beauty care, and other home-based livelihood areas.
+---
+
+TITLE: Industrial Arts
+LEVEL: shs-tvl | TAG: Technical Professional Track
+DESC: Trains students in technical and mechanical skills for industrial and construction-related careers.
+---
+
+TITLE: Strong Academic Foundation
+LEVEL: elementary | TAG: Elementary
+DESC: A comprehensive K-6 curriculum aligned with DepEd standards, integrating Catholic values in every subject area.
+---
+
+TITLE: Faith Formation
+LEVEL: elementary | TAG: Elementary
+DESC: Regular liturgical celebrations, prayer services, and Christian Living classes that nurture spiritual growth from an early age.
+---
+
+TITLE: Arts & Creativity
+LEVEL: elementary | TAG: Elementary
+DESC: Programs in visual arts, music, and performing arts that develop creative expression and artistic appreciation.
+---
+
+TITLE: Math & Science
+LEVEL: elementary | TAG: Elementary
+DESC: Engaging math and science instruction using hands-on activities and inquiry-based learning approaches.
+---
+
+TITLE: Language Proficiency
+LEVEL: elementary | TAG: Elementary
+DESC: Strong emphasis on English and Filipino communication skills, with reading enrichment programs.
+---
+
+TITLE: Character Development
+LEVEL: elementary | TAG: Elementary
+DESC: Values education integrated across all learning areas, building responsible and compassionate young learners.
+---
+
+TITLE: Holistic Curriculum
+LEVEL: jhs | TAG: Junior High School
+DESC: A well-rounded JHS program following the K-12 Enhanced Basic Education curriculum with Catholic integration.
+---
+
+TITLE: STEM Readiness
+LEVEL: jhs | TAG: Junior High School
+DESC: Strong foundation in Science, Technology, Engineering, and Mathematics to prepare students for SHS tracks.
+---
+
+TITLE: Research & Innovation
+LEVEL: jhs | TAG: Junior High School
+DESC: Introduction to basic research methodologies, encouraging curiosity and scientific inquiry among students.
+---
+
+TITLE: Co-Curricular Activities
+LEVEL: jhs | TAG: Junior High School
+DESC: Scouting, campus journalism, sports, quiz bees, and various competitions at division and regional levels.
+---
+
+TITLE: Spiritual Programs
+LEVEL: jhs | TAG: Junior High School
+DESC: Retreats, recollections, masses, and community outreach that form students in Christian service and values.
+---
+
+TITLE: Student Leadership
+LEVEL: jhs | TAG: Junior High School
+DESC: Supreme Student Government and class organizations that develop leadership skills and civic responsibility.
+---
+
+TITLE: Bachelor of Science in Accountancy
+LEVEL: college | TAG: College of Management, Accountancy and Technology
+CAREERS: Certified Public Accountant, External Auditor, Tax Consultant, Financial Controller, Government Auditor
+DESC: The BSA program develops competent and ethical accountants prepared for the CPA licensure examination. Students gain expertise in financial accounting, auditing, taxation, and management advisory services.
+---
+
+TITLE: Bachelor of Science in Accounting Information System
+LEVEL: college | TAG: College of Management, Accountancy and Technology
+CAREERS: IT Auditor, Systems Analyst, ERP Consultant, Database Administrator, Financial Systems Manager
+DESC: The BSAIS program integrates accounting knowledge with information technology skills. Students learn to design, implement, and manage accounting information systems for modern business environments.
+---
+
+TITLE: Bachelor of Science in Management Accounting
+LEVEL: college | TAG: College of Management, Accountancy and Technology
+CAREERS: Management Accountant, Cost Analyst, Budget Manager, Financial Planner, Business Consultant
+DESC: The BSMA program focuses on strategic financial management and decision-making. Students develop skills in cost analysis, budgeting, performance evaluation, and strategic planning for organizations.
+---
+
+TITLE: Bachelor of Science in Tourism Management
+LEVEL: college | TAG: College of Management, Accountancy and Technology
+CAREERS: Tour Operations Manager, Hotel Manager, Travel Consultant, Event Coordinator, Tourism Officer
+DESC: The BSTM program prepares students for careers in the dynamic tourism and hospitality industry. Students learn tourism planning, event management, and sustainable tourism development.
+---
+
+TITLE: Bachelor of Early Childhood Education
+LEVEL: college | TAG: College of Education, Arts and Sciences
+CAREERS: Preschool Teacher, Early Childhood Specialist, Child Development Worker, Daycare Center Manager
+DESC: The BECEd program prepares educators specializing in early childhood development and education. Students learn to create meaningful learning experiences that nurture curiosity, confidence, and a love for learning in young children.
+---
+
+TITLE: Bachelor of Physical Education
+LEVEL: college | TAG: College of Education, Arts and Sciences
+CAREERS: PE Teacher, Sports Coach, Fitness Instructor, Athletic Director, Sports Development Officer
+DESC: The BPEd program develops competent physical education teachers and sports professionals. Students gain knowledge in exercise science, sports coaching, and health-related fitness instruction.
+---
+
+TITLE: Bachelor of Arts in Philosophy
+LEVEL: college | TAG: College of Education, Arts and Sciences
+CAREERS: Philosophy Professor, Seminary Studies, Ethics Consultant, Writer/Journalist, Law School Preparation
+DESC: The AB Philosophy program develops critical thinking, analytical reasoning, and ethical reflection. Students explore fundamental questions about existence, knowledge, values, and the human condition.
+---
+
+TITLE: Bachelor of Science in Psychology
+LEVEL: college | TAG: College of Education, Arts and Sciences
+CAREERS: Psychologist, Guidance Counselor, Human Resource Officer, Behavioral Therapist, Research Analyst
+DESC: The BS Psychology program provides a comprehensive understanding of human behavior, mental processes, and psychological well-being. Students develop skills in counseling, assessment, and research.
+---
+
+################################################################
+SECTION 11 - NEWS & UPDATES: FULL ARTICLES (live site data via Convex API)
+################################################################
+
+=== NEWS ARTICLES (8) ===
+
+TITLE: KCC Community Outreach: Christmas Gift-Giving and Feeding Program
+DATE: December 2024 | CATEGORY: Community | SLUG: christmas-outreach-2024
+EXCERPT: KCC students and faculty organized a Christmas community outreach program, sharing blessings with less fortunate families in Kabankalan City.
+CONTENT:
+In keeping with its core value of Kindness and its mission as a preferential option for the poor, the KCC community organized a Christmas gift-giving and feeding program for underprivileged families in Kabankalan City.
+
+Students, faculty, and staff came together to prepare food packs, gift bags, and educational materials for distribution. The outreach program was accompanied by a prayer service and fellowship activities.
+
+The initiative reflects KCC's commitment to community service and its role as an evangelizing arm of the Diocese of Kabankalan.
+---
+
+TITLE: KCC Announces Expanded Programs for College Department
+DATE: December 2024 | CATEGORY: Announcement | SLUG: new-program-announcement
+EXCERPT: Kabankalan Catholic College is excited to announce expanded course offerings in the College Department to meet the growing demand for quality higher education.
+CONTENT:
+Kabankalan Catholic College, Inc. continues to grow its academic offerings in the College Department, expanding opportunities for students in Kabankalan City and surrounding areas.
+
+The institution remains committed to providing quality and inclusive Catholic education, as stated in its mission, empowering its members to become effective agents of societal transformation.
+
+Students interested in the new and existing programs are encouraged to visit the admissions office or contact the school for more information.
+---
+
+TITLE: College Department Holds Intramurals and College Week
+DATE: January 2025 | CATEGORY: Event | SLUG: college-week-2025
+EXCERPT: The KCC College Department organized its annual College Week featuring intramural games, academic contests, and cultural activities.
+CONTENT:
+The KCC College Department held its annual College Week, bringing together students from all programs for a week of friendly competition, academic contests, and cultural showcases.
+
+Events included basketball, volleyball, and table tennis tournaments, as well as quiz bees, debate competitions, essay writing contests, and talent shows. Each program fielded teams and representatives, fostering camaraderie and school spirit.
+
+The College Week culminated in an awarding ceremony recognizing outstanding performances in both athletic and academic competitions.
+---
+
+TITLE: KCC Celebrates 98th Foundation Day
+DATE: February 2025 | CATEGORY: Event | SLUG: foundation-day-2025
+EXCERPT: The entire KCC community gathered to celebrate the institution's 98th Foundation Day, commemorating nearly a century of Catholic education in Kabankalan City.
+CONTENT:
+Kabankalan Catholic College, Inc. celebrated its 98th Foundation Day with a week-long series of activities, including a thanksgiving mass, academic competitions, cultural presentations, sports events, and community outreach.
+
+Founded in 1927, KCC has grown from a small secondary school called Kabankalan Institute to a full-fledged educational institution offering programs from elementary to college. The Foundation Day celebrations highlight KCC's rich history and its continuing commitment to the mission of "Teaching Ye All Nations."
+
+The celebration also featured an alumni homecoming, where former KCCians reconnected with their alma mater and shared their success stories.
+---
+
+TITLE: Elementary Department Conducts 57th Graduation & Moving Up Ceremonies
+DATE: March 2025 | CATEGORY: Graduation | SLUG: elementary-graduation-2025
+EXCERPT: KCC Elementary Department celebrated its 57th Graduation and Moving Up Ceremonies for its young learners completing their elementary education.
+CONTENT:
+The Kabankalan Catholic College Elementary Department held its 57th Graduation and Moving Up Ceremonies, marking a significant milestone for the young KCCians.
+
+The event celebrated the completion of elementary education and recognized outstanding student achievements in academics, co-curricular activities, and values formation.
+
+Parents and guardians joined the celebration as their children received their diplomas and awards, prepared to continue their academic journey in junior high school.
+---
+
+TITLE: KCC High School Department Holds 78th Commencement & Moving Up Ceremonies
+DATE: March 2025 | CATEGORY: Graduation | SLUG: hs-commencement-2025
+EXCERPT: The KCC High School Department celebrated its 78th Commencement Exercises and 5th Moving Up Ceremonies, honoring the achievements of its graduating students.
+CONTENT:
+The Kabankalan Catholic College High School Department held its 78th Commencement Exercises and 5th Moving Up Ceremonies, celebrating the hard work and dedication of its graduating students.
+
+The ceremonies honored both the Junior High School completers (Moving Up) and the Senior High School graduates (Commencement Exercises). Students, parents, faculty, and guests gathered to witness this milestone.
+
+Graduates were reminded of KCC's core values â Kindness, Christ-Centeredness, Creativity, Integrity, Accountability, Nurturing, and Synodality â as they embark on their next chapter in life.
+
+Congratulations to the KCC Class of 2025!
+---
+
+TITLE: Enrollment for School Year 2025-2026 Now Open
+DATE: March 2025 | CATEGORY: Enrollment | SLUG: enrollment-sy-2025-2026
+EXCERPT: Kabankalan Catholic College is now accepting enrollees for SY 2025-2026 across all departments â from Elementary to College.
+CONTENT:
+Kabankalan Catholic College, Inc. officially opens its enrollment for School Year 2025-2026. All departments are accepting new and returning students:
+
+â¢ Elementary Department (Kindergarten to Grade 6)
+â¢ Junior High School (Grades 7-10)
+â¢ Senior High School (Grades 11-12) â Academic & TVL Tracks
+â¢ College Department â BSBA, BSIT, BEEd, BSEd, BSN, BS Criminology
+
+Interested students may visit the Registrar's Office or contact the admissions team for enrollment details and requirements. Scholarship programs and financial assistance are also available for qualifying students.
+
+Enroll now and be part of the KCC community!
+---
+
+TITLE: Fr. Richard L. Lachica, MAEd Appointed as New KCC School President
+DATE: April 15, 2025 | CATEGORY: Announcement | SLUG: new-school-president-2025
+EXCERPT: Bishop Louie P. Galbines, SThD, D.D. has appointed Rev. Fr. Richard L. Lachica, MAEd, as the new school president of Kabankalan Catholic College, Inc. starting Academic Year 2025-2026.
+CONTENT:
+Most Rev. Louie P. Galbines, SThD, D.D., Bishop of the Diocese of Kabankalan and Chairman of the KCC Board of Trustees, has officially appointed Rev. Fr. Richard L. Lachica, MAEd, as the new school president of Kabankalan Catholic College, Inc., effective Academic Year 2025-2026.
+
+Fr. Lachica takes over the leadership from Rev. Fr. Eugene D. Lucerna II, PhD, RPsy, RGC, who served as school president since 2019 and was the first alumnus to hold the position.
+
+The KCC community warmly welcomes Fr. Lachica and looks forward to his leadership in continuing the institution's mission of providing quality Catholic education in Kabankalan City.
+---
+
+################################################################
+SECTION 12 - APPENDIX: RAW TEXT STRINGS EXTRACTED PER SITE MODULE
+################################################################
+
+===== MODULE: ABOUT PAGE MODULE (about) =====
+Philosophy
+Vision & Mission
+History
+School Seal
+Core Values
+Hymn
+About page sections
+Escape
+Close section navigation
+Open section navigation
+Kindness
+A KCCian upholds a deep sense of unity and empathy, embodying shared purpose and mutual support within the school and wider community.
+Christ-Centeredness
+A KCCian is grounded in the living faith in God, guided by Gospel values that inspire words and actions in everyday life.
+Creativity
+A KCCian embraces innovation in the pursuit of new ideas through research and creative problem-solving for the service of Church and society.
+Integrity
+A KCCian is committed to moral responsibility and academic honesty, exemplifying Gospel-rooted principles in academic works, personal choices, and leadership.
+Accountability
+A KCCian takes ownership of his/her decisions and actions, contributing responsibly to society and upholding the standards of a globally competent individual.
+Nurturing
+A KCCian cares for God's creation as responsible steward entrusted to protect, sustain, and honor the world He has made.
+Synodality
+A KCCian journeys together with others in communion, fostering collaboration and active participation in the mission of the Church and community.
+Founding as Kabankalan Institute
+In 1927 a group of incorporators gathered to establish a secondary school named Kabankalan Institute which was later changed to Kabankalan Private Academy.
+First Commencement & The War Years
+The first commencement exercises of the school was in 1940. Classes were suspended during the Second World War (1941-1944) and were resumed in the school year 1945-1946. The Board of Trustees got a permit to open a Junior Normal College which lasted only for three years due to poor enrollment.
+Columban Fathers Acquire the Academy
+In 1953, the Columban Fathers through Fr. Thomas J. Cronin, parish priest of Kabankalan, thought of putting up a new school but later negotiated to buy Kabankalan Academy. However, most of the stockholders donated their shares in exchange for scholarship privileges.
+Columban Era
+Transfer to the Church Site & Directorship Practice
+When the Columban Fathers took over, the first decision they made was to transfer the site of the school to the space near the church. The school directorship under the Columban Fathers was not a permanent position. The change of the directorship went with the reshuffling of the parish priest. This was the standing regulation among the Columban Fathers.
+College & Elementary Departments Open
+Through the untiring efforts of Fr. Cronin, a general college and an elementary education was opened in the school year 1963-1964. Two years after, he was able to get the services of the St. Paul Sisters of Chartres, to assist in the management of the school. Their experience in school management was an asset. Through them, Kabankalan College became the center of learning in the southern part of Negros Occidental.
+Diocesan Administration Begins
+The College department was built on a hectare of land donated by the Zayco family. In 1983 the management services of the Sisters of St. Paul terminated and the school administration shifted to the hands of the Diocesan priests headed by Msgr. Josefino I. Iledan as President and assisted by the Presentation Sisters.
+The Great Fire & Reconstruction
+On March 14, 1987, while the town was celebrating its 80th Foundation Day, a fire of dubious origin razed the high school building, the parish convent and the Old Catholic church to the ground. The catastrophe brought untold financial losses to the school. Massive rehabilitation and reconstruction were immediately instituted as the school faced the opening of the next school year. Meanwhile the high school department was temporarily relocated to the College campus while the permanent three-storey building on the newly acquired lot adjacent to the College was under construction.
+Campus Expansion
+St. Columban Arts Center & Annex
+An additional phase to the physical structure of the college is the St. Columban Arts Center which serves as the socio-cultural venue not only for the students but also for the community. Behind is the annex, a concrete building that houses the new college canteen and the textbook center on the ground floor and the College library on the upper floor.
+New Diocese & Religious of the Good Shepherd
+In 1988, Kabankalan was made a new Diocese with Most Reverend Vicente M. Navarra, D.D. as its First Bishop. That year, the College obtained the services of the Religious of the Good Shepherd who served for a year. For 8 years the senior academic positions were taken by the lay members of the academic community.
+Carmelite Sisters Invited
+In 1996, the Carmelite Sisters of Our Lady (Carm, O.L.) were invited by Most Rev. Vicente Navarra, D.D., Bishop of Kabankalan at the same time Chairman of the Board of Trustees, to assist Msgr. Rogelio B. Cruz, the School President, in the management of the school.
+Bishop Buzon's Era & New Leadership
+Most Reverend Patricio A. Buzon, SDB, D.D., was installed as the second Bishop of the Diocese of Kabankalan in 2003. In 2005, he administered the School as the Chairman of the Board of Trustees and as School President. Under his management, the KCC-Technological Center situated in Barangay Talubangi, Kabankalan City was established in 2009. In 2011, Rev. Fr. Radny T. Bayog, PhD, was appointed as School President of KCC.
+Bishop Galbines & First Alumnus President
+In 2018, Most Rev. Louie P. Galbines, SThD, D.D. was installed as the third Bishop of the Diocese of Kabankalan. He also served as the Chairman of the school’s Board of Trustees. In 2019, Rev. Fr. Eugene D. Lucerna II, PhD, RPsy, RGC was appointed as School President. He was the first alumnus (KCC High School Batch 1996) to take over the aforementioned leadership position.
+Fr. Richard L. Lachica Appointed
+On April 15, 2025, Bishop Galbines appointed Rev. Fr. Richard L. Lachica, MAEd, as the new school president starting Academic Year 2025-2026.
+Formation in Christ
+Kabankalan Catholic College, Inc. is committed to forming socially conscious, responsible, and service-oriented individuals, guided by the teachings of Christ. They embody a profound understanding of the challenges and opportunities inherent in a rapidly evolving world.
+Evangelizing Mission
+As an evangelizing arm of the Diocese of Kabankalan, KCC seeks to proclaim and spread the teachings of the Church. The institution shepherds students and the community toward a deeper relationship with Christ; strengthening faith that transforms lives through service, compassion, and steadfast devotion to Christian values.
+Preferential Option for the Poor
+As a preferential option for the poor, Kabankalan Catholic College affirms that education is a universal right. Rooted in a curriculum that integrates the arts, sciences, and the Gospel, a KCC education fosters well-rounded development — one that nurtures each person's mind, body, and soul within a safe and supportive environment.
+Academic Excellence
+As an educational institution, KCC seeks academic excellence with a strong moral foundation characterized by integrity, compassion, and generosity. Our students and graduates are equipped with the skills, knowledge, and disposition necessary to contribute positively to society and to respond effectively to the needs of the Diocese, the nation, and the global community.
+Alma Mater Dear, all hail to you!
+All hail to you.
+Kabankalan Catholic College
+Our haven of pain, of joy and glory
+To your teachings and ideals
+We'll ever cling
+Amidst the toils and trials life may bring
+Guardian and light of our young lives
+Struggles and pains and frustrations
+Are to us the pillars to lean on.
+For in your portals and inspirations
+We've built our hopes, our dreams and our ambitions,
+Even when we'll leave you dear school
+Beautiful memories will linger on.
+Refrain
+About KCC | Kabankalan Catholic College, Inc.
+Learn about Kabankalan Catholic College, Inc., its Catholic identity, mission, vision, core values, and history of service in Negros Occidental.
+About KCC
+Close to a hundred years of forming minds, hearts, and lives in Kabankalan City.
+About
+Our Guiding Credo
+School Philosophy
+Teach ye all nations.
+The School Motto
+Our Compass
+Vision
+Kabankalan Catholic College, Inc., as builder of the future, is a Christ-centered learning community of accountable and socially responsible individuals, that leads positive change, responds to and serves the mission of the Diocese, the nation, and the world.
+Mission
+KCC commits to provide quality and inclusive Catholic education, rooted in the Gospel and driven by innovative research and meaningful community engagements, empowering its members to become effective agents of societal transformation.
+A Brief History of Kabankalan Catholic College, Inc.
+Formerly Kabankalan Academy
+Identity & Meaning
+The School Seal
+KCC Official Seal
+The Emblem, Decoded
+The Twelve Waves
+The twelve (12) waves at the rim of the logo represent the twelve (12) apostles tasked by Christ to teach and evangelize.
+The Motto
+The school motto "TEACH YE ALL NATIONS" expresses KCC's untiring response to Christ's call for evangelization. Every KCCian should then strive to be a model Christian and true patriot. In this way, they will be honest and responsible citizens.
+The Two Stars
+The two stars in the seal symbolize the guiding light of Catholic Education. One star represents KCC's identity, being rooted in Catholic faith and values. The other star represents its mission, to spread knowledge, truth, and service to others.
+The Philippine Map
+The Philippine map, specifically the island of Negros, represents the immediate world KCC aims to evangelize. The other islands represent the world which KCC hopes to reach out to.
+Dark Blue & Gold
+The dark blue and gold seal symbolizes wisdom, integrity, and excellence. Dark blue represents knowledge and moral strength, while gold embodies the eternal light of Christ, guiding the KCCians to success and dignity. This version highlights KCC's prestige and commitment to form graduates who embody truth and honor.
+Sung as One
+Alma Mater Hymn
+Composer
+Sr. Marie Josephine Antonio, SPC
+Lyrics
+Miss Ester Besas
+
+===== MODULE: BASIC EDUCATION MODULE (basic-education) =====
+Strong Academic Foundation
+A comprehensive K-6 curriculum aligned with DepEd standards, integrating Catholic values in every subject area.
+Faith Formation
+Regular liturgical celebrations, prayer services, and Christian Living classes that nurture spiritual growth from an early age.
+Arts & Creativity
+Programs in visual arts, music, and performing arts that develop creative expression and artistic appreciation.
+Math & Science
+Engaging math and science instruction using hands-on activities and inquiry-based learning approaches.
+Language Proficiency
+Strong emphasis on English and Filipino communication skills, with reading enrichment programs.
+Character Development
+Values education integrated across all learning areas, building responsible and compassionate young learners.
+English
+Mathematics
+Science
+Filipino
+Araling Panlipunan
+MAPEH (Music, Arts, PE, Health)
+Edukasyon sa Pagpapakatao (EsP)
+Technology and Livelihood Education (TLE)
+Christian Living / Religious Education
+Holistic Curriculum
+A well-rounded JHS program following the K-12 Enhanced Basic Education curriculum with Catholic integration.
+STEM Readiness
+Strong foundation in Science, Technology, Engineering, and Mathematics to prepare students for SHS tracks.
+Research & Innovation
+Introduction to basic research methodologies, encouraging curiosity and scientific inquiry among students.
+Co-Curricular Activities
+Scouting, campus journalism, sports, quiz bees, and various competitions at division and regional levels.
+Spiritual Programs
+Retreats, recollections, masses, and community outreach that form students in Christian service and values.
+Student Leadership
+Supreme Student Government and class organizations that develop leadership skills and civic responsibility.
+Basic Education | Kabankalan Catholic College, Inc.
+Discover KCC Basic Education programs for elementary and junior high school learners in a Christ-centered academic environment.
+Basic Education
+Where young learners grow in faith, knowledge, and character from Kindergarten through Grade 10.
+Kindergarten to Grade 6
+Elementary Department
+The Elementary Department welcomes learners from Kindergarten through Grade 6 into a caring, Christ-centered environment. Here, strong academics go hand in hand with Catholic values, helping students grow both in the classroom and in their faith.
+Our teachers know each child by name. With small class sizes, updated facilities, and a close-knit school community, every student gets the attention and encouragement they need.
+Why Choose KCC Elementary?
+Catholic values integrated in all subjects
+DepEd-aligned K-12 curriculum
+Small class sizes for personalized learning
+Dedicated and experienced faculty
+Safe and nurturing campus environment
+Regular spiritual formation activities
+Co-curricular and extracurricular programs
+Parent involvement and engagement
+Learning Areas (Grades 7-10)
+Grades 7 to 10
+Junior High School
+The Junior High School Department covers Grades 7 through 10, building on the elementary years and preparing students for Senior High. We follow the DepEd K-12 curriculum while keeping Catholic faith formation at the center.
+Students take part in academic competitions, sports, cultural events, and community outreach — gaining experiences that shape them into confident, well-rounded young people.
+Give Your Child a Catholic Education
+Give your child a head start with academics grounded in faith and values.
+Enroll Now
+View Senior High School
+
+===== MODULE: SENIOR HIGH MODULE (senior-high) =====
+STEM
+Science, Technology, Engineering, and Mathematics
+For students who intend to pursue college degrees in the sciences, engineering, technology, mathematics, and related fields. Focuses on advanced math, sciences, and research.
+Pre-Calculus
+Basic Calculus
+General Biology
+General Chemistry
+General Physics
+Research/Capstone
+Engineering
+Medicine
+IT/Computer Science
+Architecture
+Research
+Accountancy, Business, and Management
+Designed for students who plan to pursue business-related courses in college such as business administration, accountancy, marketing, and entrepreneurship.
+Fundamentals of ABM
+Business Mathematics
+Business Finance
+Organization & Management
+Applied Economics
+Principles of Marketing
+Accountancy
+Business Administration
+Entrepreneurship
+Marketing
+Economics
+HUMSS
+Humanities and Social Sciences
+For students who wish to take up journalism, communication arts, liberal arts, education, and other social science programs in college.
+Creative Writing
+Creative Nonfiction
+Introduction to World Religions
+Trends, Networks, & Critical Thinking
+Philippine Politics & Governance
+Community Engagement
+Education
+Psychology
+Mass Communication
+Public Administration
+General Academic Strand
+A flexible strand for students who are still undecided on their college course. It covers a broad range of subjects from different academic tracks.
+Humanities
+Social Sciences
+Electives from other strands
+Any college program
+Liberal Arts
+Business
+Information and Communications Technology
+Equips students with skills in computer systems, programming, web development, and digital technologies.
+Computer Programming
+Web Development
+Computer Systems Servicing
+Digital Literacy
+Home Economics
+Home Economics Strand
+Develops practical skills in food service, dressmaking, beauty care, and other home-based livelihood areas.
+Food & Beverage Service
+Bread & Pastry Production
+Cookery
+Household Services
+Industrial Arts
+Industrial Arts Strand
+Trains students in technical and mechanical skills for industrial and construction-related careers.
+Electrical Installation
+Plumbing
+Carpentry
+Automotive Servicing
+Senior High School | Kabankalan Catholic College, Inc.
+Explore KCC Senior High School tracks and strands that prepare students for college, career pathways, and community service.
+Senior High School
+Academic and technical-vocational tracks that open doors to college, careers, and beyond.
+Grades 11 & 12
+Charting Your Path to the Future
+KCC Senior High School has both Academic and TVL tracks so students can follow the path that fits their interests and goals. Every track includes Catholic values formation and activities that develop the whole person.
+Basic Education (Elementary & JHS)
+College Programs
+Academic Track
+Academic Strands
+For students headed to college or university.
+Key Subjects
+College Paths
+Technical Professional Track
+Technical Professional
+For students who want hands-on skills for work, business, or further technical training.
+Skills Developed
+Find the Right Track for You
+Not sure which strand is right for you? Our guidance counselors can help you figure it out.
+Apply for SHS
+Talk to a Counselor
+
+===== MODULE: ADMISSIONS MODULE (admissions) =====
+Submit Requirements
+Prepare and submit your application form along with the required documents.
+Entrance Examination
+Take the entrance examination to assess your academic readiness.
+Interview
+Attend a brief interview with the admissions committee.
+Enrollment
+Complete your enrollment and officially become a KCC student.
+Completed Application Form
+Report Card / Form 138
+Certificate of Good Moral Character
+PSA Birth Certificate
+2x2 ID Photos (4 pieces)
+Honorable Dismissal (for transferees)
+Admissions
+Start Your Journey With Us
+The Process
+Four Steps to Enrollment
+Admission Requirements
+Documentary Checklist
+Bring on enrollment
+Now Accepting
+Enrollment is Open!
+Secure your slot for the upcoming academic year. Visit the Registrar's Office or contact us for more details.
+Contact Admissions
+Admissions | Kabankalan Catholic College, Inc.
+Learn about admissions, enrollment steps, application requirements, and how to start your journey at Kabankalan Catholic College, Inc.
+Everything you need to know about enrolling at KCC — steps, requirements, and what to expect.
+
+===== MODULE: CONTACT MODULE (contact) =====
+Address
+Guanzon St., Brgy. 1
+Kabankalan City, Negros Occidental
+Phone
+Email
+Office Hours
+Failed to send message. Please try again.
+Get In Touch
+Contact Us
+Est · 1927
+Where to Find Us
+Visit, Call, or Write
+Drop by, call, or send us an email. We're here to help.
+Inquiries Welcome
+Send Us a Message
+Write to us and we'll get back to you soon.
+Message sent successfully! We'll get back to you soon.
+Full Name
+Email Address
+Subject
+Message
+Send Message
+Contact Us | Kabankalan Catholic College, Inc.
+Contact Kabankalan Catholic College, Inc. for inquiries, admissions questions, office hours, and campus contact information.
+Have questions about enrollment, programs, or campus life? We're happy to help.
+
+===== MODULE: HANDBOOK MODULE (handbook) =====
+Opening the handbook…
+The handbook could not be loaded.
+Open the PDF in a new tab
+Escape
+Fit to Page
+Fit to Width
+Fit Page
+Fit Width
+Custom
+Fit options
+Reading
+Zoom out
+Zoom in
+Exit full screen
+Enter full screen
+Full screen
+Download PDF
+Download
+Basic Education Student Handbook 2026-2027
+KCC Student Handbook | Kabankalan Catholic College, Inc.
+View the Kabankalan Catholic College, Inc. student handbook for policies, guidelines, and basic education information.
+KCC Student Handbook
+View student policies, guidelines, and basic education handbook information for Kabankalan Catholic College, Inc.
+
+===== MODULE: CAMPUS LIFE MODULE (campus-life) =====
+Campus Life | Kabankalan Catholic College, Inc.
+Explore campus life, events, activities, and student experiences at Kabankalan Catholic College, Inc.
+
+===== MODULE: NEWS LIST MODULE (news) =====
+KCC Facebook Page
+News & Updates
+Stay informed with the latest announcements, events, and happenings at Kabankalan Catholic College.
+Loading the latest news…
+News and Updates | Kabankalan Catholic College, Inc.
+Read the latest news, announcements, and institutional updates from Kabankalan Catholic College, Inc.
+Featured Stories
+Featured
+Read more
+Latest Updates
+Stay Connected
+Follow Us on Facebook
+Stay connected with the KCC community! Follow our official Facebook page for real-time updates, photos, event coverage, and announcements.
+Kabankalan Catholic College (Official)
+The KCC Chroniclet
+KCC High School Department
+Supreme Student Affairs Organization
+KCC Scholarship Program
+KCC Counseling and Testing Office
+KCC Christian Formation
+KCC College Department
+KCC Criminology
+KCC College of Education, Arts and Sciences
+KCC College of Management, Accountancy and Technology
+KCC College Department: Supreme Student Affairs Organization
+KCC Community Extension Services
+KCC CWTS 2025-2026
+
+===== MODULE: NEWS DETAIL MODULE (news/:slug) =====
+Kabankalan Catholic College, Inc.
+Loading article…
+The news article you are looking for could not be found.
+404 — Not Found
+Article Not Found
+The article you are looking for may have been moved or no longer exists.
+Back to News
+Home
+News & Updates
+
+===== MODULE: PROGRAMS MODULE (programs) =====
+College Programs
+Our college programs combine strong academics with Catholic values to prepare graduates for professional life.
+Programs
+College Programs | Kabankalan Catholic College, Inc.
+Explore the college degree programs of Kabankalan Catholic College, Inc. designed to form competent, service-oriented, and values-driven graduates.
+Basic Education (Elementary & JHS)
+Senior High School
+Majors / Specializations
+Career Opportunities
+Ready to Start Your College Journey?
+Take the first step toward your future. Contact our admissions office for enrollment details.
+Apply Now
+
+===== MODULE: GLOBAL INDEX BUNDLE (home, nav, footer, shared sections) =====
+LINK
+Promise
+POST
+NullError
+No error has been set
+Home
+About
+Academics
+College Programs
+Degree programs & courses
+Senior High School
+Academic & TVL tracks
+Basic Education
+Elementary & Junior High
+News
+Admissions
+Campus Life
+Contact
+Kabankalan Catholic College, Inc. Logo
+Kabankalan Catholic College, Inc.
+Catholic Education: Our Identity, Our Mission
+Enroll Now
+Toggle menu
+KCC Logo
+Kabankalan Catholic College
+A Catholic school in Kabankalan City forming students who are grounded in faith, strong in academics, and ready to serve.
+Guanzon St., Brgy. 1, Kabankalan City, Negros Occidental
+8:00 AM – 12:NN and 1:00 – 5:00 PM
+Quick Links
+About KCC
+News & Updates
+Handbook
+Our Mission
+KCC commits to provide quality and inclusive Catholic education, rooted in the Gospel and driven by innovative research and meaningful community engagements, empowering its members to become effective agents of societal transformation.
+Follow us on Facebook
+Kabankalan Catholic College, Inc. All rights reserved.
+"Teach Ye All Nations" — Mt 28:19
+Est. 1927 — Kabankalan City, Negros Occidental
+"Teach Ye All Nations" — Matthew 28:19
+A Christ-centered learning community committed to academic excellence, faith formation, and service since 1927.
+Apply for Admission
+Explore Programs
+Scroll
+Academic Excellence
+Rigorous academics that challenge students to think critically and develop a genuine love for learning.
+Faith Formation
+Deepening faith through Catholic tradition, prayer, and a personal relationship with God.
+Community Service
+Reaching out to those in need, putting the Gospel into practice through hands-on service.
+Holistic Development
+Shaping students who are not only skilled and knowledgeable but also grounded in strong values.
+About Us
+A Legacy of Faith
+Founded in 1927, Kabankalan Catholic College has served as the home of Catholic education in Kabankalan City, Negros Occidental. For close to a century, KCC has shaped graduates who carry with them strong academics, solid values, and a heart for service.
+Year Founded
+Programs Offered
+Years of Excellence
+What We Stand For
+The Four Pillars
+Academic Programs
+From business and IT to education and criminology, KCC prepares students for the careers they want to pursue.
+Explore All Levels
+Education for Every Stage
+Tertiary
+Degree programs in Business, IT, Accountancy, Education, and Criminology.
+Grades 11-12
+Academic Track (STEM, ABM, HUMSS, GAS) and TVL Track strands.
+View SHS Tracks
+K to Grade 10
+Elementary and Junior High School departments with strong Catholic foundations.
+Learn More
+Academic Events
+CMAT Pinning 2025
+The Rite of Pinning for the College of Management, Accountancy, and Technology marks a significant milestone in our students' academic journey. This ceremony honors their dedication, perseverance, and readiness to embrace their roles as future professionals and leaders.
+CMAT Pinning 2025 photo 1
+CMAT Pinning 2025 photo 2
+CMAT Pinning 2025 photo 3
+CMAT Pinning 2025 photo 4
+CMAT Pinning 2025 photo 5
+CMAT Pinning 2025 photo 6
+CMAT Pinning 2025 photo 7
+CMAT Pinning 2025 photo 8
+CMAT Pinning 2025 photo 9
+CMAT Pinning 2025 photo 10
+CMAT Pinning 2025 photo 11
+Criminology Reception Rites
+Built through discipline, courage, and brotherhood.
+KCC Criminology Class Makisig undergoes their Reception Rites — a test of strength, resilience, and commitment to the path of future public servants.
+Criminology Reception Rites photo 1
+Criminology Reception Rites photo 2
+Criminology Reception Rites photo 3
+Criminology Reception Rites photo 4
+Criminology Reception Rites photo 5
+Criminology Reception Rites photo 6
+Criminology Reception Rites photo 7
+Criminology Reception Rites photo 8
+Criminology Reception Rites photo 9
+Criminology Reception Rites photo 10
+Criminology Reception Rites photo 11
+Criminology Reception Rites photo 12
+Criminology Reception Rites photo 13
+Criminology Reception Rites photo 14
+Criminology Reception Rites photo 15
+Board Exam Topnotcher
+Kabankalan Catholic College, Inc. (KCC) celebrates another academic milestone after alumna Kristel Clair T. Paltu-ob, LPT secures a spot among the top examinees in the March 2026 Licensure Examination for Professional Teachers (LEPT).
+Paltu-ob ranked eighth nationwide after earning a 93.20% rating in the board examination, bringing pride and recognition to the KCC community. Her achievement highlights years of dedication and commitment to the teaching profession, further reflecting the institution’s pursuit of academic excellence.
+The college commends Paltu-ob for her perseverance and hard work, describing her accomplishment as both a personal success and a significant achievement for the school. KCC also expresses confidence that she will continue to make meaningful contributions in the field of education as she begins her professional journey as a licensed educator.
+Her success now serves as an inspiration to aspiring teachers and students, showing that determination and discipline can lead to remarkable achievements on the national stage.
+The KCC community extends its congratulations to Paltu-ob for bringing honor to the institution through her outstanding performance in the March 2026 LEPT.
+Board Exam Topnotcher photo 1
+Community And Outreach Programs
+Blood Donation Activity In Connection With The 129th Philippines Army Founding Anniversary
+Blood Donation Activity In Connection With The 129th Philippines Army Founding Anniversary photo 1
+Blood Donation Activity In Connection With The 129th Philippines Army Founding Anniversary photo 2
+Blood Donation Activity In Connection With The 129th Philippines Army Founding Anniversary photo 3
+Dinalagan 2025
+The Kabankalan Catholic College KCC Counseling and Testing Office successfully spearheaded DINALAGAN 2025: A Run for Mental Health Awareness, held on October 11, 2025.
+This meaningful event aimed to promote mental health awareness and overall well-being within the community. With every step, participants ran not just for fitness, but for a cause — to remind everyone that mental health truly matters
+Dinalagan 2025 photo 1
+Dinalagan 2025 photo 2
+Dinalagan 2025 photo 3
+Dinalagan 2025 photo 4
+Dinalagan 2025 photo 5
+Dinalagan 2025 photo 6
+Dinalagan 2025 photo 7
+Cultural And Arts
+Elementary United Nations Day
+Our little KCCians proudly showcased cultures from around the world during the KCC United Nations Day!
+Elementary United Nations Day photo 1
+Elementary United Nations Day photo 2
+Elementary United Nations Day photo 3
+Elementary United Nations Day photo 4
+Elementary United Nations Day photo 5
+Elementary United Nations Day photo 6
+Elementary United Nations Day photo 7
+Elementary United Nations Day photo 8
+Elementary United Nations Day photo 9
+Elementary United Nations Day photo 10
+Elementary United Nations Day photo 11
+Elementary United Nations Day photo 12
+KADICOSCA Meet 2026
+KADICOSCA Meet 2026 photo 1
+KADICOSCA Meet 2026 photo 2
+KADICOSCA Meet 2026 photo 3
+KADICOSCA Meet 2026 photo 4
+Laragway 2025 Mr And Ms KCC
+The stage was on fire, the cheers were roaring, and the crown now belongs to two outstanding KCCians!
+Congratulations, Trixie Figueroa of STEM and Angelo Gabriel Cabañero of Junior High School, the newly crowned LARAGWAY 2025 Mr. & Miss KCC.
+Laragway 2025 Mr And Ms KCC photo 1
+Laragway 2025 Mr And Ms KCC photo 2
+Laragway 2025 Mr And Ms KCC photo 3
+Laragway 2025 Mr And Ms KCC photo 4
+Laragway 2025 Mr And Ms KCC photo 5
+Laragway 2025 Mr And Ms KCC photo 6
+Laragway 2025 Mr And Ms KCC photo 7
+Laragway 2025 Mr And Ms KCC photo 8
+Laragway 2025 Mr And Ms KCC photo 9
+Laragway 2025 Mr And Ms KCC photo 10
+Laragway 2025 Mr And Ms KCC photo 11
+Laragway 2025 Mr And Ms KCC photo 12
+Laragway 2025 Mr And Ms KCC photo 13
+Laragway 2025 Mr And Ms KCC photo 14
+Laragway 2025 Mr And Ms KCC photo 15
+Laragway 2025 Mr And Ms KCC photo 16
+Laragway 2025 Mr And Ms KCC photo 17
+Laragway 2025 Mr And Ms KCC photo 18
+Laragway 2025 Mr And Ms KCC photo 19
+Laragway 2025 Mr And Ms KCC photo 20
+Laragway 2025 Mr And Ms KCC photo 21
+Laragway 2025 Mr And Ms KCC photo 22
+Laragway 2025 Mr And Ms KCC photo 23
+Spiritual Activities
+Blessing Of The New CEAS Building
+Through God’s abundant grace, Kabankalan Catholic College, Inc. joyfully celebrates the Blessing of the New CEAS Building today, January 16, 2026. This two-storey academic facility, featuring an integrated swimming pool, marks a significant milestone in the institution’s journey. It stands as a testament to KCC’s commitment to academic excellence, holistic formation, and the continuous enhancement of learning environments that nurture both mind and character.
+The new CEAS Building reflects the shared vision, dedication, and generous support of the administration, faculty, staff, benefactors, and partners, as KCC continues to provide quality, values-driven education in service of the community and for the greater glory of God.
+The blessing ceremony was presided over by Most Rev. Louie P. Galbines, SThD, DD, together with the KCC administrators and faculty.
+Blessing Of The New CEAS Building photo 1
+Blessing Of The New CEAS Building photo 2
+Blessing Of The New CEAS Building photo 3
+Blessing Of The New CEAS Building photo 4
+Blessing Of The New CEAS Building photo 5
+Blessing Of The New CEAS Building photo 6
+Blessing Of The New CEAS Building photo 7
+Blessing Of The New CMAT Building
+This morning, Kabankalan Catholic College joyfully celebrated the blessing of its new building for the College of Management, Accountancy, and Technology (CMAT).
+The rite of blessing marks not only the dedication of a new facility but also a renewed commitment to excellence in education and service. With gratitude and faith, we entrust this building to the Lord’s guidance, that it may become a home of learning, growth, and opportunities for generations of KCCians.
+All Hail, KCC!
+To God be the glory!
+Blessing Of The New CMAT Building photo 1
+Blessing Of The New CMAT Building photo 2
+Blessing Of The New CMAT Building photo 3
+Blessing Of The New CMAT Building photo 4
+Blessing Of The New CMAT Building photo 5
+Blessing Of The New CMAT Building photo 6
+Blessing Of The New CMAT Building photo 7
+Blessing Of The New CMAT Building photo 8
+Blessing Of The New CMAT Building photo 9
+Blessing Of The New CMAT Building photo 10
+Holy Mass 11th Educators Congress
+A blessed opening for the 11th Educators Congress with a Holy Mass led by Rev. Fr. Emmanuel G. Magno, PhL, together with the parochial schools of the Diocese of Kabankalan.
+Holy Mass 11th Educators Congress photo 1
+Holy Mass 11th Educators Congress photo 2
+Holy Mass 11th Educators Congress photo 3
+Holy Mass 11th Educators Congress photo 4
+Holy Mass 11th Educators Congress photo 5
+Holy Mass 11th Educators Congress photo 6
+Holy Spirit Mass
+The Kabankalan Catholic College community came together in faith and thanksgiving for the Holy Spirit Mass with the theme: “Come Holy Spirit, Lead Us, Pilgrims of Hope.”
+Held at the St. Columban Arts Center, the celebration marked a meaningful start of the academic year as we entrust our journey to the guidance of the Holy Spirit. The event also included the introduction of the faculty, staff, and personnel of the institution.
+May the Spirit continue to strengthen us in knowledge, character, and competence.
+Holy Spirit Mass photo 1
+Holy Spirit Mass photo 2
+Holy Spirit Mass photo 3
+Holy Spirit Mass photo 4
+Holy Spirit Mass photo 5
+Holy Spirit Mass photo 6
+Holy Spirit Mass photo 7
+Holy Spirit Mass photo 8
+Holy Spirit Mass photo 9
+Holy Spirit Mass photo 10
+Holy Spirit Mass photo 11
+Nativity Of Mama Mary
+KCC celebrates with deep gratitude the Nativity of Mama Mary! The morning Mass, led by Rev. Fr. Freddie Delatado, brought together the Elementary and High School departments in prayer. In the afternoon, the College Department united in worship during the Mass celebrated by our School President, Rev. Fr. Richard Lachica. May the birth of our Blessed Mother inspire us to live with faith, humility, and love.
+Nativity Of Mama Mary photo 1
+Nativity Of Mama Mary photo 2
+Nativity Of Mama Mary photo 3
+Nativity Of Mama Mary photo 4
+Nativity Of Mama Mary photo 5
+Nativity Of Mama Mary photo 6
+Nativity Of Mama Mary photo 7
+Nativity Of Mama Mary photo 8
+Nativity Of Mama Mary photo 9
+Nativity Of Mama Mary photo 10
+Nativity Of Mama Mary photo 11
+Sports And Athletics
+District Sports Meet 2025
+Photos captured during the Opening Program of the District Sports Meet 2025 at the St. Columban Arts Center, Kabankalan Catholic College, Inc.
+District Sports Meet 2025 photo 1
+District Sports Meet 2025 photo 2
+District Sports Meet 2025 photo 3
+District Sports Meet 2025 photo 4
+District Sports Meet 2025 photo 5
+District Sports Meet 2025 photo 6
+District Sports Meet 2025 photo 7
+District Sports Meet 2025 photo 8
+District Sports Meet 2025 photo 9
+KADICOSCA 2026 Knights
+Charging forward — KCC Knights stand strong for District 2 at the City Sports Meet 2025! Happening this December 10–13.
+KADICOSCA 2026 Knights photo 1
+KADICOSCA 2026 Knights photo 2
+KADICOSCA 2026 Knights photo 3
+KADICOSCA 2026 Knights photo 4
+KADICOSCA 2026 Knights photo 5
+KADICOSCA 2026 Knights photo 6
+KADICOSCA 2026 Knights photo 7
+KADICOSCA 2026 Knights photo 8
+KADICOSCA Updates
+The KCC Men's Basketball team reclaimed championship title after dethroning defending champions, the BCC Stewards, in a nail-biting 75-69 victory held this morning, April 23, at the CCC covered court.
+From the opening quarter to halftime, BCC Stewards displayed strong effort to keep their opponet at bay, controlling the tempo of the game with scores 25-13 and 38-32, respectively .
+By third quarter, Knights mounted a strong comeback. Their relentless effort to regain the momentum secured them a seven-points advantage, 57-50.
+In the final decisive quarter, both team traded baskets, but knights held their composure and sealed the game, 75-69.
+This feat marks the Knights unwavering determination and fervent desire to bring the title back to their alma mater.
+Congratulations, KCC Knights!
+KADICOSCA Updates photo 1
+KADICOSCA Updates photo 2
+KADICOSCA Updates photo 3
+KADICOSCA Updates photo 4
+Escape
+ArrowRight
+ArrowLeft
+Close gallery
+Previous image
+Next image
+Image unavailable
+See more...
+Album
+Albums
+Campus life at KCC goes beyond the classroom — friendships are made, faith is strengthened, and memories are built.
+Life at KCC
+Latest Updates
+News & Announcements
+What's new at KCC — announcements, events, and stories from our community.
+Read more
+View All News & Updates
+Kabankalan Catholic College, Inc. | Catholic Education: Our Identity, Our Mission
+Kabankalan Catholic College, Inc. is a Christ-centered Catholic educational institution in Kabankalan City, Negros Occidental, offering basic education, senior high school, and college programs.
+Something went wrong. Please refresh the page.

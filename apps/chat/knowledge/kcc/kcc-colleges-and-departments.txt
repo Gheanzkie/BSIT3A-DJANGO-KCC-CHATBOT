@@ -1,0 +1,7 @@
+KCC Colleges, Departments, Courses and Programs (Kurso at Programa)
+Ang KCC College Department ay may tatlong college/department:
+1. College of Management, Accountancy and Technology (CMAT) - business, IT, accountancy, tourism.
+2. College of Education, Arts and Sciences (CEAS) - education, arts, sciences, psychology.
+3. College of Criminology - criminology.
+Lahat ng 13 college courses/kurso/programs ng KCC: BSBA, BSIT, BSA, BSAIS, BSMA, BSTM (CMAT); BEEd, BSEd, BECEd, BPEd, AB Philosophy, BS Psychology (CEAS); BS Criminology (Criminology).
+Basic Education departments: Elementary Department (K-6), Junior High School (7-10), Senior High School (11-12, Academic at TVL tracks).

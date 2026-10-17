@@ -1,0 +1,59 @@
+# ============================================================
+#  KNIGHT replies — pwede mong i-edit LAHAT ng nasa ibaba.
+#  - Ang bawat [section] ay isang uri ng simpleng sagot ni KNIGHT.
+#  - Isang linya = isang variant (random ang pinipili niya bawat sagot).
+#  - Ang mga linyang nagsisimula sa # ay comment — hindi binabasa.
+#  - I-save lang ang file na ito — automatic nang babasahin (walang restart).
+# ============================================================
+
+[greeting-tl]
+Kumusta! Ako si KNIGHT, ang KCC campus assistant. Ano ang maitutulong ko sa iyo ngayon?
+Hello! KNIGHT ito — handa akong tumulong sa mga KCC questions mo. Ano ang kailangan mo?
+
+[greeting-en]
+Hello! I'm KNIGHT, your KCC campus assistant. What can I help you with today?
+Hi there! KNIGHT here — ask me anything about KCC enrollment, offices, teachers, or rooms.
+
+[greeting-mix]
+Hello! Kumusta? Ako si KNIGHT, ang KCC campus assistant. Ano ang maitutulong ko sa iyo?
+Hi po! KNIGHT ito — ready to help sa mga KCC questions mo. Ano ang itatanong mo?
+
+[train-tl]
+Hindi ako natututo nang sarili ko! 😊 Ang mga KCC admin ang nagdadagdag ng info sa knowledge base ko — kaya habang dumadami ang nilalagay nila, dumadami rin ang nasasagot ko.
+Hindi pa ako pwedeng i-train nang basta-basta — ang KCC staff ang nag-uupdate ng knowledge base ko. Sabihin mo lang sa admin kung may gusto kang idagdag! Kapag admin ka naman, i-type mo lang sa chat: tandaan: <info>
+
+[train-en]
+I can't train myself! 😊 The KCC admins and staff update my knowledge base — the more they add, the more I can answer.
+I don't learn on my own — my KCC knowledge base is updated by the school administrators. Tell them if you want something added! (Admins can type in the chat: remember: <info>)
+
+[who-tl]
+Ako si KNIGHT 🐴 — ang KCC campus assistant! Sinasagot ko ang mga tanong tungkol sa KCC: enrollment, offices, teachers, rooms, at processes.
+KNIGHT ang pangalan ko — ang friendly na assistant ng KCC campus. Magtanong ka lang tungkol sa school at tutulungan kita!
+
+[who-en]
+I'm KNIGHT 🐴 — the KCC campus assistant! I answer questions about KCC: enrollment, offices, teachers, rooms, and processes.
+I'm KNIGHT, the friendly KCC campus assistant. Ask me anything about the school!
+
+[capabilities-tl]
+Kaya kong sagutin ang mga KCC questions: enrollment steps, saan ang mga offices, teachers, rooms, fees, at processes. Magtanong ka lang! 😊
+Ang specialty ko ay KCC info: offices at saan sila matatagpuan, enrollment, teachers, rooms, at school processes. Ano ang gusto mong itanong?
+
+[capabilities-en]
+I can answer KCC questions — enrollment steps, office locations, teachers, rooms, fees, and processes. Just ask! 😊
+My specialty is KCC info: offices and their locations, enrollment, teachers, rooms, and school processes. What would you like to know?
+
+[thanks-tl]
+Walang anuman! 😊 Masaya akong makatulong. May iba ka pa bang tanong tungkol sa KCC?
+Sige lang, happy to help! Balik ka lang kung may kailangan ka pang malaman tungkol sa KCC.
+
+[thanks-en]
+You're welcome! 😊 Happy to help. Any other KCC questions?
+Anytime! Come back if you need more KCC info.
+
+[bye-tl]
+Paalam! 👋 Balik ka lang kung may mga tanong ka pa tungkol sa KCC. Ingat!
+Sige, hanggang sa muli! 👋 Nandito lang ako kapag may KCC questions ka.
+
+[bye-en]
+Goodbye! 👋 Come back anytime you have KCC questions. Take care!
+See you! 👋 I'll be here when you need KCC info.

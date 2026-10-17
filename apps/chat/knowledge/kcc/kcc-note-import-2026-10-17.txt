@@ -1,0 +1,5 @@
+KCC Knowledge Import - Maintenance Note (Oct 17, 2026)
+All files under the "kcc" folder were imported from the official KCC website (kcc.edu.ph): Home, About, Programs, Basic Education, Senior High, Admissions, Campus Life, News, Contact, and Handbook pages.
+Facts came from the public site pages and content data (news articles, program records). Full raw dump: knowledge/_kcc-full-site-dump-20261017.txt (ignored by loader, underscore prefix).
+When the school publishes changes (new president, programs, contacts, news), edit or add files in the kcc folder - picked up automatically on the next question. Source of truth: kcc.edu.ph.
+Oct 17, 2026 updates: Master lists (courses, SHS strands, history, news, campus life), colleges/departments file, FAQ (tuition, teachers, scholarships). Natural/descriptive phrasing; data lang sa knowledge folder.
