@@ -1,0 +1,7 @@
+KCC Student Handbook Appendix D: AI Guidelines for Faculty Members
+Faculty members are expected to:
+- Familiarize themselves with the functionality of AI tools, including their strengths and weaknesses, to enhance their efficacy in facilitating student learning.
+- Evaluate the work of students who declare no use of AI tools as the grading baseline.
+- Adjust the grading baseline for students who disclose the use of AI tools, based on the extent of usage, while also valuing creativity, critical analysis, and the refinement of inaccuracies or superficial interpretations prompted by AI tool suggestions.
+- Utilize AI detection tools to assess the probable utilization of AI tools.
+- Impose penalties for passive or unreflective incorporation of AI-generated material and assign zero points for mere reproduction of AI-generated output.

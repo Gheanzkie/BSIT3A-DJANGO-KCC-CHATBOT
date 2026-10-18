@@ -1,0 +1,6 @@
+KCC Student Handbook Appendix D: AI Guidelines — Documentation Requirement for Students
+Students must include an appendix when incorporating AI tools in assignments, detailing:
+a) the entire interaction, highlighting relevant sections;
+b) a description of the specific AI tools used (e.g., ChatGPT private subscription version or DALL-E free version);
+c) an explanation of how the AI tools were applied (e.g., generating ideas, phrasing, text components, argumentation, evidence, conceptual maps, key concept illustrations, etc.);
+d) rationale for employing AI tools (e.g., time-saving, overcoming writer's block, stimulating thought, managing stress, improving clarity, translation, experimentation, etc.).

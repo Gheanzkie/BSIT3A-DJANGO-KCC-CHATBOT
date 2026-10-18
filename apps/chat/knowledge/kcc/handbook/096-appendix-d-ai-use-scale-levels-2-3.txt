@@ -1,0 +1,4 @@
+KCC Student Handbook Appendix D: Generative AI Acceptable Use Scale — Levels 2 and 3
+Level 2 — AI-Assisted Editing: No new content can be created using AI. AI can be used to make improvements to the clarity or quality of student-created work to improve the final output. An AI disclosure statement must be included disclosing how AI was used. Link(s) to AI chat(s) must be submitted with the final submission.
+
+Level 3 — AI for Specified Task Completion: AI is used to complete certain elements of the task as specified by the teacher. This level requires critical engagement with AI-generated content and evaluating its output. You are responsible for providing human oversight and evaluation of all AI-generated content. All AI-created content must be cited using appropriate formatting and citation style. Link(s) to AI chat(s) must be submitted with the final submission.

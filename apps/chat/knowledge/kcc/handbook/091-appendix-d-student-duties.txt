@@ -1,0 +1,8 @@
+KCC Student Handbook Appendix D: AI Guidelines for Students — Duties
+Students shall use AI tools wisely and intelligently, with the goal of deepening critical understanding of subject matter and to support learning. Students should understand the design intent, inner workings, data inputs, and restrictions of particular AI tools, while being mindful of ethical considerations and mitigating human risks and harmful consequences related to the use of such tools.
+
+Students are required to:
+- Attribute credit to AI tools whenever utilized, even if solely for generating ideas rather than producing usable text or illustrations.
+- Refrain from using AI tools during in-class examinations or assignments unless explicitly permitted and instructed.
+- Prior to submission, utilize AI detection tools and originality checks to ensure their work is not inadvertently flagged.
+- Employ AI tools judiciously to deepen comprehension of subject matter and bolster learning.
