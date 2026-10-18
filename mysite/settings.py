@@ -60,7 +60,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'True').strip().lower() in ('1', 'true', 
 
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,bolster-algorithm-tinderbox.ngrok-free.dev',).split(',')
     if host.strip()
 ]
 
@@ -208,9 +208,18 @@ AI_KB_MIN_SCORE = float(os.environ.get('AI_KB_MIN_SCORE', '0.6'))
 AI_MAX_HISTORY = int(os.environ.get('AI_MAX_HISTORY', '6'))
 AI_HTTP_TIMEOUT = int(os.environ.get('AI_HTTP_TIMEOUT', '60'))
 
-# Reply generation — mas mababang hidden reasoning = mas mabilis + tipid sa token quota.
+# Reply generation — token-frugal defaults + per-engine effort + escalation retry.
+# Default effort 'low' = tipid (gpt-oss still reasons, konti lang ang hidden
+# tokens; sagot ay naka-ground sa KB context + prompt). Itaas sa 'medium'/'high'
+# via env kung kailangan ng mas matalinong sagot sa isang engine.
 AI_MAX_OUTPUT_TOKENS = int(os.environ.get('AI_MAX_OUTPUT_TOKENS', '2048'))
 AI_REASONING_EFFORT = os.environ.get('AI_REASONING_EFFORT', 'low').strip()
+# Per-engine overrides: '' = inherit global; 'none'/'off' = huwag ipadala ang param.
+AI_REASONING_EFFORT_PRIMARY = os.environ.get('AI_REASONING_EFFORT_PRIMARY', '').strip()
+AI_REASONING_EFFORT_FALLBACK = os.environ.get('AI_REASONING_EFFORT_FALLBACK', '').strip()
+# Kapag naubos ng hidden reasoning ang output budget (empty reply, finish_reason
+# 'length'), i-retry isang beses ang parehong engine gamit ang mas malaking budget.
+AI_REASONING_ESCALATION_TOKENS = int(os.environ.get('AI_REASONING_ESCALATION_TOKENS', '4096'))
 
 # Provider retry/backoff para sa transient errors (timeout, 429, 5xx).
 AI_RETRY_ATTEMPTS = int(os.environ.get('AI_RETRY_ATTEMPTS', '2'))
@@ -225,3 +234,7 @@ CHAT_MAX_PER_MINUTE = int(os.environ.get('CHAT_MAX_PER_MINUTE', '20'))
 # Kapag True, ang mga web-search snippet ay ise-save sa knowledge base (UNVERIFIED).
 # Default False — staff-reviewed o typed facts lang ang dapat na ma-trust.
 AI_WEB_SAVE_FACTS = os.environ.get('AI_WEB_SAVE_FACTS', 'False').strip().lower() in ('1', 'true', 'yes', 'on')
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://bolster-algorithm-tinderbox.ngrok-free.dev",
+]

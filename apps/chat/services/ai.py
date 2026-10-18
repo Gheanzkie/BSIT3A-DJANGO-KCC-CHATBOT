@@ -16,6 +16,13 @@ Default slots:
   Fallback  (KNIGHT v1.2): AI_FALLBACK_BASE_URL + AI_CHAT_MODEL_GEMINI + GEMINI_API_KEY
   Embeddings             : Google Gemini (AI_EMBED_MODEL = gemini-embedding-001)
 
+Reasoning (upgrade): AI_REASONING_EFFORT ang global default; may per-engine
+overrides (AI_REASONING_EFFORT_PRIMARY / _FALLBACK — 'none' = huwag ipadala ang
+param). Ang utility calls (prompt fix, auto-learn) ay 'low' pa rin para tipid sa
+quota. Kapag naubos ng hidden reasoning ang output budget (empty reply,
+finish_reason 'length'), isang escalation retry (AI_REASONING_ESCALATION_TOKENS)
+bago sumuko sa provider.
+
 Kung walang embedding key (o pumalya ang embeddings), keyword search pa rin
 ang gagamitin — tuloy pa rin ang sagot.
 """
@@ -291,6 +298,7 @@ _KNIGHT_SYSTEM_TEMPLATE = """You are KNIGHT, the assistant of KCC (Kabankalan Ca
 
 RULES:
 - Answer the user's question USING ONLY the KNOWLEDGE BASE CONTEXT below.
+- THINK carefully before answering: identify exactly what the user is asking, find the supporting facts in the context, and double-check that EVERY claim in your answer is supported — if part of the question is not covered, say so instead of guessing.
 - If the answer is not in the context, say you could not find information and recommend visiting the right office. NEVER INVENT information.
 - {language_rule} Keep simple answers short (2-5 sentences), but when the user asks for a full list, complete lyrics, or full text, give ALL of it completely — never truncate.
 - Be FRIENDLY and warm in tone — like a helpful kuya/ate of KCC. You may use emoji when fitting.
@@ -406,10 +414,28 @@ def embed_text(text):
 # Chat engines
 # ---------------------------------------------------------------------------
 
-def _chat_openai(base_url, api_key, model, system_prompt, history, user_message, usage_key='groq', user=None):
+def _normalize_effort(value):
+    """Reasoning effort -> clean string. '' = huwag ipadala ang param ('none'/'off'/'-')."""
+    v = (value or '').strip()
+    return '' if v.lower() in ('', 'none', 'off', '-') else v
+
+
+def _slot_reasoning_effort(slot):
+    """Per-engine reasoning effort: AI_REASONING_EFFORT_<SLOT> kung naka-set, kundi ang global."""
+    specific = getattr(settings, f'AI_REASONING_EFFORT_{slot.upper()}', '')
+    if (specific or '').strip():
+        return _normalize_effort(specific)
+    return _normalize_effort(getattr(settings, 'AI_REASONING_EFFORT', ''))
+
+
+def _chat_openai(base_url, api_key, model, system_prompt, history, user_message, usage_key='groq', user=None, effort=None):
     """One OpenAI-compatible chat call.
 
     POST {base_url}/chat/completions with Bearer auth (Groq + Gemini).
+    effort=None -> gamitin ang settings default; '' = huwag ipadala ang reasoning_effort.
+    Kapag naubos ng hidden reasoning ang output budget (empty content, finish_reason
+    'length'), i-retry isang beses ang parehong provider gamit ang
+    AI_REASONING_ESCALATION_TOKENS na budget bago sumuko.
     """
     if not api_key:
         raise AIConfigError(f'API key for "{model}" is not set.')
@@ -418,69 +444,90 @@ def _chat_openai(base_url, api_key, model, system_prompt, history, user_message,
     messages.extend(history)
     messages.append({'role': 'user', 'content': user_message})
 
-    body = {
-        'model': model,
-        'messages': messages,
-        'temperature': 0.2,
-        'max_tokens': int(getattr(settings, 'AI_MAX_OUTPUT_TOKENS', 2048)),  # may reasoning models (gpt-oss) — bigyan ng headroom
-    }
-    effort = (getattr(settings, 'AI_REASONING_EFFORT', 'low') or '').strip()
-    if effort:
-        # Bawasan ang hidden reasoning tokens (gpt-oss/Gemini) — mas mabilis + tipid sa quota.
-        body['reasoning_effort'] = effort
-    t0 = time.monotonic()
-    try:
-        resp = _post_retry(
-            f'{base_url.rstrip("/")}/chat/completions',
-            headers={'Authorization': f'Bearer {api_key}'},
-            payload=body,
-        )
-        data = resp.json()
-    except requests.RequestException as exc:
-        raise AIUnavailable(f'Chat request failed ({model}): {exc}') from exc
-    except ValueError as exc:
-        raise AIUnavailable(f'Invalid JSON response from {model}') from exc
+    if effort is None:
+        effort = _normalize_effort(getattr(settings, 'AI_REASONING_EFFORT', ''))
+    else:
+        effort = _normalize_effort(effort)
 
-    usage = data.get('usage') or {}
-    resp_headers = {k.lower(): v for k, v in resp.headers.items()}
-    rate_limit = None
-    if resp_headers.get('x-ratelimit-remaining-tokens'):
-        rate_limit = {
-            'remaining_tokens': resp_headers.get('x-ratelimit-remaining-tokens', ''),
-            'limit_tokens': resp_headers.get('x-ratelimit-limit-tokens', ''),
-            'reset': resp_headers.get('x-ratelimit-reset-tokens', ''),
+    base_tokens = int(getattr(settings, 'AI_MAX_OUTPUT_TOKENS', 2048))
+    escalation = int(getattr(settings, 'AI_REASONING_ESCALATION_TOKENS', 0) or 0)
+    budgets = [base_tokens]
+    if escalation > base_tokens:
+        # Isang bounded retry: bigyan ng mas malaking budget ang hidden reasoning
+        # bago sumuko sa provider na ito (finish_reason='length' + empty content).
+        budgets.append(escalation)
+
+    for attempt, max_tokens in enumerate(budgets):
+        body = {
+            'model': model,
+            'messages': messages,
+            'temperature': 0.2,
+            'max_tokens': max_tokens,
         }
-    _record_usage(
-        usage_key,
-        prompt_tokens=usage.get('prompt_tokens', 0),
-        completion_tokens=usage.get('completion_tokens', 0),
-        total_tokens=usage.get('total_tokens', 0),
-        rate_limit=rate_limit,
-        latency_ms=(time.monotonic() - t0) * 1000,
-        user=user,
-    )
+        if effort:
+            body['reasoning_effort'] = effort
+        t0 = time.monotonic()
+        try:
+            resp = _post_retry(
+                f'{base_url.rstrip("/")}/chat/completions',
+                headers={'Authorization': f'Bearer {api_key}'},
+                payload=body,
+            )
+            data = resp.json()
+        except requests.RequestException as exc:
+            raise AIUnavailable(f'Chat request failed ({model}): {exc}') from exc
+        except ValueError as exc:
+            raise AIUnavailable(f'Invalid JSON response from {model}') from exc
 
-    try:
-        content = (data['choices'][0]['message'].get('content') or '').strip()
-    except (KeyError, IndexError, TypeError) as exc:
-        raise AIUnavailable(f'Unexpected response from {model}: {data}') from exc
-    if not content:
+        usage = data.get('usage') or {}
+        resp_headers = {k.lower(): v for k, v in resp.headers.items()}
+        rate_limit = None
+        if resp_headers.get('x-ratelimit-remaining-tokens'):
+            rate_limit = {
+                'remaining_tokens': resp_headers.get('x-ratelimit-remaining-tokens', ''),
+                'limit_tokens': resp_headers.get('x-ratelimit-limit-tokens', ''),
+                'reset': resp_headers.get('x-ratelimit-reset-tokens', ''),
+            }
+        _record_usage(
+            usage_key,
+            prompt_tokens=usage.get('prompt_tokens', 0),
+            completion_tokens=usage.get('completion_tokens', 0),
+            total_tokens=usage.get('total_tokens', 0),
+            rate_limit=rate_limit,
+            latency_ms=(time.monotonic() - t0) * 1000,
+            user=user,
+        )
+
+        try:
+            choice = data['choices'][0]
+            content = (choice['message'].get('content') or '').strip()
+        except (KeyError, IndexError, TypeError) as exc:
+            raise AIUnavailable(f'Unexpected response from {model}: {data}') from exc
+
+        if content:
+            return content
+
+        if choice.get('finish_reason') == 'length' and attempt + 1 < len(budgets):
+            logger.info('%s hit its output cap on hidden reasoning; retrying with max_tokens=%d.',
+                        model, budgets[attempt + 1])
+            continue
         raise AIUnavailable(f'{model} returned an empty answer (reasoning-only response).')
-    return content
 
 
-def _chat_slot(slot, system_prompt, history, user_message, user=None):
+def _chat_slot(slot, system_prompt, history, user_message, user=None, effort=None):
+    if effort is None:
+        effort = _slot_reasoning_effort(slot)
     if slot == 'primary':
         return (
             _chat_openai(settings.AI_PRIMARY_BASE_URL, settings.GROQ_API_KEY,
                          settings.AI_CHAT_MODEL_GROQ, system_prompt, history, user_message,
-                         usage_key='groq', user=user),
+                         usage_key='groq', user=user, effort=effort),
             settings.AI_PRIMARY_NAME,
         )
     return (
         _chat_openai(settings.AI_FALLBACK_BASE_URL, settings.GEMINI_API_KEY,
                      settings.AI_CHAT_MODEL_GEMINI, system_prompt, history, user_message,
-                     usage_key='gemini', user=user),
+                     usage_key='gemini', user=user, effort=effort),
         settings.AI_FALLBACK_NAME,
     )
 
@@ -497,7 +544,8 @@ def correct_prompt(message, engine='auto', user=None):
     if not original or len(original) > 500:
         return original
     try:
-        fixed, _engine = chat(_PROMPT_FIX_SYSTEM, [], original, engine=engine, user=user)
+        # Utility call: typo-fix lang — low effort, hindi ito reasoning task (tipid sa quota).
+        fixed, _engine = chat(_PROMPT_FIX_SYSTEM, [], original, engine=engine, user=user, effort='low')
     except AIUnavailable:
         return original
     fixed = (fixed or '').strip().strip('"').strip("'")
@@ -506,12 +554,16 @@ def correct_prompt(message, engine='auto', user=None):
     return fixed
 
 
-def chat(system_prompt, history, user_message, engine='auto', user=None):
-    """Try engines in preference order ('auto' | 'primary' | 'fallback'). Returns (answer, engine_name)."""
+def chat(system_prompt, history, user_message, engine='auto', user=None, effort=None):
+    """Try engines in preference order ('auto' | 'primary' | 'fallback'). Returns (answer, engine_name).
+
+    effort: None = per-engine settings (AI_REASONING_EFFORT[_PRIMARY/_FALLBACK]);
+    explicit 'low'/'medium'/'high' = override (hal. utility calls).
+    """
     errors = []
     for slot in _ENGINE_ORDER.get(engine, _ENGINE_ORDER['auto']):
         try:
-            return _chat_slot(slot, system_prompt, history, user_message, user=user)
+            return _chat_slot(slot, system_prompt, history, user_message, user=user, effort=effort)
         except (AIConfigError, AIUnavailable) as exc:
             errors.append(f'{slot}: {exc}')
             logger.info('Engine %s failed (%s), trying next', slot, exc)
@@ -829,7 +881,8 @@ def auto_learn(message, engine='primary'):
     if len(message) < 10:
         return []
     try:
-        raw, _ = chat(_AUTO_LEARN_PROMPT, [], message, engine=engine)
+        # Utility call: JSON fact extraction — low effort (tipid sa quota).
+        raw, _ = chat(_AUTO_LEARN_PROMPT, [], message, engine=engine, effort='low')
     except (AIConfigError, AIUnavailable) as exc:
         logger.info('Auto-learn skipped (%s)', exc)
         return []
@@ -862,6 +915,7 @@ _KNIGHT_WEB_TEMPLATE = """You are KNIGHT, the campus assistant of KCC (Kabankala
 Your knowledge base had NO info for this question, so local WEB RESEARCH RESULTS are provided below.
 RULES:
 - Answer the user's question USING ONLY the WEB RESEARCH RESULTS below.
+- THINK carefully: double-check every fact in your answer against the results below before responding.
 - Mention briefly that the info came from an online search and may need confirmation with the right KCC office.
 - NEVER INVENT information beyond the results.
 - {language_rule} Keep simple answers short (2-5 sentences), but when the user asks for a full list or full text, give ALL of it completely — never truncate.
@@ -876,6 +930,7 @@ Two sources are provided below: (1) the OFFICIAL KNOWLEDGE BASE CONTEXT of KCC, 
 
 RULES:
 - Answer the user's question by COMBINING both sources below.
+- THINK carefully first: identify exactly what is asked, then support every claim from the two sources (KB wins for campus facts) — if something is not covered by either source, say so instead of guessing.
 - KNOWLEDGE BASE CONTEXT is the OFFICIAL KCC info — it always wins for KCC campus matters. WEB RESULTS are only a supplement.
 - If both answer, base the reply on the knowledge base and add useful details from the web results (briefly note that part came from an online search).
 - If the answer is not in either source, say you could not find information and recommend visiting the right office. NEVER INVENT information.

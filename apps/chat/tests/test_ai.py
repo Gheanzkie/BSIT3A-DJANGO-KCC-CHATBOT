@@ -214,3 +214,110 @@ class AutoLearnNotedModeTests(SimpleTestCase):
             noted = ai.auto_learn('Ang dean office ng CMAT ay nasa 2nd floor ng old building.')
         self.assertEqual(noted, ['CMAT Dean Office'])
         self.assertFalse(remember_mock.called)
+
+
+class ReasoningUpgradeTests(SimpleTestCase):
+    """Per-engine reasoning effort + escalation retry (mocked, walang API calls)."""
+
+    @override_settings(AI_REASONING_EFFORT='medium', AI_REASONING_EFFORT_PRIMARY='high',
+                       AI_REASONING_EFFORT_FALLBACK='')
+    def test_slot_effort_resolution(self):
+        self.assertEqual(ai._slot_reasoning_effort('primary'), 'high')
+        self.assertEqual(ai._slot_reasoning_effort('fallback'), 'medium')
+
+    @override_settings(AI_REASONING_EFFORT='medium', AI_REASONING_EFFORT_PRIMARY='none')
+    def test_slot_effort_none_disables_param(self):
+        self.assertEqual(ai._slot_reasoning_effort('primary'), '')
+        self.assertEqual(ai._slot_reasoning_effort('fallback'), 'medium')
+
+    @override_settings(AI_MAX_OUTPUT_TOKENS=2048)
+    def test_effort_sent_in_payload(self):
+        captured = {}
+
+        def fake_post(url, **kwargs):
+            captured.update(kwargs['json'])
+            return FakeResponse(_chat_ok_payload('ok'))
+
+        with mock.patch.object(ai.requests, 'post', side_effect=fake_post), \
+                mock.patch.object(ai, '_record_usage'):
+            ai._chat_openai('http://x', 'key', 'm', 'sys', [], 'hi', effort='high')
+        self.assertEqual(captured['reasoning_effort'], 'high')
+        self.assertEqual(captured['max_tokens'], 2048)
+
+    @override_settings(AI_REASONING_EFFORT='none')
+    def test_effort_omitted_when_disabled(self):
+        captured = {}
+
+        def fake_post(url, **kwargs):
+            captured.update(kwargs['json'])
+            return FakeResponse(_chat_ok_payload('ok'))
+
+        with mock.patch.object(ai.requests, 'post', side_effect=fake_post), \
+                mock.patch.object(ai, '_record_usage'):
+            ai._chat_openai('http://x', 'key', 'm', 'sys', [], 'hi')
+        self.assertNotIn('reasoning_effort', captured)
+
+    @override_settings(AI_MAX_OUTPUT_TOKENS=2048, AI_REASONING_ESCALATION_TOKENS=4096)
+    def test_escalation_retry_when_reasoning_exhausts_budget(self):
+        calls = {'budgets': []}
+
+        def fake_post(url, **kwargs):
+            calls['budgets'].append(kwargs['json']['max_tokens'])
+            if len(calls['budgets']) == 1:
+                return FakeResponse({
+                    'choices': [{'message': {'content': ''}, 'finish_reason': 'length'}],
+                    'usage': {'total_tokens': 2048},
+                })
+            return FakeResponse(_chat_ok_payload('reasoned answer'))
+
+        with mock.patch.object(ai.requests, 'post', side_effect=fake_post), \
+                mock.patch.object(ai, '_record_usage'):
+            out = ai._chat_openai('http://x', 'key', 'm', 'sys', [], 'hi')
+        self.assertEqual(out, 'reasoned answer')
+        self.assertEqual(calls['budgets'], [2048, 4096])
+
+    @override_settings(AI_MAX_OUTPUT_TOKENS=2048, AI_REASONING_ESCALATION_TOKENS=0)
+    def test_no_escalation_when_disabled(self):
+        calls = {'n': 0}
+
+        def fake_post(url, **kwargs):
+            calls['n'] += 1
+            return FakeResponse({
+                'choices': [{'message': {'content': ''}, 'finish_reason': 'length'}],
+                'usage': {},
+            })
+
+        with mock.patch.object(ai.requests, 'post', side_effect=fake_post), \
+                mock.patch.object(ai, '_record_usage'):
+            with self.assertRaises(ai.AIUnavailable):
+                ai._chat_openai('http://x', 'key', 'm', 'sys', [], 'hi')
+        self.assertEqual(calls['n'], 1)
+
+    def test_empty_non_length_response_not_retried(self):
+        calls = {'n': 0}
+
+        def fake_post(url, **kwargs):
+            calls['n'] += 1
+            return FakeResponse({
+                'choices': [{'message': {'content': ''}, 'finish_reason': 'stop'}],
+                'usage': {},
+            })
+
+        with mock.patch.object(ai.requests, 'post', side_effect=fake_post), \
+                mock.patch.object(ai, '_record_usage'):
+            with self.assertRaises(ai.AIUnavailable):
+                ai._chat_openai('http://x', 'key', 'm', 'sys', [], 'hi')
+        self.assertEqual(calls['n'], 1)
+
+    def test_chat_passes_explicit_effort_to_slot(self):
+        slot_mock = mock.MagicMock(return_value=('ok', 'KNIGHT v1.0'))
+        with mock.patch.object(ai, '_chat_slot', slot_mock):
+            out = ai.chat('sys', [], 'hi', effort='low')
+        self.assertEqual(out, ('ok', 'KNIGHT v1.0'))
+        self.assertEqual(slot_mock.call_args.kwargs.get('effort'), 'low')
+
+    def test_correct_prompt_uses_low_effort(self):
+        chat_mock = mock.MagicMock(return_value=('saan ang registrar office?', 'KNIGHT v1.0'))
+        with mock.patch.object(ai, 'chat', chat_mock):
+            ai.correct_prompt('asan ang regstrar ofis?')
+        self.assertEqual(chat_mock.call_args.kwargs.get('effort'), 'low')
