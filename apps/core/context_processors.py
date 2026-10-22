@@ -11,6 +11,35 @@ def announcement(request):
     }
 
 
+def chat_sessions(request):
+    """Saved chats for the sidebar on EVERY page (not just /chat/).
+
+    Without this, leaving the chat page (e.g. clicking Announcements) made the
+    session list render as "No sessions yet." until the user pressed New chat.
+    Anonymous visitors only get a list once their browser session exists, so we
+    never create session rows just by browsing.
+    """
+    from apps.chat.models import Conversation
+    items = []
+    try:
+        user = getattr(request, 'user', None)
+        if user is not None and user.is_authenticated:
+            items = list(
+                Conversation.objects.filter(user=user).order_by('-updated_at')[:50]
+            )
+        else:
+            key = getattr(getattr(request, 'session', None), 'session_key', None)
+            if key:
+                items = list(
+                    Conversation.objects.filter(
+                        user__isnull=True, session_key=key
+                    ).order_by('-updated_at')[:50]
+                )
+    except Exception:
+        return {}
+    return {'sessions': items}
+
+
 def tickets(request):
     """Open ticket badge for the admin sidebar only."""
     user = getattr(request, 'user', None)
