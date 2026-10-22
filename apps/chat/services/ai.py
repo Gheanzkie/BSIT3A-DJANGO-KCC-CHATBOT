@@ -36,6 +36,8 @@ import re
 import threading
 import time
 from datetime import datetime
+
+from django.utils import timezone
 from pathlib import Path
 from typing import NamedTuple
 
@@ -881,7 +883,7 @@ def sync_announcement_knowledge(pk, title, message, created_at=None, active=True
     stamp = ''
     if created_at is not None:
         try:
-            stamp = created_at.strftime('%B %d, %Y %I:%M %p')
+            stamp = timezone.localtime(created_at).strftime('%B %d, %Y %I:%M %p')
         except (AttributeError, ValueError):
             stamp = str(created_at)
     header = f'{title} (KCC Announcement, {stamp})' if stamp else f'{title} (KCC Announcement)'

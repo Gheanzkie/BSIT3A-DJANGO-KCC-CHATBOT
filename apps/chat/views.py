@@ -201,7 +201,7 @@ def chat_send(request):
             'engine': 'KNIGHT KB',
             'sources': [],
             'conversation_id': conversation.pk,
-            'created_at': assistant_msg.created_at.strftime('%H:%M'),
+            'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
         })
 
     # Auto-learn (staff-only): bagong KCC facts mula sa staff/admin -> save sa knowledge/.
@@ -249,5 +249,5 @@ def chat_send(request):
         'engine': engine,
         'sources': sources,
         'conversation_id': conversation.pk,
-        'created_at': assistant_msg.created_at.strftime('%H:%M'),
+        'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
     })
