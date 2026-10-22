@@ -15,28 +15,12 @@
 <!-- STATS -->
 <div class="row row-deck row-cards mt-2">
 
-  <div class="col-sm-6 col-lg-3">
+  <div class="col-sm-6 col-lg-4">
     <div class="card">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div>
-            <div class="fs-3 fw-bold" style="color:#f8fafc;">{{ total_users|default:"—" }}</div>
-            <div class="text-muted">Total Users</div>
-          </div>
-          <div style="width:48px;height:48px;border-radius:12px;background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;color:var(--kcc-accent);font-size:1.2rem;">
-            <i class="fas fa-users"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-lg-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div>
-            <div class="fs-3 fw-bold" style="color:#f8fafc;">{{ total_conversations|default:"—" }}</div>
+            <div class="fs-3 fw-bold kcc-stat-value">{{ total_conversations|default:"—" }}</div>
             <div class="text-muted">Conversations</div>
           </div>
           <div style="width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,0.12);display:flex;align-items:center;justify-content:center;color:#60a5fa;font-size:1.2rem;">
@@ -47,12 +31,12 @@
     </div>
   </div>
 
-  <div class="col-sm-6 col-lg-3">
+  <div class="col-sm-6 col-lg-4">
     <div class="card">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div>
-            <div class="fs-3 fw-bold" style="color:#f8fafc;">{{ total_messages|default:"—" }}</div>
+            <div class="fs-3 fw-bold kcc-stat-value">{{ total_messages|default:"—" }}</div>
             <div class="text-muted">Messages</div>
           </div>
           <div style="width:48px;height:48px;border-radius:12px;background:rgba(168,85,247,0.12);display:flex;align-items:center;justify-content:center;color:#c084fc;font-size:1.2rem;">
@@ -63,20 +47,22 @@
     </div>
   </div>
 
-  <div class="col-sm-6 col-lg-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div>
-            <div class="fs-3 fw-bold" style="color:#f8fafc;">{{ active_today|default:"—" }}</div>
-            <div class="text-muted">Active Today</div>
-          </div>
-          <div style="width:48px;height:48px;border-radius:12px;background:rgba(251,191,36,0.12);display:flex;align-items:center;justify-content:center;color:#fbbf24;font-size:1.2rem;">
-            <i class="fas fa-bolt"></i>
+  <div class="col-sm-6 col-lg-4">
+    <a href="{% url 'tickets' %}" class="text-decoration-none">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <div class="fs-3 fw-bold kcc-stat-value">{{ open_tickets|default:"0" }}</div>
+              <div class="text-muted">Open Tickets</div>
+            </div>
+            <div style="width:48px;height:48px;border-radius:12px;background:rgba(239,68,68,0.12);display:flex;align-items:center;justify-content:center;color:#f87171;font-size:1.2rem;">
+              <i class="fas fa-ticket"></i>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </a>
   </div>
 
 </div>
@@ -107,9 +93,9 @@
             <tbody>
               {% for m in models_info %}
               <tr>
-                <td style="color:#f1f5f9;font-size:0.85rem;">{{ m.slot }}</td>
-                <td><span class="badge" style="background:rgba(16,185,129,0.15);color:#6ee7b7;">{{ m.provider }}</span></td>
-                <td style="font-size:0.82rem;color:#cbd5e1;">{{ m.model }}
+                <td class="kcc-strong" style="font-size:0.85rem;">{{ m.slot }}</td>
+                <td><span class="badge kcc-badge-green">{{ m.provider }}</span></td>
+                <td class="kcc-dim" style="font-size:0.82rem;">{{ m.model }}
                   <div class="text-muted" style="font-size:0.68rem;">{{ m.endpoint }}</div>
                 </td>
                 <td>{% if m.key_set %}<code style="font-size:0.75rem;">{{ m.key_masked }}</code>{% else %}<span class="badge bg-danger">not set</span>{% endif %}</td>
@@ -127,7 +113,7 @@
                     <span class="text-muted">—</span>
                   {% endif %}
                 </td>
-                <td style="font-size:0.78rem;color:#94a3b8;">{{ m.usage.last_call|default:"—" }}</td>
+                <td class="kcc-faint" style="font-size:0.78rem;">{{ m.usage.last_call|default:"—" }}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -145,14 +131,9 @@
       <div class="card-body d-flex align-items-center gap-3 flex-wrap">
         <img src="{% static 'img/kcc_logo.png' %}" alt="KCC" style="width:56px;height:56px;object-fit:contain;border-radius:12px;box-shadow:0 4px 15px rgba(16,185,129,0.3);">
         <div class="flex-grow-1">
-          <h3 class="mb-1" style="color:#f1f5f9;">Welcome back, {{ user.first_name|default:user.username }}!</h3>
-          <p class="text-muted mb-0">Manage users and monitor the KCC Assistant Chatbot from here.</p>
+          <h3 class="mb-1 kcc-strong">Welcome back, {{ user.first_name|default:user.username }}!</h3>
+          <p class="text-muted mb-0">Monitor the KCC Assistant Chatbot from here.</p>
         </div>
-        {% if user.is_superuser %}
-        <a href="{% url 'users:user_list' %}" class="btn btn-primary">
-          <i class="fas fa-users me-1"></i> Manage Users
-        </a>
-        {% endif %}
       </div>
     </div>
   </div>

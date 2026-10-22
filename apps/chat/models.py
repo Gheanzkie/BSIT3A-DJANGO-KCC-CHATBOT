@@ -15,11 +15,15 @@ class Conversation(models.Model):
         ('en', 'English'),
     ]
 
+    # Public chat: anonymous visitors own conversations through their session key.
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='chat_conversations',
+        null=True,
+        blank=True,
     )
+    session_key = models.CharField(max_length=64, blank=True, default='', db_index=True)
     title = models.CharField(max_length=200, blank=True)
     engine_preference = models.CharField(max_length=12, choices=ENGINE_CHOICES, default='auto')
     language = models.CharField(max_length=12, choices=LANGUAGE_CHOICES, default='auto')

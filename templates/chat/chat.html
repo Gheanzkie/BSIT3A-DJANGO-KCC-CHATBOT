@@ -7,8 +7,21 @@
   .kcc-shell { height: calc(100vh - 150px); min-height: 540px; }
   @media (max-width: 991.98px) {
     .kcc-shell { height: auto; min-height: 0; }
-    .kcc-chat-card { height: 74vh !important; }
-    .kcc-sessions { max-height: 40vh; }
+    .kcc-chat-card { height: 74vh !important; height: calc(100dvh - 150px) !important; min-height: 420px; }
+    .kcc-sessions { max-height: 28vh; }
+    .kcc-chat-inner { padding: 0.85rem 0.75rem 0.5rem; }
+  }
+  @media (max-width: 575.98px) {
+    .kcc-chat-card { height: calc(100dvh - 130px) !important; min-height: 360px; }
+    .kcc-welcome-title { font-size: 1.45rem; }
+    .kcc-welcome-sub { font-size: 0.88rem; }
+    .kcc-chips { gap: 0.35rem; margin-top: 1rem; }
+    .kcc-chip { width: 100%; }
+    .kcc-pills { gap: 0.35rem; }
+    .kcc-pill { max-width: 100%; }
+    .kcc-composer { padding: 0.6rem 0.6rem 0.75rem; }
+    .kcc-row > .kcc-bubble, .kcc-holder { max-width: 94%; }
+    .kcc-bubble { font-size: 0.86rem; }
   }
   .kcc-chat-card { display: flex; flex-direction: column; overflow: hidden; }
   .kcc-chat-window { flex: 1 1 auto; overflow-y: auto; }
@@ -98,6 +111,28 @@
   .kcc-side-item { display: flex; align-items: center; border-radius: 10px; padding: 0.1rem 0.3rem 0.1rem 0.6rem; gap: 0.25rem; }
   .kcc-side-item:hover { background: rgba(255,255,255,0.04); }
   .kcc-side-item.active { background: rgba(16,185,129,0.12); }
+
+  /* ---- light mode ---- */
+  html.kcc-light .kcc-welcome-title {
+    background: linear-gradient(135deg, #0b6e4f, #10b981);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  html.kcc-light .kcc-welcome-sub { color: #475569; }
+  html.kcc-light .kcc-chip { background: #ffffff; border-color: #cbd5e1; color: #334155; }
+  html.kcc-light .kcc-chip:hover { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.5); color: #0b6e4f; }
+  html.kcc-light .kcc-input-wrap { background: #ffffff; border-color: #cbd5e1; }
+  html.kcc-light .kcc-input { color: #0f172a; }
+  html.kcc-light .kcc-input::placeholder { color: #94a3b8; }
+  html.kcc-light .kcc-bubble-bot { color: #0f172a; }
+  html.kcc-light .kcc-engine { color: #64748b; }
+  html.kcc-light .kcc-source-chip { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  html.kcc-light .kcc-pill { background: #ffffff; border-color: #cbd5e1; color: #334155; }
+  .kcc-side-link { color: #cbd5e1; }
+  .kcc-side-link-active { color: #10b981; }
+  html.kcc-light .kcc-side-link { color: #334155; }
+  html.kcc-light .kcc-side-link-active { color: #0b6e4f; }
+  html.kcc-light .kcc-source-chip a { color: #047857; }
+  html.kcc-light .kcc-side-item:hover { background: rgba(15,23,42,0.04); }
 </style>
 
 <div class="row g-3">
@@ -116,8 +151,8 @@
         <div class="kcc-sessions d-flex flex-column gap-1">
           {% for s in sessions %}
           <div class="kcc-side-item {% if s.pk == current_conversation_id %}active{% endif %}">
-            <a href="{% url 'chat:session' s.pk %}" class="text-decoration-none text-truncate flex-grow-1"
-               style="font-size:0.85rem;color:{% if s.pk == current_conversation_id %}#10b981{% else %}#cbd5e1{% endif %};">
+            <a href="{% url 'chat:session' s.pk %}" class="text-decoration-none text-truncate flex-grow-1 kcc-side-link {% if s.pk == current_conversation_id %}kcc-side-link-active{% endif %}"
+               style="font-size:0.85rem;">
               {{ s.title|default:"New chat" }}
             </a>
             <form method="post" action="{% url 'chat:session_delete' s.pk %}"

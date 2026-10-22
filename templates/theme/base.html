@@ -2,8 +2,19 @@
 <!doctype html>
 <html lang="en" data-bs-theme="dark">
   <head>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('kcc-theme') || 'dark';
+          if (t !== 'light' && t !== 'dark') { t = 'dark'; }
+          document.documentElement.setAttribute('data-bs-theme', t);
+          if (t === 'light') { document.documentElement.classList.add('kcc-light'); }
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <link rel="icon" type="image/png" href="{% static 'img/kcc_logo.png' %}">
     <title>KCC Assistant Chatbot</title>
     <link href="{% static 'css/tabler.css' %}" rel="stylesheet"/>
     <link href="{% static 'css/app-theme.css' %}" rel="stylesheet"/>
@@ -29,7 +40,44 @@
         color: #94a3b8;
         border-radius: 8px;
         margin: 1px 8px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+        padding: 0.5rem 0.75rem;
       }
+      .dh-sidebar .nav-link-title { min-width: 0; }
+      .dh-sidebar .navbar-nav { padding-left: 0.25rem; padding-right: 0.25rem; }
+      /* Session rows: link + delete button aligned, same rhythm for admin and users */
+      /* Session row: delete button pinned to the RIGHT of the link, never below */
+      .dh-sidebar .kcc-session-row {
+        position: relative;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+      }
+      .dh-sidebar .kcc-session-row > .nav-link {
+        flex: 1 1 auto;
+        min-width: 0;
+        margin-right: 0;
+        padding-right: 2.1rem;
+      }
+      .dh-sidebar .kcc-session-row > form {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        display: flex;
+        flex-shrink: 0;
+      }
+      .dh-sidebar .kcc-session-row > form .btn {
+        width: 26px; height: 26px; padding: 0; border: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+        opacity: 0.65;
+      }
+      .dh-sidebar .kcc-session-row > form .btn:hover { opacity: 1; }
       .dh-sidebar .nav-link:hover {
         background: rgba(255,255,255,0.05);
         color: #e2e8f0;
@@ -105,6 +153,29 @@
         background: rgba(239,68,68,0.1);
         color: #f87171;
       }
+      /* Keep the account card identical for admin and regular users */
+      .dh-user-card { min-width: 0; overflow: hidden; }
+      .dh-user-card > button { min-width: 0; overflow: hidden; }
+      .dh-user-card .dh-user-name,
+      .dh-user-card .dh-user-role {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .dh-user-logout {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        margin-left: auto;
+        padding: 0;
+        line-height: 1;
+      }
+      .dh-user-card > form { margin-left: auto; flex-shrink: 0; display: flex; }
 
       /* cards */
       .card {
@@ -210,19 +281,160 @@
       /* badge */
       .badge.bg-success { background: rgba(16,185,129,0.2) !important; color: #6ee7b7; }
       .badge.bg-danger { background: rgba(239,68,68,0.2) !important; color: #fca5a5; }
+
+      /* ---------- RESPONSIVE (tablet / mobile) ---------- */
+      .kcc-sidebar-fab, .kcc-sidebar-backdrop { display: none; }
+
+      @media (max-width: 991.98px) {
+        /* Mobile: responsive top navbar (brand + hamburger), menu drops down */
+        .kcc-sidebar-fab, .kcc-sidebar-backdrop { display: none !important; }
+        .dh-sidebar {
+          position: sticky !important;
+          top: 0;
+          width: 100% !important;
+          height: auto !important;
+          transform: none !important;
+          transition: none;
+          z-index: 1035;
+          overflow: visible !important;
+          border-right: 0 !important;
+          border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+        }
+        .dh-sidebar .container-fluid {
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          padding: 0.35rem 0.75rem;
+        }
+        .dh-sidebar .navbar-brand { width: auto !important; }
+        .dh-sidebar .navbar-toggler { display: inline-flex !important; margin-left: auto; }
+        .dh-sidebar .navbar-collapse {
+          width: 100% !important;
+          flex-basis: 100% !important;
+          overflow-x: hidden !important;
+          overflow-y: visible !important;
+        }
+        .dh-sidebar #sidebar-menu { display: none; }
+        .dh-sidebar #sidebar-menu.show { display: block; }
+        .dh-sidebar .navbar-nav,
+        .dh-sidebar .nav-item,
+        .dh-sidebar .nav-link { max-width: 100%; min-width: 0; }
+        .dh-sidebar .nav-link-title {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .dh-sidebar .navbar-nav { padding: 0.35rem 0.25rem 0.5rem; }
+        .dh-sidebar .navbar-nav .nav-link { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .dh-sidebar .dropdown-item { padding-left: 0.9rem; padding-right: 0.9rem; }
+        body.kcc-sidebar-locked { overflow: auto; }
+
+        .page, .page-wrapper { margin-left: 0 !important; width: 100% !important; flex-direction: column; }
+        .page-body { padding: 0.75rem 0.5rem; }
+        .container-xl { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .page-header { margin-bottom: 0.75rem; }
+        .card { border-radius: 12px; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .modal-dialog { margin: 0.6rem; }
+        .btn { white-space: normal; }
+      }
+      @media (max-width: 575.98px) {
+        body { overflow-x: hidden; }
+        .page-title { font-size: 1.15rem; }
+        .fs-3 { font-size: 1.4rem !important; }
+        .dh-user-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .row-deck > [class*="col-"] { margin-bottom: 0.5rem; }
+        .card-body { padding: 0.9rem; }
+        .card-header { padding: 0.7rem 0.9rem; }
+        .table > :not(caption) > * > * { padding: 0.5rem; }
+        .alert { font-size: 0.85rem; }
+      }
+
+      /* ---------- LIGHT MODE ---------- */
+      html.kcc-light body, html.kcc-light .page, html.kcc-light .page-wrapper,
+      html.kcc-light .page-body {
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%) !important;
+        color: #0f172a;
+      }
+      html.kcc-light .dh-sidebar {
+        background: #ffffff !important;
+        border-right: 1px solid rgba(15,23,42,0.08);
+      }
+      html.kcc-light .dh-sidebar .nav-link { color: #475569; }
+      html.kcc-light .dh-sidebar .nav-link:hover { background: rgba(15,23,42,0.05); color: #0f172a; }
+      html.kcc-light .dh-sidebar .nav-link.active { background: rgba(16,185,129,0.12); color: #0b6e4f; }
+      html.kcc-light .dh-brand-name { color: #0f172a; }
+      html.kcc-light .dh-nav-section { color: #94a3b8; }
+      html.kcc-light .dh-user-card { background: #f8fafc; border-color: #e2e8f0; }
+      html.kcc-light .dh-user-name { color: #0f172a; }
+      html.kcc-light .dh-user-role { color: #64748b; }
+      html.kcc-light .dh-user-logout { color: #64748b; }
+      html.kcc-light .card {
+        background: #ffffff !important;
+        border: 1px solid rgba(15,23,42,0.08) !important;
+      }
+      html.kcc-light .card-header { background: #f8fafc; border-bottom-color: rgba(15,23,42,0.08); }
+      html.kcc-light .card-title { color: #0f172a; }
+      html.kcc-light .card-body { color: #334155; }
+      html.kcc-light .page-pretitle { color: #64748b; }
+      html.kcc-light .page-title { color: #0f172a; }
+      html.kcc-light .table { color: #334155; }
+      html.kcc-light .table > :not(caption) > * > * { color: #334155; border-color: rgba(15,23,42,0.08); }
+      html.kcc-light .table thead th { color: #64748b; }
+      html.kcc-light .form-control, html.kcc-light .form-select {
+        background: #ffffff; border-color: #cbd5e1; color: #0f172a;
+      }
+      html.kcc-light .form-control::placeholder { color: #94a3b8; }
+      html.kcc-light .form-label { color: #334155; }
+      html.kcc-light .modal-content { background: #ffffff; border-color: rgba(15,23,42,0.1); color: #0f172a; }
+      html.kcc-light .modal-title { color: #0f172a; }
+      html.kcc-light .text-muted { color: #64748b !important; }
+      html.kcc-light .dh-footer { color: #64748b; border-top-color: rgba(15,23,42,0.08); }
+      html.kcc-light .alert-danger { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+      html.kcc-light .alert-success { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+      html.kcc-light .page-link { background: #ffffff; border-color: #e2e8f0; color: #334155; }
+      html.kcc-light .fs-3.fw-bold { color: #0f172a !important; }
+      html.kcc-light .dropdown-menu { background: #ffffff; border-color: #e2e8f0; }
+      html.kcc-light .dropdown-item { color: #334155; }
+      html.kcc-light .dropdown-item:hover { background: #f1f5f9; color: #0f172a; }
+
+      /* ---------- SHARED TEXT/BADGE UTILITIES (theme-aware) ---------- */
+      .kcc-stat-value { color: #f8fafc; }
+      .kcc-strong { color: #f1f5f9; }
+      .kcc-dim { color: #cbd5e1; }
+      .kcc-faint { color: #94a3b8; }
+      .kcc-badge-green { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+      .kcc-badge-red { background: rgba(239,68,68,0.18); color: #fca5a5; }
+      html.kcc-light .kcc-stat-value,
+      html.kcc-light .kcc-strong { color: #0f172a !important; }
+      html.kcc-light .kcc-dim { color: #334155 !important; }
+      html.kcc-light .kcc-faint { color: #64748b !important; }
+      html.kcc-light .kcc-badge-green { background: rgba(16,185,129,0.12) !important; color: #047857 !important; }
+      html.kcc-light .kcc-badge-red { background: rgba(239,68,68,0.12) !important; color: #b91c1c !important; }
+      html.kcc-light .kcc-ann-media { background: #e2e8f0; }
+      html.kcc-light .kcc-ann-counter { background: rgba(15,23,42,0.65); }
+      html.kcc-light .kcc-engine,
+      html.kcc-light .kcc-pill,
+      html.kcc-light .kcc-source-chip { border-color: #cbd5e1 !important; }
     </style>
   </head>
 
   <body>
     <div class="page">
 
-        {% if request.user.is_authenticated %}
-            {% include 'theme/sidebar.html' %}
-        {% endif %}
+        {% include 'theme/sidebar.html' %}
 
         <div class="page-wrapper">
             <div class="page-body">
                 <div class="container-xl">
+                    {% if messages %}
+                      {% for message in messages %}
+                      <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                      {% endfor %}
+                    {% endif %}
                     {% block content %}
                     {% endblock %}
                 </div>
@@ -231,8 +443,114 @@
         </div>
     </div>
 
+    <button type="button" id="kccSidebarFab" class="kcc-sidebar-fab"
+            aria-label="Open menu" aria-controls="kccSidebar" aria-expanded="false">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div id="kccSidebarBackdrop" class="kcc-sidebar-backdrop"></div>
+
+    {% include 'partials/modals.html' %}
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/tabler.js' %}"></script>
+    <script>
+      (function () {
+        var menuBtn = document.getElementById('kccSidebarMenuBtn');
+        var menu = document.getElementById('kccSidebarMenu');
+        if (!menuBtn || !menu) return;
+        menuBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var open = menu.classList.contains('d-none');
+          menu.classList.toggle('d-none');
+          menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          var icon = menuBtn.querySelector('i');
+          if (icon) { icon.className = open ? 'fas fa-xmark' : 'fas fa-bars'; }
+        });
+      })();
+    </script>
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var btns = document.querySelectorAll('[data-theme-toggle]');
+        function sync() {
+          var light = root.classList.contains('kcc-light');
+          btns.forEach(function (b) {
+            var icon = b.querySelector('i');
+            var label = b.querySelector('[data-theme-label]');
+            if (icon) { icon.className = light ? 'fas fa-moon' : 'fas fa-sun'; }
+            if (label) { label.textContent = light ? 'Dark mode' : 'Light mode'; }
+          });
+        }
+        btns.forEach(function (b) {
+          b.addEventListener('click', function () {
+            var light = root.classList.toggle('kcc-light');
+            root.setAttribute('data-bs-theme', light ? 'light' : 'dark');
+            try { localStorage.setItem('kcc-theme', light ? 'light' : 'dark'); } catch (e) {}
+            sync();
+          });
+        });
+        sync();
+      })();
+    </script>
+    <script>
+      (function () {
+        var aside = document.getElementById('kccSidebar');
+        var fab = document.getElementById('kccSidebarFab');
+        var backdrop = document.getElementById('kccSidebarBackdrop');
+        if (!aside || !fab || !backdrop) return;
+
+        function setOpen(open) {
+          aside.classList.toggle('kcc-sidebar-open', open);
+          backdrop.classList.toggle('show', open);
+          document.body.classList.toggle('kcc-sidebar-locked', open);
+          fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+          var icon = fab.querySelector('i');
+          if (icon) { icon.className = open ? 'fas fa-xmark' : 'fas fa-bars'; }
+        }
+
+        fab.addEventListener('click', function () {
+          setOpen(!aside.classList.contains('kcc-sidebar-open'));
+        });
+        backdrop.addEventListener('click', function () { setOpen(false); });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') { setOpen(false); }
+        });
+        aside.querySelectorAll('a.nav-link, .dropdown-item').forEach(function (link) {
+          link.addEventListener('click', function () { setOpen(false); });
+        });
+      })();
+    </script>
+    <script>
+      (function () {
+        var toggle = document.getElementById('kccMenuToggle');
+        var menu = document.getElementById('sidebar-menu');
+        if (!toggle || !menu) return;
+
+        function setMenu(open) {
+          menu.classList.toggle('show', open);
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          toggle.classList.toggle('collapsed', !open);
+        }
+
+        toggle.addEventListener('click', function (e) {
+          e.preventDefault();
+          setMenu(!menu.classList.contains('show'));
+        });
+        menu.querySelectorAll('a.nav-link, .dropdown-item').forEach(function (link) {
+          link.addEventListener('click', function () {
+            if (window.innerWidth < 992) { setMenu(false); }
+          });
+        });
+        window.addEventListener('resize', function () {
+          if (window.innerWidth >= 992) {
+            menu.classList.remove('show');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+        setMenu(false);
+      })();
+    </script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

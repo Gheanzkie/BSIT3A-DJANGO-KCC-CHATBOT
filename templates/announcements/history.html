@@ -1,0 +1,217 @@
+{% extends "theme/base.html" %}
+{% block content %}
+
+<style>
+  .kcc-ann-media { position: relative; background: #0b1220; border-radius: 12px; overflow: hidden; }
+  .kcc-ann-media .carousel-item img { height: 420px; width: 100%; object-fit: contain; }
+  @media (max-width: 576px) { .kcc-ann-media .carousel-item img { height: 240px; } }
+  .kcc-ann-counter {
+    position: absolute; top: 10px; right: 12px; z-index: 2;
+    background: rgba(0,0,0,0.55); color: #fff; border-radius: 999px;
+    padding: 2px 10px; font-size: 0.75rem;
+  }
+  .kcc-ann-media .carousel-control-prev,
+  .kcc-ann-media .carousel-control-next { width: 48px; opacity: 0.95; }
+  .kcc-ann-media .carousel-control-prev-icon,
+  .kcc-ann-media .carousel-control-next-icon {
+    background-color: rgba(0,0,0,0.45); border-radius: 50%;
+    padding: 16px; background-size: 55%;
+  }
+  .kcc-ann-media .carousel-item img { cursor: zoom-in; }
+
+  /* ---------- FULLSCREEN LIGHTBOX ---------- */
+  .kcc-lightbox {
+    display: none; position: fixed; inset: 0; z-index: 2000;
+    background: rgba(2,6,23,0.96);
+    align-items: center; justify-content: center;
+    padding: 3vh 2vw;
+  }
+  .kcc-lightbox.open { display: flex; }
+  .kcc-lightbox img {
+    max-width: 94vw; max-height: 86vh; object-fit: contain;
+    cursor: zoom-in; transition: transform 0.2s ease;
+  }
+  .kcc-lightbox img.zoomed { transform: scale(1.85); cursor: zoom-out; }
+  .kcc-lb-close {
+    position: absolute; top: 14px; right: 18px; z-index: 2;
+    width: 44px; height: 44px; border: 0; border-radius: 50%;
+    background: rgba(255,255,255,0.14); color: #fff;
+    font-size: 1.7rem; line-height: 1; display: flex; align-items: center; justify-content: center;
+  }
+  .kcc-lb-prev, .kcc-lb-next {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+    width: 54px; height: 54px; border: 0; border-radius: 50%;
+    background: rgba(255,255,255,0.16); color: #fff; font-size: 1.4rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .kcc-lb-prev { left: 14px; }
+  .kcc-lb-next { right: 14px; }
+  .kcc-lb-counter {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    color: #e2e8f0; font-size: 0.85rem;
+    background: rgba(255,255,255,0.12); padding: 4px 14px; border-radius: 999px;
+  }
+  .kcc-lightbox.single .kcc-lb-prev,
+  .kcc-lightbox.single .kcc-lb-next { display: none; }
+
+  /* Mobile: keep back/next always on-screen, below the image */
+  @media (max-width: 767.98px) {
+    .kcc-lightbox { padding: 0 0 90px; }
+    .kcc-lightbox img { max-width: 100vw; max-height: 68vh; }
+    .kcc-lb-prev, .kcc-lb-next {
+      top: auto; bottom: 22px; transform: none;
+      width: 52px; height: 52px; font-size: 1.3rem;
+      background: rgba(255,255,255,0.22);
+    }
+    .kcc-lb-prev { left: 18px; }
+    .kcc-lb-next { right: 18px; }
+    .kcc-lb-counter { bottom: 30px; font-size: 0.8rem; }
+    .kcc-lb-close { top: 10px; right: 12px; width: 40px; height: 40px; font-size: 1.5rem; }
+  }
+</style>
+
+
+
+<div class="page-header d-print-none">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">KCC Chatbot</div>
+      <h2 class="page-title"><i class="fas fa-bullhorn me-2" style="color:var(--kcc-accent);"></i>Announcements</h2>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-lg-9">
+    {% for a in announcements %}
+    <article class="card mb-3">
+      <div class="card-body">
+        <h3 class="card-title mb-1">{{ a.title|default:"Announcement" }}</h3>
+        <div class="text-muted mb-2" style="font-size:0.8rem;">
+          <i class="far fa-clock me-1"></i>Posted {{ a.created_at|date:"M d, Y g:i A" }}
+        </div>
+
+        <div style="white-space:pre-wrap;">{{ a.message }}</div>
+
+        {% if a.images.all %}
+        <div id="annGallery{{ a.pk }}" class="carousel slide kcc-ann-media mt-2" data-bs-ride="false">
+          <div class="carousel-inner">
+            {% for picture in a.images.all %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <img src="{{ picture.image.url }}" alt="Announcement picture {{ forloop.counter }}" title="Click to view fullscreen">
+            </div>
+            {% endfor %}
+          </div>
+          {% if a.images.count > 1 %}
+          <span class="kcc-ann-counter">{{ a.images.count }} pictures</span>
+          <button class="carousel-control-prev" type="button" data-bs-target="#annGallery{{ a.pk }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#annGallery{{ a.pk }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </article>
+    {% empty %}
+    <div class="card">
+      <div class="card-body text-center text-muted py-5">
+        <i class="fas fa-bullhorn fa-2x mb-2"></i>
+        <div>No announcements yet.</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div id="kccLightbox" class="kcc-lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Announcement image viewer">
+  <button type="button" class="kcc-lb-close" aria-label="Close">&times;</button>
+  <button type="button" class="kcc-lb-prev" aria-label="Previous image">&#10094;</button>
+  <img id="kccLightboxImg" src="" alt="Announcement full view">
+  <button type="button" class="kcc-lb-next" aria-label="Next image">&#10095;</button>
+  <div id="kccLightboxCounter" class="kcc-lb-counter"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    var lb = document.getElementById('kccLightbox');
+    var lbImg = document.getElementById('kccLightboxImg');
+    var counter = document.getElementById('kccLightboxCounter');
+    if (!lb || !lbImg || !counter) return;
+
+    /* Reparent to <body> so no page container can clip the fixed overlay
+       (mobile browsers were hiding the in-overlay prev/next controls). */
+    document.body.appendChild(lb);
+
+    var srcs = [], idx = 0, carouselEl = null;
+
+    function syncCarousel() {
+      if (!carouselEl || !window.bootstrap) return;
+      var inst = window.bootstrap.Carousel.getOrCreateInstance(carouselEl, { interval: false });
+      inst.to(idx);
+    }
+
+    function render() {
+      lbImg.src = srcs[idx];
+      lbImg.classList.remove('zoomed');
+      counter.textContent = (idx + 1) + ' / ' + srcs.length;
+      lb.classList.toggle('single', srcs.length < 2);
+    }
+
+    function open(car, i) {
+      carouselEl = car;
+      srcs = [];
+      car.querySelectorAll('.carousel-item img').forEach(function (im) {
+        srcs.push(im.getAttribute('src'));
+      });
+      idx = i;
+      render();
+      lb.classList.add('open');
+      lb.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+      lb.classList.remove('open');
+      lb.setAttribute('aria-hidden', 'true');
+      lbImg.classList.remove('zoomed');
+      lbImg.src = '';
+      document.body.style.overflow = '';
+    }
+
+    function step(d) {
+      if (srcs.length < 2) return;
+      idx = (idx + d + srcs.length) % srcs.length;
+      render();
+      syncCarousel();
+    }
+
+    document.querySelectorAll('.kcc-ann-media').forEach(function (car) {
+      car.querySelectorAll('.carousel-item img').forEach(function (im, i) {
+        im.addEventListener('click', function (e) {
+          e.preventDefault();
+          open(car, i);
+        });
+      });
+    });
+
+    lb.querySelector('.kcc-lb-close').addEventListener('click', close);
+    lb.querySelector('.kcc-lb-prev').addEventListener('click', function (e) { e.stopPropagation(); step(-1); });
+    lb.querySelector('.kcc-lb-next').addEventListener('click', function (e) { e.stopPropagation(); step(1); });
+    lbImg.addEventListener('click', function (e) { e.stopPropagation(); lbImg.classList.toggle('zoomed'); });
+    lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
+    });
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,291 @@
+<!-- ============ FLOATING AUTH MODALS ============ -->
+
+<div class="modal fade" id="kccLoginModal" tabindex="-1" aria-labelledby="kccLoginTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="kccLoginTitle"><i class="fas fa-right-to-bracket me-2"></i>Log in</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" style="font-size:0.85rem;">Log in to save your chat sessions. The admin uses this form too.</p>
+        <form id="kccLoginForm">
+          {% csrf_token %}
+          <div class="alert alert-danger d-none" data-kcc-error role="alert"></div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" autocomplete="email" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" autocomplete="current-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-right-to-bracket me-1"></i> Log in
+          </button>
+        </form>
+      </div>
+      <div class="modal-footer justify-content-center" style="font-size:0.85rem;">
+        No account yet?
+        <button type="button" class="btn btn-link p-0 ms-1" data-kcc-switch="#kccRegisterModal">Create one</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="kccRegisterModal" tabindex="-1" aria-labelledby="kccRegisterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="kccRegisterTitle"><i class="fas fa-user-plus me-2"></i>Create account</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="kccRegisterForm">
+          {% csrf_token %}
+          <div class="alert alert-danger d-none" data-kcc-error role="alert"></div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First name</label>
+              <input type="text" name="first_name" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last name</label>
+              <input type="text" name="last_name" class="form-control">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Username</label>
+              <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" autocomplete="email" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Password</label>
+              <input type="password" name="password" class="form-control" autocomplete="new-password" minlength="8" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirm password</label>
+              <input type="password" name="confirm_password" class="form-control" autocomplete="new-password" minlength="8" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-3">
+            <i class="fas fa-user-plus me-1"></i> Create account
+          </button>
+        </form>
+      </div>
+      <div class="modal-footer justify-content-center" style="font-size:0.85rem;">
+        Already have an account?
+        <button type="button" class="btn btn-link p-0 ms-1" data-kcc-switch="#kccLoginModal">Log in</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REPORT A PROBLEM ============ -->
+
+<div class="modal fade" id="kccReportModal" tabindex="-1" aria-labelledby="kccReportTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="kccReportTitle"><i class="fas fa-flag me-2"></i>Report a Problem</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" style="font-size:0.85rem;">Tell the admin what went wrong. Your account is attached automatically if you are logged in.</p>
+        <form id="kccReportForm">
+          {% csrf_token %}
+          <div class="alert alert-danger d-none" data-kcc-error role="alert"></div>
+          <div class="alert alert-success d-none" data-kcc-success role="alert"></div>
+          <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-select">
+              <option value="bug">Bug / Error</option>
+              <option value="content">Wrong answer / content</option>
+              <option value="account">Account / login</option>
+              <option value="other" selected>Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">What happened?</label>
+            <textarea name="message" rows="5" maxlength="2000" required class="form-control" placeholder="Describe the problem..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-paper-plane me-1"></i> Send to admin
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if user.is_authenticated %}
+<!-- ============ PROFILE ============ -->
+
+<div class="modal fade" id="kccProfileModal" tabindex="-1" aria-labelledby="kccProfileTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="kccProfileTitle"><i class="fas fa-circle-user me-2"></i>My Account</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#kccTabProfile" type="button" role="tab">
+              <i class="fas fa-id-card me-1"></i> Profile
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#kccTabPassword" type="button" role="tab">
+              <i class="fas fa-lock me-1"></i> Password
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="kccTabProfile" role="tabpanel">
+            <form id="kccProfileForm">
+              {% csrf_token %}
+              <div class="alert alert-danger d-none" data-kcc-error role="alert"></div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Username</label>
+                  <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">First name</label>
+                  <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Last name</label>
+                  <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 mt-3">
+                <i class="fas fa-save me-1"></i> Save profile
+              </button>
+            </form>
+          </div>
+
+          <div class="tab-pane fade" id="kccTabPassword" role="tabpanel">
+            <form id="kccPasswordForm">
+              {% csrf_token %}
+              <div class="alert alert-danger d-none" data-kcc-error role="alert"></div>
+              <div class="alert alert-success d-none" data-kcc-success role="alert"></div>
+              <div class="mb-3">
+                <label class="form-label">Current password</label>
+                <input type="password" name="current_password" class="form-control" autocomplete="current-password" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">New password</label>
+                <input type="password" name="new_password" class="form-control" autocomplete="new-password" minlength="8" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Confirm new password</label>
+                <input type="password" name="confirm_password" class="form-control" autocomplete="new-password" minlength="8" required>
+              </div>
+              <button type="submit" class="btn btn-danger w-100">
+                <i class="fas fa-key me-1"></i> Change password
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+(function () {
+  function postForm(form, url) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: new FormData(form)
+    }).then(function (res) {
+      return res.json().catch(function () {
+        return { ok: false, error: 'Server error (' + res.status + ').' };
+      }).then(function (data) {
+        return { ok: res.ok && data.ok, data: data };
+      });
+    });
+  }
+
+  function wire(formId, url, onSuccess) {
+    var form = document.getElementById(formId);
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var err = form.querySelector('[data-kcc-error]');
+      if (err) { err.textContent = ''; err.classList.add('d-none'); }
+      var btn = form.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
+      postForm(form, url).then(function (r) {
+        if (btn) btn.disabled = false;
+        if (!r.ok) {
+          if (err) { err.textContent = (r.data && r.data.error) || 'Something went wrong.'; err.classList.remove('d-none'); }
+          return;
+        }
+        onSuccess(r.data, form);
+      }).catch(function () {
+        if (btn) btn.disabled = false;
+        if (err) { err.textContent = 'Network error. Please try again.'; err.classList.remove('d-none'); }
+      });
+    });
+  }
+
+  // Switch between login / register. Bootstrap's dismiss+toggle combo on one
+  // button closes the new modal together with the old one, so drive it manually.
+  document.querySelectorAll('[data-kcc-switch]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var targetSel = btn.getAttribute('data-kcc-switch');
+      var current = btn.closest('.modal');
+      var targetEl = document.querySelector(targetSel);
+      if (!targetEl) return;
+      var show = function () {
+        if (current) { current.removeEventListener('hidden.bs.modal', show); }
+        if (window.bootstrap && bootstrap.Modal) {
+          bootstrap.Modal.getOrCreateInstance(targetEl).show();
+        } else {
+          targetEl.classList.add('show');
+          targetEl.style.display = 'block';
+        }
+      };
+      if (current && window.bootstrap && bootstrap.Modal) {
+        current.addEventListener('hidden.bs.modal', show);
+        bootstrap.Modal.getOrCreateInstance(current).hide();
+      } else {
+        show();
+      }
+    });
+  });
+
+  // Login / register -> reload so the sidebar shows the logged-in state.
+  wire('kccLoginForm', "{% url 'login' %}", function () { window.location.reload(); });
+  wire('kccRegisterForm', "{% url 'register' %}", function () { window.location.reload(); });
+
+  // Report -> stay in the modal and show the confirmation.
+  wire('kccReportForm', "{% url 'report' %}", function (data, form) {
+    form.reset();
+    var ok = form.querySelector('[data-kcc-success]');
+    if (ok) { ok.textContent = data.message || 'Report sent.'; ok.classList.remove('d-none'); }
+  });
+
+  {% if user.is_authenticated %}
+  wire('kccProfileForm', "{% url 'users:profile' %}", function () { window.location.reload(); });
+  wire('kccPasswordForm', "{% url 'users:password' %}", function (data, form) {
+    form.reset();
+    var ok = form.querySelector('[data-kcc-success]');
+    if (ok) { ok.textContent = data.message || 'Password changed.'; ok.classList.remove('d-none'); }
+  });
+  {% endif %}
+})();
+</script>

@@ -36,6 +36,23 @@ if _CHAT_ENV_FILE.exists():
             if _value.strip():
                 os.environ[_key.strip()] = _value.strip()
 
+# Portable fallback: apps/chat/ai_keys.b64 ships the provider keys encoded so a
+# fresh clone works out of the box (GitHub push protection blocks plain keys).
+# A local ai_config.env / .env still wins because setdefault never overrides.
+_KEYS_BLOB = BASE_DIR / 'apps' / 'chat' / 'ai_keys.b64'
+if _KEYS_BLOB.exists():
+    try:
+        import base64 as _b64
+        _decoded = _b64.b64decode(_KEYS_BLOB.read_text(encoding='utf-8')).decode('utf-8')
+        for _line in _decoded.splitlines():
+            _line = _line.strip()
+            if _line and not _line.startswith('#') and '=' in _line:
+                _key, _, _value = _line.partition('=')
+                if _value.strip():
+                    os.environ.setdefault(_key.strip(), _value.strip())
+    except (OSError, ValueError):
+        pass
+
 
 def _get_secret_key():
     """DJANGO_SECRET_KEY env var, else a local git-ignored .secret_key file, else generate one."""
@@ -102,6 +119,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.core.context_processors.tickets',
+                'apps.core.context_processors.announcement',
             ],
         },
     },
@@ -166,6 +185,10 @@ STATICFILES_DIRS = [
 
 LOGIN_REDIRECT_URL = '/home/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Public (anonymous) chats are tied to a browser session and never shared.
+# The session cookie dies when the browser closes; stale rows are purged on visit.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 AUTH_USER_MODEL = 'users.User'
 

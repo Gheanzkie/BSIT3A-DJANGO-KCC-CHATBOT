@@ -1,0 +1,114 @@
+{% extends "theme/base.html" %}
+{% block content %}
+
+<div class="page-header d-print-none">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">Admin</div>
+      <h2 class="page-title"><i class="fas fa-bullhorn me-2" style="color:var(--kcc-accent);"></i>Announcements</h2>
+    </div>
+  </div>
+</div>
+
+<div class="row row-cards mt-2">
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bullhorn me-2" style="color:var(--kcc-accent);"></i>Publish announcement</h3>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Title <span class="text-muted">(optional)</span></label>
+            <input type="text" name="title" maxlength="140" class="form-control" placeholder="e.g. Enrollment schedule">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Message</label>
+            <textarea name="message" rows="5" class="form-control" required placeholder="Write the announcement..."></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Pictures <span class="text-muted">(multiple allowed)</span></label>
+            <input type="file" name="images" accept="image/*" multiple class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-paper-plane me-1"></i> Publish
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Posted announcements</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-vcenter card-table mb-0">
+          <thead>
+            <tr>
+              <th style="width:90px;">Picture</th>
+              <th>Announcement</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in announcements %}
+            <tr>
+              <td>
+                {% for picture in a.images.all|slice:":1" %}
+                <img src="{{ picture.image.url }}" alt="" style="width:72px;height:54px;object-fit:cover;border-radius:8px;">
+                {% empty %}
+                <span class="text-muted" style="font-size:0.75rem;">No picture</span>
+                {% endfor %}
+                {% if a.images.count > 1 %}
+                <div class="text-muted" style="font-size:0.7rem;">+{{ a.images.count|add:"-1" }} more</div>
+                {% endif %}
+              </td>
+              <td style="font-size:0.85rem;">
+                {% if a.title %}<div class="fw-semibold">{{ a.title }}</div>{% endif %}
+                <div class="text-muted">{{ a.message|truncatechars:160 }}</div>
+                <div class="text-muted" style="font-size:0.72rem;">{{ a.created_at|date:"M d, Y g:i A" }}</div>
+              </td>
+              <td>
+                {% if a.is_active %}<span class="badge bg-success">Published</span>
+                {% else %}<span class="badge bg-danger">Hidden</span>{% endif %}
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                  <a href="{% url 'announcement_edit' a.pk %}" class="btn btn-sm btn-outline-primary" title="Edit announcement">
+                    <i class="fas fa-pen"></i>
+                  </a>
+                  <form method="post" action="{% url 'announcement_update' a.pk %}" class="m-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="toggle">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Publish / hide">
+                      <i class="fas fa-toggle-on"></i>
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'announcement_update' a.pk %}" class="m-0"
+                        onsubmit="return confirm('Delete this announcement?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">No announcements yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "theme/base.html" %}
+{% block content %}
+
+<div class="page-header d-print-none">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">Admin</div>
+      <h2 class="page-title">Activity Log</h2>
+    </div>
+    <div class="col-auto">
+      <span class="text-muted" style="font-size:0.8rem;">{{ total_count }} record{{ total_count|pluralize }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="row row-cards mt-2">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <form method="get" class="d-flex gap-2 w-100">
+          <input type="text" name="q" value="{{ query }}" class="form-control form-control-sm"
+                 placeholder="Search action, path, user, or IP...">
+          <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-search me-1"></i> Search</button>
+          {% if query %}<a href="{% url 'activity' %}" class="btn btn-sm btn-outline-secondary">Clear</a>{% endif %}
+        </form>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-vcenter card-table mb-0">
+          <thead>
+            <tr>
+              <th style="width:150px;">Time</th>
+              <th>User</th>
+              <th>Action</th>
+              <th>Method</th>
+              <th>Path</th>
+              <th>Status</th>
+              <th>IP</th>
+              <th>User agent</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+            <tr>
+              <td class="text-muted" style="font-size:0.78rem;white-space:nowrap;">{{ log.created_at|date:"M d, H:i:s" }}</td>
+              <td style="font-size:0.82rem;">
+                {% if log.user %}{{ log.user.username }}{% else %}<span class="text-muted">anonymous</span>{% endif %}
+              </td>
+              <td style="font-size:0.82rem;">{{ log.action|default:"—" }}</td>
+              <td><span class="badge" style="background:rgba(16,185,129,0.15);color:#6ee7b7;">{{ log.method }}</span></td>
+              <td style="font-size:0.8rem;max-width:280px;word-break:break-all;">{{ log.path }}</td>
+              <td style="font-size:0.8rem;">{{ log.status_code|default:"—" }}</td>
+              <td style="font-size:0.78rem;">{{ log.ip|default:"—" }}</td>
+              <td class="text-muted" style="font-size:0.72rem;max-width:240px;">
+                <div class="text-truncate" title="{{ log.user_agent }}">{{ log.user_agent|default:"—" }}</div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center text-muted py-4">No activity recorded yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if total_count > 500 %}
+      <div class="card-footer text-muted" style="font-size:0.75rem;">Showing the latest 500 records. Use search to narrow down.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

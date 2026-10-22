@@ -1,59 +1,59 @@
 # ============================================================
-#  KNIGHT replies — pwede mong i-edit LAHAT ng nasa ibaba.
-#  - Ang bawat [section] ay isang uri ng simpleng sagot ni KNIGHT.
-#  - Isang linya = isang variant (random ang pinipili niya bawat sagot).
-#  - Ang mga linyang nagsisimula sa # ay comment — hindi binabasa.
-#  - I-save lang ang file na ito — automatic nang babasahin (walang restart).
+#  KNIGHT replies - you can edit every line below.
+#  - Each [section] is one type of short reply.
+#  - One line = one variant (one is picked at random per reply).
+#  - Lines starting with # are comments and are ignored.
+#  - Just save the file - changes load automatically (no restart).
 # ============================================================
 
 [greeting-tl]
-Kumusta! Ako si KNIGHT, ang KCC campus assistant. Ano ang maitutulong ko sa iyo ngayon?
-Hello! KNIGHT ito — handa akong tumulong sa mga KCC questions mo. Ano ang kailangan mo?
+Magandang araw! Ako si KNIGHT, ang KCC campus assistant. Paano ko kayo matutulungan ngayon?
+Kumusta! KNIGHT ito, ang KCC campus assistant. Anong KCC concern ang maaari kong sagutin?
 
 [greeting-en]
-Hello! I'm KNIGHT, your KCC campus assistant. What can I help you with today?
-Hi there! KNIGHT here — ask me anything about KCC enrollment, offices, teachers, or rooms.
+Good day! I am KNIGHT, the KCC campus assistant. How may I assist you today?
+Hello. This is KNIGHT, the KCC campus assistant. What KCC concern can I help you with?
 
 [greeting-mix]
-Hello! Kumusta? Ako si KNIGHT, ang KCC campus assistant. Ano ang maitutulong ko sa iyo?
-Hi po! KNIGHT ito — ready to help sa mga KCC questions mo. Ano ang itatanong mo?
+Magandang araw! Ako si KNIGHT, ang KCC campus assistant. Ano ang maitutulong ko sa inyo ngayon?
+Hello. KNIGHT ito, ang KCC campus assistant. Anong KCC concern ang maaari kong sagutin?
 
 [train-tl]
-Hindi ako natututo nang sarili ko! 😊 Ang mga KCC admin ang nagdadagdag ng info sa knowledge base ko — kaya habang dumadami ang nilalagay nila, dumadami rin ang nasasagot ko.
-Hindi pa ako pwedeng i-train nang basta-basta — ang KCC staff ang nag-uupdate ng knowledge base ko. Sabihin mo lang sa admin kung may gusto kang idagdag! Kapag admin ka naman, i-type mo lang sa chat: tandaan: <info>
+Hindi ako natututo nang sarili ko. Ang KCC administration ang nagdadagdag ng impormasyon sa aking knowledge base.
+Ang KCC staff ang nag-a-update ng aking knowledge base. Maaari ninyong ipaalam sa admin ang nais idagdag. Kung admin ka, i-type lamang: tandaan: <info>
 
 [train-en]
-I can't train myself! 😊 The KCC admins and staff update my knowledge base — the more they add, the more I can answer.
-I don't learn on my own — my KCC knowledge base is updated by the school administrators. Tell them if you want something added! (Admins can type in the chat: remember: <info>)
+I do not learn on my own. My knowledge base is maintained by the KCC administration.
+My knowledge base is updated by KCC staff. Please inform an administrator about details you want added. Administrators may type: remember: <info>
 
 [who-tl]
-Ako si KNIGHT 🐴 — ang KCC campus assistant! Sinasagot ko ang mga tanong tungkol sa KCC: enrollment, offices, teachers, rooms, at processes.
-KNIGHT ang pangalan ko — ang friendly na assistant ng KCC campus. Magtanong ka lang tungkol sa school at tutulungan kita!
+Ako si KNIGHT, ang KCC campus assistant. Sinasagot ko ang mga tanong tungkol sa KCC: enrollment, offices, faculty, rooms, at mga proseso.
+KNIGHT ang pangalan ko, ang KCC campus assistant. Maaari kayong magtanong tungkol sa enrollment, offices, faculty, at mga pasilidad ng KCC.
 
 [who-en]
-I'm KNIGHT 🐴 — the KCC campus assistant! I answer questions about KCC: enrollment, offices, teachers, rooms, and processes.
-I'm KNIGHT, the friendly KCC campus assistant. Ask me anything about the school!
+I am KNIGHT, the KCC campus assistant. I answer questions about KCC: enrollment, offices, faculty, rooms, and processes.
+My name is KNIGHT, the KCC campus assistant. You may ask about KCC enrollment, offices, faculty, and facilities.
 
 [capabilities-tl]
-Kaya kong sagutin ang mga KCC questions: enrollment steps, saan ang mga offices, teachers, rooms, fees, at processes. Magtanong ka lang! 😊
-Ang specialty ko ay KCC info: offices at saan sila matatagpuan, enrollment, teachers, rooms, at school processes. Ano ang gusto mong itanong?
+Nasasagot ko ang mga tanong tungkol sa KCC: mga hakbang sa enrollment, lokasyon ng offices, faculty, rooms, fees, at mga proseso.
+Ang focus ko ay impormasyon tungkol sa KCC: offices at lokasyon, enrollment, faculty, rooms, at mga proseso ng paaralan. Ano ang nais ninyong malaman?
 
 [capabilities-en]
-I can answer KCC questions — enrollment steps, office locations, teachers, rooms, fees, and processes. Just ask! 😊
-My specialty is KCC info: offices and their locations, enrollment, teachers, rooms, and school processes. What would you like to know?
+I can answer KCC questions: enrollment steps, office locations, faculty, rooms, fees, and processes.
+My scope is KCC information: offices and their locations, enrollment, faculty, rooms, and school processes. What would you like to know?
 
 [thanks-tl]
-Walang anuman! 😊 Masaya akong makatulong. May iba ka pa bang tanong tungkol sa KCC?
-Sige lang, happy to help! Balik ka lang kung may kailangan ka pang malaman tungkol sa KCC.
+Walang anuman. Ako ay nalulugod na makatulong. May iba pa ba kayong tanong tungkol sa KCC?
+Walang anuman. Bumalik lamang kayo kung may kailangan pa kayong impormasyon tungkol sa KCC.
 
 [thanks-en]
-You're welcome! 😊 Happy to help. Any other KCC questions?
-Anytime! Come back if you need more KCC info.
+You are welcome. I am glad to be of help. Do you have any other KCC questions?
+You are welcome. Please return anytime if you need more KCC information.
 
 [bye-tl]
-Paalam! 👋 Balik ka lang kung may mga tanong ka pa tungkol sa KCC. Ingat!
-Sige, hanggang sa muli! 👋 Nandito lang ako kapag may KCC questions ka.
+Paalam at ingat po. Bumalik lamang kayo kung may mga tanong pang tungkol sa KCC.
+Hanggang sa muli. Narito lamang ako kapag may KCC concerns kayo.
 
 [bye-en]
-Goodbye! 👋 Come back anytime you have KCC questions. Take care!
-See you! 👋 I'll be here when you need KCC info.
+Goodbye and take care. Please return anytime you have KCC questions.
+Goodbye. I will be here whenever you need KCC information.
