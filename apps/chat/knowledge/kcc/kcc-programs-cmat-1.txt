@@ -1,4 +1,4 @@
-KCC College Programs - Management, Accountancy and Technology (Part 1)
+# KCC College Programs - Management, Accountancy and Technology (Part 1)
 Ang mga sumusunod ay college courses/kurso (degree programs) ng KCC sa ilalim ng College of Management, Accountancy and Technology (CMAT) - Part 1.
 BS in Business Administration (BSBA) - Majors: Financial Management, Marketing Management. Careers: Financial Analyst, Marketing Manager, HR Specialist, Entrepreneur, Business Consultant. Prepares students for careers in business and management: financial analysis, marketing strategy, organizational management, entrepreneurship.
 BS in Information Technology (BSIT) - Careers: Software Developer, Network Administrator, Database Administrator, IT Consultant, Web Developer. Develops future-ready IT professionals with skills in software development, networking, database management, and emerging technologies, with hands-on experience building real-world applications.

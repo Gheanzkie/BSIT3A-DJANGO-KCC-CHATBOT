@@ -1,4 +1,4 @@
-KCC Senior High - TVL Technical Professional Track Strands
+# KCC Senior High - TVL Technical Professional Track Strands
 ICT (Information and Communications Technology): Equips students with skills in computer systems, programming, web development, and digital technologies. Skills: Computer Programming, Web Development, Computer Systems Servicing, Digital Literacy.
 Home Economics: Develops practical skills in food service, dressmaking, beauty care, and other home-based livelihood areas. Skills: Food & Beverage Service, Bread & Pastry Production, Cookery, Household Services.
 Industrial Arts: Trains students in technical and mechanical skills for industrial and construction-related careers. Skills: Electrical Installation, Plumbing, Carpentry, Automotive Servicing.

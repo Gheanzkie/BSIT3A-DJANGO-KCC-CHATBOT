@@ -1,5 +1,6 @@
-KCC School Profile - Kabankalan Catholic College, Inc.
+# KCC School Profile - Kabankalan Catholic College, Inc.
 Kabankalan Catholic College, Inc. (KCC) is a Christ-centered Catholic educational institution in Kabankalan City, Negros Occidental, Philippines.
+
 - Founded: 1927, as "Kabankalan Institute" (later renamed Kabankalan Private Academy; formerly Kabankalan Academy).
 - Motto: "Teach Ye All Nations" (Matthew 28:19).
 - Tagline: "Catholic Education: Our Identity, Our Mission".

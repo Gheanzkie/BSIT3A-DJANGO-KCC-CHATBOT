@@ -718,7 +718,10 @@ def _cosine(a, b):
 
 
 def _keywords(text):
-    return {w for w in re.findall(r'[a-zA-Z0-9]+', text.lower()) if len(w) >= 3 and w not in _STOPWORDS}
+    # Money amounts (9,000.00) are noise for keyword matching; keep grade numbers.
+    text = re.sub(r'[\d,]+\.\d{2}', ' ', text.lower())
+    return {w for w in re.findall(r'[a-zA-Z0-9]+', text)
+            if (len(w) >= 3 or w.isdigit()) and w not in _STOPWORDS}
 
 
 # ---------------------------------------------------------------------------

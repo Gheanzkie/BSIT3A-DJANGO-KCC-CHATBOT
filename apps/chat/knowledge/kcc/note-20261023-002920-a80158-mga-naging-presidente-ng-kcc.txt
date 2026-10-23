@@ -1,8 +1,15 @@
-Mga naging presidente ng KCC
-Pangalan	Panahon / detalye
-Msgr. Josefino I. Iledan	Naging College President noong panahon ng pamamahala ng mga diocesan priest, simula 1983.
-Msgr. Rogelio B. Cruz	College President noong 1996, nang tumulong ang Carmelite Sisters of Our Lady sa pamamahala ng paaralan.
-Most Rev. Patricio A. Buzon, SDB, D.D.	Naging School President at Chairman of the Board of Trustees noong 2005.
-Rev. Fr. Radny T. Bayog, Ph.D.	Itinalagang School President noong 2011.
-Rev. Fr. Eugene D. Lucerna II	Nagsimulang manungkulan noong School Year 2019–2020 at nagsilbi nang humigit-kumulang anim na taon.
+# Mga naging presidente ng KCC
+
+Pangalan	Panahon / detalye
+
+Msgr. Josefino I. Iledan	Naging College President noong panahon ng pamamahala ng mga diocesan priest, simula 1983.
+
+Msgr. Rogelio B. Cruz	College President noong 1996, nang tumulong ang Carmelite Sisters of Our Lady sa pamamahala ng paaralan.
+
+Most Rev. Patricio A. Buzon, SDB, D.D.	Naging School President at Chairman of the Board of Trustees noong 2005.
+
+Rev. Fr. Radny T. Bayog, Ph.D.	Itinalagang School President noong 2011.
+
+Rev. Fr. Eugene D. Lucerna II	Nagsimulang manungkulan noong School Year 2019–2020 at nagsilbi nang humigit-kumulang anim na taon.
+
 Rev. Fr. Richard L. Lachica, MAEd	Itinalagang bagong School President noong Abril 15, 2025, para sa AY 2025–2026.

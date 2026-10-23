@@ -1,0 +1,37 @@
+# KCC Tuition and Fees - Grade 12 (AY 2026-2027)
+
+Grade 12 fee schedule, Senior High School, Kabankalan Catholic College, Inc.,
+Academic Year 2026-2027.
+
+Also asked as: grade 12 tuition, grade 12 school fees, senior high school tuition, SHS grade 12 fees, grade 12 voucher deduction, grade 12 FAPE QVR, graduating senior high fees.
+## Fee breakdown
+
+| Fee item | Amount |
+|---|---|
+| Tuition | ₱21,000.00 |
+| Entrance & Miscellaneous | ₱6,790.00 |
+| Wela (MIS) | ₱900.00 |
+| LMS | ₱1,800.00 |
+| Intramurals | ₱100.00 |
+| KCC Week | ₱100.00 |
+| Centennial | ₱100.00 |
+| PTA | ₱200.00 |
+| Yearbook | ₱3,000.00 |
+| Graduation Fee | ₱800.00 |
+| Alumni Fee | ₱100.00 |
+
+## FAPE/QVR deduction and total
+
+| Student came from | FAPE/QVR deduction | Total school fees |
+|---|---|---|
+| Public school | ₱17,500.00 | ₱17,390.00 |
+| Private school | ₱14,000.00 | ₱20,890.00 |
+
+## How to answer
+
+1. Ask whether the student came from a public or a private school before giving a total.
+2. Public school graduate: ₱17,390.00. Private school graduate: ₱20,890.00.
+3. Grade 12 is higher than Grade 11 because of Yearbook, Graduation Fee and Alumni Fee.
+4. If the user does not know the school type, give both totals and explain the difference.
+5. Give the breakdown only when the user asks for details.
+6. Do not invent additional fees or payment terms.

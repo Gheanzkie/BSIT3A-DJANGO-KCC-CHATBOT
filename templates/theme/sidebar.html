@@ -14,20 +14,18 @@
     <div class="collapse navbar-collapse" id="sidebar-menu">
       <ul class="navbar-nav pt-lg-2 py-lg-2">
 
-        <!-- ============ Help / Report / Theme (flat, no nested menu) ============ -->
-        <li class="nav-item mb-1">
-          <a class="nav-link" href="{% url 'help' %}">
-            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-circle-question"></i></span>
-            <span class="nav-link-title">Help</span>
+        <!-- ============ Back to chat (guests + members) ============ -->
+        {% if not user.is_superuser %}
+        {% if request.resolver_match.app_name != 'chat' %}
+        <li class="nav-item px-2 pt-2 mb-1">
+          <a class="btn btn-primary btn-sm w-100" href="{% url 'chat:page' %}">
+            <i class="fas fa-comments me-1"></i> Back to chat
           </a>
         </li>
-        <li class="nav-item mb-1">
-          <button type="button" class="nav-link w-100 text-start" data-bs-toggle="modal" data-bs-target="#kccReportModal"
-                  style="background:none;border:0;cursor:pointer;">
-            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-flag"></i></span>
-            <span class="nav-link-title">Report a Problem</span>
-          </button>
-        </li>
+        {% endif %}
+        {% endif %}
+
+        <!-- ============ Theme toggle (Help / Report / Announcements are floating buttons) ============ -->
         <li class="nav-item mb-1">
           <button type="button" class="nav-link w-100 text-start" data-theme-toggle
                   style="background:none;border:0;cursor:pointer;">
@@ -74,17 +72,10 @@
           </a>
         </li>
 
-        <li class="nav-item mb-1">
-          <a class="nav-link {% if request.resolver_match.url_name == 'announcements' %}active{% endif %}" href="{% url 'announcements' %}">
-            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-bullhorn"></i></span>
-            <span class="nav-link-title">Announcements</span>
-          </a>
-        </li>
-
         {% else %}
         <!-- ============ PUBLIC: flat nav (no sessions, no new chat) ============ -->
         {% if user.is_authenticated %}
-        <li class="nav-item px-2 pt-2">
+        <li class="nav-item px-2 pt-2 pb-1">
           <form method="post" action="{% url 'chat:new' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary btn-sm w-100">
@@ -121,12 +112,13 @@
         {% endif %}
 
         <li class="nav-item mb-1">
-          <a class="nav-link {% if request.resolver_match.url_name == 'announcements' %}active{% endif %}" href="{% url 'announcements' %}">
+          <button type="button" class="nav-link w-100 text-start" data-kcc-panel="announcements"
+                  style="background:none;border:0;cursor:pointer;">
             <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-bullhorn"></i></span>
             <span class="nav-link-title">Announcements
               {% if sidebar_announcements %}<span class="badge ms-1 kcc-badge-green" style="font-size:0.6rem;vertical-align:middle;">{{ sidebar_announcements|length }}</span>{% endif %}
             </span>
-          </a>
+          </button>
         </li>
         {% endif %}
 

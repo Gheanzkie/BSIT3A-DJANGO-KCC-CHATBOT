@@ -1,4 +1,4 @@
-KCC College Programs - Management, Accountancy and Technology (Part 2)
+# KCC College Programs - Management, Accountancy and Technology (Part 2)
 Ang mga sumusunod ay college courses/kurso (degree programs) ng KCC sa ilalim ng College of Management, Accountancy and Technology (CMAT) - Part 2.
 BS in Accounting Information System (BSAIS) - Careers: IT Auditor, Systems Analyst, ERP Consultant, Database Administrator, Financial Systems Manager. Integrates accounting knowledge with information technology skills; students learn to design, implement, and manage accounting information systems for modern business environments.
 BS in Management Accounting (BSMA) - Careers: Management Accountant, Cost Analyst, Budget Manager, Financial Planner, Business Consultant. Focuses on strategic financial management and decision-making: cost analysis, budgeting, performance evaluation, and strategic planning.

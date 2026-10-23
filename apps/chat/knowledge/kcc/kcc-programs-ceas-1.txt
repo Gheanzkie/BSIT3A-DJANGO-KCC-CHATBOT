@@ -1,4 +1,4 @@
-KCC College Programs - Education, Arts and Sciences (Part 1)
+# KCC College Programs - Education, Arts and Sciences (Part 1)
 Ang mga sumusunod ay college courses/kurso (degree programs) ng KCC sa ilalim ng College of Education, Arts and Sciences (CEAS) - Part 1.
 Bachelor of Elementary Education (BEEd) - Majors: General Education. Careers: Elementary School Teacher, Education Specialist, Curriculum Developer, School Administrator. Prepares dedicated and competent educators for elementary education, with strong pedagogical foundations and content knowledge for teaching young learners.
 Bachelor of Secondary Education (BSEd) - Majors: English, Filipino, Values Education, Science, Mathematics. Careers: High School Teacher, Subject Coordinator, Education Researcher, Guidance Counselor. Trains future secondary school teachers with specializations; graduates gain advanced subject matter knowledge and teaching methodologies.

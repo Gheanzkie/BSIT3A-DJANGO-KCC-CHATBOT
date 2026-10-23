@@ -1,2 +1,2 @@
-KCC Gym Schedule
+# KCC Gym Schedule
 ang gym ay bukas monday to friday ang closed saturday and sunday

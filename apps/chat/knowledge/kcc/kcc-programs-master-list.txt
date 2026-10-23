@@ -1,18 +1,23 @@
-KCC College Courses - Complete List (Courses, Kurso, Programs, All 13 Degrees)
+# KCC College Courses - Complete List (Courses, Kurso, Programs, All 13 Degrees)
 Lahat ng college courses at kurso ng KCC - kumpletong listahan ng 13 degree programs, ayon sa college:
 College of Management, Accountancy and Technology (CMAT):
+
 1. BS Business Administration (BSBA) - majors: Financial Management, Marketing Management
 2. BS Information Technology (BSIT)
 3. BS Accountancy (BSA)
 4. BS Accounting Information System (BSAIS)
 5. BS Management Accounting (BSMA)
 6. BS Tourism Management (BSTM)
+
 College of Education, Arts and Sciences (CEAS):
+
 7. Bachelor of Elementary Education (BEEd)
 8. Bachelor of Secondary Education (BSEd) - majors: English, Filipino, Values Education, Science, Mathematics
 9. Bachelor of Early Childhood Education (BECEd)
 10. Bachelor of Physical Education (BPEd)
 11. Bachelor of Arts in Philosophy (AB Philosophy)
 12. BS Psychology
+
 College of Criminology:
+
 13. BS Criminology

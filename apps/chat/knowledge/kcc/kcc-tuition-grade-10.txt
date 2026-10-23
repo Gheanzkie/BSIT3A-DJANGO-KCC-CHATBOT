@@ -1,0 +1,31 @@
+# KCC Tuition and Fees - Grade 10 (AY 2026-2027)
+
+Grade 10 fee schedule, High School Department of Kabankalan Catholic College, Inc.,
+Academic Year 2026-2027.
+
+Also asked as: grade 10 tuition, grade 10 school fees, fourth year high school fees, JHS grade 10 fees, graduating JHS fees.
+## Fee breakdown
+
+| Fee item | Amount |
+|---|---|
+| Tuition | ₱15,015.00 |
+| Entrance & Miscellaneous | ₱6,790.00 |
+| Wela (MIS) | ₱900.00 |
+| LMS | ₱1,800.00 |
+| Intramurals | ₱100.00 |
+| KCC Week | ₱100.00 |
+| Centennial | ₱100.00 |
+| PTA | ₱200.00 |
+| Yearbook | ₱3,000.00 |
+| Graduation Fee | ₱800.00 |
+| Alumni Fee | ₱100.00 |
+| Less: FAPE/QVR | ₱9,000.00 |
+
+**Total school fees: ₱19,905.00**
+
+## How to answer
+
+1. Grade 10 total is ₱19,905.00 after the ₱9,000.00 FAPE/QVR deduction.
+2. Grade 10 is higher than the lower grade levels because of Yearbook, Graduation Fee and Alumni Fee.
+3. Give the breakdown only when the user asks for details.
+4. Do not invent additional fees or payment terms.

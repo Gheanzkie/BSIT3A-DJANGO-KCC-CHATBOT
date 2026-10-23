@@ -1,4 +1,5 @@
-KCC Basic Education - Elementary (K-6)
+# KCC Basic Education - Elementary (K-6)
+
 - Strong Academic Foundation: A comprehensive K-6 curriculum aligned with DepEd standards, integrating Catholic values in every subject area.
 - Faith Formation: Regular liturgical celebrations, prayer services, and Christian Living classes that nurture spiritual growth from an early age.
 - Arts & Creativity: Programs in visual arts, music, and performing arts that develop creative expression and artistic appreciation.
