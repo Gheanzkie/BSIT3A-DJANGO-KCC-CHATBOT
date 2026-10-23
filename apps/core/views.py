@@ -49,7 +49,7 @@ def _drop_anonymous_conversations(request, anon_key):
 @require_http_methods(['GET', 'POST'])
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('dashboard') if request.user.is_superuser else redirect('chat:page')
+        return redirect('dashboard') if request.user.is_superuser else redirect('welcome')
 
     if request.method == 'GET':
         return render(request, 'auth/login.html')
@@ -75,11 +75,12 @@ def login_view(request):
         cache.delete(account_key)
         anon_key = request.session.session_key
         login(request, user)
+        request.session.pop('kcc_chat_started', None)
         _drop_anonymous_conversations(request, anon_key)
         log_activity(request, 'login', user=user)
         if ajax:
-            return JsonResponse({'ok': True, 'redirect': '/home/' if user.is_superuser else '/chat/'})
-        return redirect('dashboard') if user.is_superuser else redirect('chat:page')
+            return JsonResponse({'ok': True, 'redirect': '/home/' if user.is_superuser else '/'})
+        return redirect('dashboard') if user.is_superuser else redirect('welcome')
 
     cache.set(account_key, cache.get(account_key, 0) + 1, settings.LOGIN_LOCKOUT_SECONDS)
     cache.set(ip_key, cache.get(ip_key, 0) + 1, settings.LOGIN_LOCKOUT_SECONDS)
@@ -93,7 +94,7 @@ def login_view(request):
 def register_view(request):
     """Create an account from the floating register modal; auto-login on success."""
     if request.user.is_authenticated:
-        return redirect('chat:page')
+        return redirect('welcome')
 
     if request.method == 'GET':
         return redirect('login')
@@ -150,18 +151,19 @@ def register_view(request):
     )
     anon_key = request.session.session_key
     login(request, user)
+    request.session.pop('kcc_chat_started', None)
     _drop_anonymous_conversations(request, anon_key)
     log_activity(request, 'register', user=user)
 
     if ajax:
-        return JsonResponse({'ok': True, 'redirect': '/chat/'})
-    return redirect('chat:page')
+        return JsonResponse({'ok': True, 'redirect': '/'})
+    return redirect('welcome')
 
 
 @require_POST
 def logout_view(request):
     logout(request)
-    return redirect('chat:page')
+    return redirect('welcome')
 
 
 def _mask_key(key):
@@ -172,8 +174,12 @@ def _mask_key(key):
     return f'{key[:6]}…{key[-4:]}'
 
 
-@user_passes_test(_is_superuser, login_url='login')
 def home(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if not request.user.is_superuser:
+        # Regular users belong in the chat at the site root.
+        return redirect('welcome')
     from apps.chat.models import Conversation, Message
     from apps.chat.services import ai as ai_service
 
@@ -218,10 +224,10 @@ def home(request):
 
 
 def welcome_view(request):
-    """Public visitors land straight in the chat, ChatGPT-style."""
+    """Landing page at the site root; the chat itself lives at /chat/."""
     if request.user.is_authenticated and request.user.is_superuser:
         return redirect('dashboard')
-    return redirect('chat:page')
+    return render(request, 'welcome.html')
 
 
 # ---------- HELP ----------
@@ -235,7 +241,7 @@ def help_view(request):
 @require_http_methods(['GET', 'POST'])
 def report_view(request):
     if request.method == 'GET':
-        return redirect('chat:page')
+        return redirect('welcome')
 
     ip = _client_ip(request)
     ajax = _is_ajax(request)
@@ -244,7 +250,7 @@ def report_view(request):
         if ajax:
             return JsonResponse({'ok': False, 'error': REPORT_LIMIT_MESSAGE}, status=429)
         messages.error(request, REPORT_LIMIT_MESSAGE)
-        return redirect('chat:page')
+        return redirect('welcome')
     cache.set(rate_key, cache.get(rate_key, 0) + 1, 3600)
 
     category = request.POST.get('category', 'other')
@@ -256,7 +262,7 @@ def report_view(request):
         if ajax:
             return JsonResponse({'ok': False, 'error': 'Please describe the problem (at least 5 characters).'}, status=400)
         messages.error(request, 'Please describe the problem (at least 5 characters).')
-        return redirect('chat:page')
+        return redirect('welcome')
 
     ticket = Ticket.objects.create(
         user=request.user if request.user.is_authenticated else None,
@@ -267,7 +273,7 @@ def report_view(request):
     if ajax:
         return JsonResponse({'ok': True, 'ticket': ticket.pk, 'message': f'Thanks! Ticket #{ticket.pk} was sent to the admin.'})
     messages.success(request, f'Thanks! Ticket #{ticket.pk} was sent to the admin.')
-    return redirect('chat:page')
+    return redirect('welcome')
 
 
 # ---------- ADMIN ANNOUNCEMENTS ----------

@@ -43,6 +43,7 @@ from typing import NamedTuple
 
 import requests
 from django.conf import settings
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -345,8 +346,9 @@ class AIUnavailable(Exception):
 # Low-level HTTP
 # ---------------------------------------------------------------------------
 
-def _post(url, *, headers=None, payload=None, params=None):
-    resp = requests.post(url, headers=headers, json=payload, params=params, timeout=REQUEST_TIMEOUT)
+def _post(url, *, headers=None, payload=None, params=None, timeout=None):
+    resp = requests.post(url, headers=headers, json=payload, params=params,
+                         timeout=timeout or REQUEST_TIMEOUT)
     resp.raise_for_status()
     return resp
 
@@ -359,13 +361,14 @@ def _is_transient(exc):
     return status in (429, 500, 502, 503, 504)
 
 
-def _post_retry(url, *, headers=None, payload=None, params=None):
+def _post_retry(url, *, headers=None, payload=None, params=None, timeout=None, attempts=None):
     """_post() na may bounded retry + exponential backoff para sa transient errors only."""
-    attempts = int(getattr(settings, 'AI_RETRY_ATTEMPTS', 2))
+    if attempts is None:
+        attempts = int(getattr(settings, 'AI_RETRY_ATTEMPTS', 2))
     backoff = float(getattr(settings, 'AI_RETRY_BACKOFF', 1.5))
     for attempt in range(attempts + 1):
         try:
-            return _post(url, headers=headers, payload=payload, params=params)
+            return _post(url, headers=headers, payload=payload, params=params, timeout=timeout)
         except requests.RequestException as exc:
             if attempt >= attempts or not _is_transient(exc):
                 raise
@@ -436,7 +439,7 @@ def _slot_reasoning_effort(slot):
     return _normalize_effort(getattr(settings, 'AI_REASONING_EFFORT', ''))
 
 
-def _chat_openai(base_url, api_key, model, system_prompt, history, user_message, usage_key='groq', user=None, effort=None):
+def _chat_openai(base_url, api_key, model, system_prompt, history, user_message, usage_key='groq', user=None, effort=None, slot=None):
     """One OpenAI-compatible chat call.
 
     POST {base_url}/chat/completions with Bearer auth (Groq + Gemini).
@@ -476,10 +479,16 @@ def _chat_openai(base_url, api_key, model, system_prompt, history, user_message,
             body['reasoning_effort'] = effort
         t0 = time.monotonic()
         try:
+            timeout = (int(getattr(settings, 'AI_HTTP_TIMEOUT_FALLBACK', 25))
+                       if slot == 'fallback' else REQUEST_TIMEOUT)
+            attempts = (int(getattr(settings, 'AI_RETRY_ATTEMPTS_FALLBACK', 1))
+                        if slot == 'fallback' else None)
             resp = _post_retry(
                 f'{base_url.rstrip("/")}/chat/completions',
                 headers={'Authorization': f'Bearer {api_key}'},
                 payload=body,
+                timeout=timeout,
+                attempts=attempts,
             )
             data = resp.json()
         except requests.RequestException as exc:
@@ -535,7 +544,7 @@ def _chat_slot(slot, system_prompt, history, user_message, user=None, effort=Non
     return (
         _chat_openai(settings.AI_FALLBACK_BASE_URL, settings.GEMINI_API_KEY,
                      settings.AI_CHAT_MODEL_GEMINI, system_prompt, history, user_message,
-                     usage_key='gemini', user=user, effort=effort),
+                     usage_key='gemini', user=user, effort='', slot='fallback'),
         settings.AI_FALLBACK_NAME,
     )
 
@@ -549,11 +558,13 @@ Kung tama na ang teksto, ibalik ito nang buo at walang babaguhin."""
 def correct_prompt(message, engine='auto', user=None):
     """Model-based autocorrect ng maling prompt. Returns corrected text (o original kapag fail)."""
     original = (message or '').strip()
-    if not original or len(original) > 500:
+    if not original or len(original) < 12 or len(original) > 500:
         return original
     try:
         # Utility call: typo-fix lang — low effort, hindi ito reasoning task (tipid sa quota).
-        fixed, _engine = chat(_PROMPT_FIX_SYSTEM, [], original, engine=engine, user=user, effort='low')
+        # Run it on the fast engine when available so a slow provider is not paid twice.
+        fix_engine = 'primary' if getattr(settings, 'GROQ_API_KEY', '') else engine
+        fixed, _engine = chat(_PROMPT_FIX_SYSTEM, [], original, engine=fix_engine, user=user, effort='low')
     except AIUnavailable:
         return original
     fixed = (fixed or '').strip().strip('"').strip("'")
@@ -569,13 +580,33 @@ def chat(system_prompt, history, user_message, engine='auto', user=None, effort=
     explicit 'low'/'medium'/'high' = override (hal. utility calls).
     """
     errors = []
-    for slot in _ENGINE_ORDER.get(engine, _ENGINE_ORDER['auto']):
+    order = list(_ENGINE_ORDER.get(engine, _ENGINE_ORDER['auto']))
+    # Short cooldown: a provider that just 503'd is skipped for a while instead of
+    # making every single question wait for it first.
+    healthy = [slot for slot in order if not _slot_dead(slot)]
+    order = healthy or order
+    for slot in order:
         try:
-            return _chat_slot(slot, system_prompt, history, user_message, user=user, effort=effort)
+            reply = _chat_slot(slot, system_prompt, history, user_message, user=user, effort=effort)
+            _mark_slot(slot, ok=True)
+            return reply
         except (AIConfigError, AIUnavailable) as exc:
+            _mark_slot(slot, ok=False)
             errors.append(f'{slot}: {exc}')
             logger.info('Engine %s failed (%s), trying next', slot, exc)
     raise AIUnavailable('; '.join(errors))
+
+
+def _slot_dead(slot):
+    return bool(cache.get(f'kcc:ai:dead:{slot}'))
+
+
+def _mark_slot(slot, *, ok):
+    key = f'kcc:ai:dead:{slot}'
+    if ok:
+        cache.delete(key)
+    else:
+        cache.set(key, 1, int(getattr(settings, 'AI_SLOT_COOLDOWN_SECONDS', 90)))
 
 
 # ---------------------------------------------------------------------------

@@ -28,13 +28,9 @@ def chat_sessions(request):
                 Conversation.objects.filter(user=user).order_by('-updated_at')[:50]
             )
         else:
-            key = getattr(getattr(request, 'session', None), 'session_key', None)
-            if key:
-                items = list(
-                    Conversation.objects.filter(
-                        user__isnull=True, session_key=key
-                    ).order_by('-updated_at')[:50]
-                )
+            # Guests never see a session list: their chat is ephemeral and gets
+            # deleted when the tab closes, so nothing is exposed or countable.
+            items = []
     except Exception:
         return {}
     return {'sessions': items}

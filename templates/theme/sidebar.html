@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 <aside id="kccSidebar" class="navbar navbar-vertical navbar-expand-lg navbar-dark dh-sidebar">
   <div class="container-fluid">
     <a href="{% if user.is_superuser %}{% url 'dashboard' %}{% else %}{% url 'chat:page' %}{% endif %}" class="navbar-brand navbar-brand-autodark d-flex align-items-center gap-2 text-decoration-none" style="padding: 0.75rem 0.5rem;">
@@ -6,34 +6,34 @@
       <span class="dh-brand-name"><span style="color:var(--kcc-accent)">KCC</span> CHATBOT</span>
     </a>
 
-    <button class="navbar-toggler" type="button" id="kccMenuToggle" aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <button class="navbar-toggler" type="button" id="kccMenuToggle"
+            aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fas fa-bars" id="kccMenuToggleIcon"></i>
     </button>
 
     <div class="collapse navbar-collapse" id="sidebar-menu">
       <ul class="navbar-nav pt-lg-2 py-lg-2">
 
-        <!-- ============ HAMBURGER: Help / Report ============ -->
+        <!-- ============ Help / Report / Theme (flat, no nested menu) ============ -->
         <li class="nav-item mb-1">
-          <button type="button" id="kccSidebarMenuBtn" class="nav-link w-100 text-start"
-                  aria-expanded="false" aria-controls="kccSidebarMenu"
+          <a class="nav-link" href="{% url 'help' %}">
+            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-circle-question"></i></span>
+            <span class="nav-link-title">Help</span>
+          </a>
+        </li>
+        <li class="nav-item mb-1">
+          <button type="button" class="nav-link w-100 text-start" data-bs-toggle="modal" data-bs-target="#kccReportModal"
                   style="background:none;border:0;cursor:pointer;">
-            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-bars"></i></span>
-            <span class="nav-link-title">Menu</span>
+            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-flag"></i></span>
+            <span class="nav-link-title">Report a Problem</span>
           </button>
-          <div id="kccSidebarMenu" class="d-none" style="border-left:2px solid rgba(16,185,129,0.3);margin-left:1rem;padding-left:0.4rem;">
-            <a class="nav-link" href="{% url 'help' %}">
-              <i class="fas fa-circle-question me-2"></i>Help
-            </a>
-            <button type="button" class="nav-link w-100 text-start" data-bs-toggle="modal" data-bs-target="#kccReportModal"
-                    style="background:none;border:0;cursor:pointer;">
-              <i class="fas fa-flag me-2"></i>Report a Problem
-            </button>
-            <button type="button" class="nav-link w-100 text-start" data-theme-toggle
-                    style="background:none;border:0;cursor:pointer;">
-              <span class="me-2"><i class="fas fa-sun"></i></span><span data-theme-label>Light mode</span>
-            </button>
-          </div>
+        </li>
+        <li class="nav-item mb-1">
+          <button type="button" class="nav-link w-100 text-start" data-theme-toggle
+                  style="background:none;border:0;cursor:pointer;">
+            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-sun"></i></span>
+            <span class="nav-link-title" data-theme-label>Light mode</span>
+          </button>
         </li>
 
         {% if user.is_superuser %}
@@ -82,7 +82,8 @@
         </li>
 
         {% else %}
-        <!-- ============ PUBLIC: New chat + Sessions ============ -->
+        <!-- ============ PUBLIC: flat nav (no sessions, no new chat) ============ -->
+        {% if user.is_authenticated %}
         <li class="nav-item px-2 pt-2">
           <form method="post" action="{% url 'chat:new' %}">
             {% csrf_token %}
@@ -91,18 +92,20 @@
             </button>
           </form>
         </li>
+        {% endif %}
 
+        {% if user.is_authenticated %}
         <li class="nav-item">
           <span class="dh-nav-section">Recent</span>
         </li>
 
         {% for s in sessions %}
         <li class="nav-item mb-1 kcc-session-row">
-          <a class="nav-link text-truncate flex-grow-1 {% if s.pk == current_conversation_id %}active{% endif %}" href="{% url 'chat:session' s.pk %}" style="font-size:0.85rem;">
+          <a class="nav-link text-truncate flex-grow-1 {% if s.token == current_conversation_token %}active{% endif %}" href="{% url 'chat:session' s.token %}" style="font-size:0.85rem;">
             <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="far fa-comment"></i></span>
             <span class="nav-link-title text-truncate">{{ s.title|default:"New chat" }}</span>
           </a>
-          <form method="post" action="{% url 'chat:session_delete' s.pk %}" class="m-0"
+          <form method="post" action="{% url 'chat:session_delete' s.token %}" class="m-0"
                 onsubmit="return confirm('Delete this session?');">
             {% csrf_token %}
             <button type="submit" class="btn btn-sm text-secondary p-1 lh-1" title="Delete session">
@@ -115,6 +118,7 @@
           <div class="text-secondary px-3" style="font-size:0.8rem;">No sessions yet.</div>
         </li>
         {% endfor %}
+        {% endif %}
 
         <li class="nav-item mb-1">
           <a class="nav-link {% if request.resolver_match.url_name == 'announcements' %}active{% endif %}" href="{% url 'announcements' %}">

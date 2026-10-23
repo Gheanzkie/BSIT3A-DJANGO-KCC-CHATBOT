@@ -103,6 +103,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.chat.middleware.ChatSessionLifecycleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -191,6 +192,16 @@ LOGOUT_REDIRECT_URL = '/'
 # The session cookie dies when the browser closes; stale rows are purged on visit.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# Chat URLs carry a private, per-conversation token — never leak it to other
+# sites through the Referer header.
+SECURE_REFERRER_POLICY = 'same-origin'
+
+# Ephemeral public chats: closing the tab flags the visitor's chats for removal;
+# they are deleted once this grace period (seconds) passes without a return.
+ANON_CHAT_CLOSE_GRACE_SECONDS = int(os.environ.get('ANON_CHAT_CLOSE_GRACE_SECONDS', '20'))
+# Request-driven purge is debounced to this interval (seconds) per process.
+ANON_CHAT_PURGE_INTERVAL_SECONDS = int(os.environ.get('ANON_CHAT_PURGE_INTERVAL_SECONDS', '60'))
+
 AUTH_USER_MODEL = 'users.User'
 
 MEDIA_URL = '/media/'
@@ -231,6 +242,11 @@ AI_KB_TOP_K = int(os.environ.get('AI_KB_TOP_K', '3'))
 AI_KB_MIN_SCORE = float(os.environ.get('AI_KB_MIN_SCORE', '0.6'))
 AI_MAX_HISTORY = int(os.environ.get('AI_MAX_HISTORY', '6'))
 AI_HTTP_TIMEOUT = int(os.environ.get('AI_HTTP_TIMEOUT', '60'))
+# Fallback engine (Gemini) gets a tighter budget so a dead/overloaded provider
+# does not stall every answer; failed slots are skipped briefly (circuit breaker).
+AI_HTTP_TIMEOUT_FALLBACK = int(os.environ.get('AI_HTTP_TIMEOUT_FALLBACK', '25'))
+AI_RETRY_ATTEMPTS_FALLBACK = int(os.environ.get('AI_RETRY_ATTEMPTS_FALLBACK', '1'))
+AI_SLOT_COOLDOWN_SECONDS = int(os.environ.get('AI_SLOT_COOLDOWN_SECONDS', '90'))
 
 # Reply generation — token-frugal defaults + per-engine effort + escalation retry.
 # Default effort 'low' = tipid (gpt-oss still reasons, konti lang ang hidden

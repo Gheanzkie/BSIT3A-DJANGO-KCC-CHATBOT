@@ -255,12 +255,32 @@
     }
 
     /* ---------- RESPONSIVE ---------- */
-    @media (max-width: 640px) {
-      .kcc-nav { padding: 0.85rem 1rem; }
-      .kcc-brand-text { font-size: 1rem; }
-      .kcc-hero { padding-top: 6rem; }
-      .kcc-hero-actions { flex-direction: column; width: 100%; max-width: 320px; }
-      .kcc-hero-actions .btn-kcc { justify-content: center; }
+    body { overflow-x: hidden; }
+
+    @media (max-width: 768px) {
+      .kcc-nav { padding: 0.7rem 1rem; }
+      .kcc-brand { min-width: 0; }
+      .kcc-brand-logo { width: 32px; height: 32px; }
+      .kcc-brand-text { font-size: 0.95rem; line-height: 1.2; }
+      .kcc-hero { padding: 5.75rem 1rem 3rem; }
+      .kcc-hero-icon { width: 84px; height: 84px; margin-bottom: 1rem; }
+      .kcc-hero h1 { font-size: clamp(1.6rem, 6.2vw, 2.4rem); line-height: 1.22; }
+      .kcc-hero p { font-size: 0.95rem; max-width: 100%; }
+      .kcc-hero-actions { flex-direction: column; width: 100%; max-width: 340px; gap: 0.65rem; }
+      .kcc-hero-actions .btn-kcc { width: 100%; justify-content: center; }
+      .kcc-features { grid-template-columns: 1fr; padding: 0 1rem 3rem; gap: 0.9rem; }
+      .kcc-card { padding: 1.25rem; }
+      .kcc-footer { padding: 1.5rem 1rem; }
+    }
+
+    @media (max-width: 420px) {
+      .kcc-nav { padding: 0.6rem 0.8rem; }
+      .kcc-brand-text { font-size: 0.88rem; }
+      .kcc-hero { padding: 5.25rem 0.9rem 2.5rem; }
+      .kcc-hero-badge { font-size: 0.72rem; padding: 0.3rem 0.8rem; }
+      .kcc-hero h1 { font-size: clamp(1.35rem, 7vw, 1.8rem); }
+      .kcc-hero p { font-size: 0.9rem; }
+      .kcc-card { padding: 1.1rem; }
     }
   </style>
 </head>
@@ -272,9 +292,6 @@
       <img src="{% static 'img/kcc_logo.png' %}" alt="KCC Logo" class="kcc-brand-logo">
       <div class="kcc-brand-text">KCC <span>Chatbot Assistant</span></div>
     </a>
-    <div class="kcc-nav-actions">
-      <a href="{% url 'login' %}" class="btn-kcc btn-kcc-outline">Admin Sign In</a>
-    </div>
   </nav>
 
   <!-- HERO -->

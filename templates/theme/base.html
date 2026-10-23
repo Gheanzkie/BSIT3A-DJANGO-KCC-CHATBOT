@@ -286,51 +286,73 @@
       .kcc-sidebar-fab, .kcc-sidebar-backdrop { display: none; }
 
       @media (max-width: 991.98px) {
-        /* Mobile: responsive top navbar (brand + hamburger), menu drops down */
-        .kcc-sidebar-fab, .kcc-sidebar-backdrop { display: none !important; }
-        .dh-sidebar {
-          position: sticky !important;
-          top: 0;
-          width: 100% !important;
-          height: auto !important;
-          transform: none !important;
-          transition: none;
-          z-index: 1035;
-          overflow: visible !important;
-          border-right: 0 !important;
-          border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-        }
-        .dh-sidebar .container-fluid {
-          flex-direction: row;
-          flex-wrap: wrap;
+        /* Mobile: off-canvas sidebar drawer (AdminLTE-style), hamburger top-left */
+        .kcc-sidebar-fab {
+          display: inline-flex !important;
           align-items: center;
-          padding: 0.35rem 0.75rem;
+          justify-content: center;
+          position: fixed;
+          top: 10px;
+          left: 10px;
+          width: 42px;
+          height: 42px;
+          border-radius: 10px;
+          border: 1px solid rgba(255,255,255,0.15);
+          background: #1e293b;
+          color: #e2e8f0;
+          z-index: 1060;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.35);
         }
-        .dh-sidebar .navbar-brand { width: auto !important; }
-        .dh-sidebar .navbar-toggler { display: inline-flex !important; margin-left: auto; }
-        .dh-sidebar .navbar-collapse {
-          width: 100% !important;
-          flex-basis: 100% !important;
+        .kcc-sidebar-fab i { font-size: 1.15rem; line-height: 1; }
+        .kcc-sidebar-backdrop {
+          display: block !important;
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.5);
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity .2s ease;
+          z-index: 1049;
+        }
+        .kcc-sidebar-backdrop.show { opacity: 1; visibility: visible; }
+        .dh-sidebar {
+          position: fixed !important;
+          top: 0;
+          left: 0;
+          width: 270px !important;
+          max-width: 85vw;
+          height: 100vh !important;
+          transform: translateX(-100%) !important;
+          transition: transform .25s ease;
+          z-index: 1050;
+          overflow-y: auto !important;
           overflow-x: hidden !important;
-          overflow-y: visible !important;
+          border-right: 1px solid rgba(255,255,255,0.08) !important;
+          border-bottom: 0 !important;
         }
-        .dh-sidebar #sidebar-menu { display: none; }
-        .dh-sidebar #sidebar-menu.show { display: block; }
-        .dh-sidebar .navbar-nav,
-        .dh-sidebar .nav-item,
-        .dh-sidebar .nav-link { max-width: 100%; min-width: 0; }
-        .dh-sidebar .nav-link-title {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+        .dh-sidebar.kcc-sidebar-open { transform: translateX(0) !important; }
+        .dh-sidebar .container-fluid {
+          flex-direction: column;
+          align-items: stretch;
+          padding: 3.2rem 0.5rem 0.5rem;  /* room for the top-left X button */
         }
+        .dh-sidebar .navbar-brand { width: 100% !important; padding-right: 3rem !important; }
+        /* one hamburger only: the fixed one at the top-left */
+        .dh-sidebar .navbar-toggler { display: none !important; }
+        .dh-sidebar .navbar-collapse {
+          display: block !important;
+          width: 100% !important;
+          flex-basis: auto !important;
+          overflow: visible !important;
+        }
+        .dh-sidebar #sidebar-menu { display: block !important; }
         .dh-sidebar .navbar-nav { padding: 0.35rem 0.25rem 0.5rem; }
         .dh-sidebar .navbar-nav .nav-link { padding-left: 0.75rem; padding-right: 0.75rem; }
         .dh-sidebar .dropdown-item { padding-left: 0.9rem; padding-right: 0.9rem; }
-        body.kcc-sidebar-locked { overflow: auto; }
+        body.kcc-sidebar-locked { overflow: hidden; }
 
         .page, .page-wrapper { margin-left: 0 !important; width: 100% !important; flex-direction: column; }
-        .page-body { padding: 0.75rem 0.5rem; }
+        .page-body { padding: 3.4rem 0.5rem 0.75rem; }
         .container-xl { padding-left: 0.5rem; padding-right: 0.5rem; }
         .page-header { margin-bottom: 0.75rem; }
         .card { border-radius: 12px; }
@@ -455,22 +477,6 @@
     <script src="{% static 'js/tabler.js' %}"></script>
     <script>
       (function () {
-        var menuBtn = document.getElementById('kccSidebarMenuBtn');
-        var menu = document.getElementById('kccSidebarMenu');
-        if (!menuBtn || !menu) return;
-        menuBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          var open = menu.classList.contains('d-none');
-          menu.classList.toggle('d-none');
-          menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-          var icon = menuBtn.querySelector('i');
-          if (icon) { icon.className = open ? 'fas fa-xmark' : 'fas fa-bars'; }
-        });
-      })();
-    </script>
-    <script>
-      (function () {
         var root = document.documentElement;
         var btns = document.querySelectorAll('[data-theme-toggle]');
         function sync() {
@@ -527,10 +533,13 @@
         var menu = document.getElementById('sidebar-menu');
         if (!toggle || !menu) return;
 
+        var icon = document.getElementById('kccMenuToggleIcon');
+
         function setMenu(open) {
           menu.classList.toggle('show', open);
           toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
           toggle.classList.toggle('collapsed', !open);
+          if (icon) { icon.className = open ? 'fas fa-xmark' : 'fas fa-bars'; }
         }
 
         toggle.addEventListener('click', function (e) {

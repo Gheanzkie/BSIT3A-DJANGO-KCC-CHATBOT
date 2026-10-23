@@ -150,12 +150,12 @@
         <div class="text-secondary px-1 pb-1" style="font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;">Recent</div>
         <div class="kcc-sessions d-flex flex-column gap-1">
           {% for s in sessions %}
-          <div class="kcc-side-item {% if s.pk == current_conversation_id %}active{% endif %}">
-            <a href="{% url 'chat:session' s.pk %}" class="text-decoration-none text-truncate flex-grow-1 kcc-side-link {% if s.pk == current_conversation_id %}kcc-side-link-active{% endif %}"
+          <div class="kcc-side-item {% if s.token == current_conversation_token %}active{% endif %}">
+            <a href="{% url 'chat:session' s.token %}" class="text-decoration-none text-truncate flex-grow-1 kcc-side-link {% if s.token == current_conversation_token %}kcc-side-link-active{% endif %}"
                style="font-size:0.85rem;">
               {{ s.title|default:"New chat" }}
             </a>
-            <form method="post" action="{% url 'chat:session_delete' s.pk %}"
+            <form method="post" action="{% url 'chat:session_delete' s.token %}"
                   onsubmit="return confirm('Delete this session?');" class="mb-0">
               {% csrf_token %}
               <button type="submit" class="btn btn-sm text-secondary p-1 lh-1" title="Delete session">
@@ -257,7 +257,7 @@
   var modelSel = document.getElementById('modelSelect');
   var welcome = document.getElementById('welcomeState');
 
-  var convId = '{{ current_conversation_id|default_if_none:"" }}';
+  var convId = '{{ current_conversation_token|default_if_none:"" }}';
   var isNewChat = !convId; // welcome state = bagong chat
 
   function getCookie(name) {
@@ -266,6 +266,47 @@
     if (parts.length === 2) return parts.pop().split(';').shift();
     return '';
   }
+
+  {% if not user.is_authenticated %}
+  // Public chats are ephemeral: tell the server when the tab/browser closes so
+  // the conversation is removed from the database. Skipped while the visitor is
+  // just moving around the site (internal links / forms).
+  var navigating = false;
+  var leaveSent = false;
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a || a.target === '_blank') return;
+    if (a.href && a.href.indexOf(window.location.origin) === 0) navigating = true;
+  }, true);
+  document.addEventListener('submit', function (e) {
+    if (e.target && e.target.id !== 'chatForm') navigating = true;
+  }, true);
+
+  function sendLeaveBeacon() {
+    if (leaveSent || navigating) return;
+    leaveSent = true;
+    var url = "{% url 'chat:leave' %}";
+    var csrf = getCookie('csrftoken');
+    if (navigator.sendBeacon) {
+      var fd = new FormData();
+      fd.append('csrfmiddlewaretoken', csrf);
+      fd.append('chat_token', convId || '');
+      if (navigator.sendBeacon(url, fd)) return;
+    }
+    try {
+      fetch(url, {
+        method: 'POST',
+        body: new URLSearchParams({ csrfmiddlewaretoken: csrf, chat_token: convId || '' }),
+        headers: { 'X-CSRFToken': csrf },
+        keepalive: true
+      });
+    } catch (err) {}
+  }
+  window.addEventListener('pagehide', function (e) {
+    if (!e.persisted) sendLeaveBeacon();
+  });
+  window.addEventListener('beforeunload', sendLeaveBeacon);
+  {% endif %}
 
   function scrollBottom() { win.scrollTop = win.scrollHeight; }
 
@@ -361,12 +402,12 @@
         btn.disabled = false;
         if (r.d && r.d.ok) {
           bubble(r.d.reply, 'assistant', r.d.engine, r.d.sources);
-          if (r.d.conversation_id) {
-            convId = String(r.d.conversation_id);
-            if (wasNewChat) {
-              isNewChat = false;
-              history.replaceState(null, '', "{% url 'chat:page' %}" + convId + '/');
-            }
+          if (r.d.conversation_token) {
+            convId = String(r.d.conversation_token);
+            // Tab-scoped: stored per tab, so a new tab gets a fresh chat.
+            try { sessionStorage.setItem('kcc_chat_tab_token', convId); } catch (e) {}
+            // Keep the address bar at the site root — no chat id in the URL.
+            if (wasNewChat) { isNewChat = false; }
           }
         } else {
           bubble((r.d && r.d.error) || 'May error. Subukan ulit.', 'assistant');
@@ -401,6 +442,38 @@
       input.focus();
     });
   });
+
+  {% if not user.is_authenticated %}
+  // Restore this tab's own chat (sessionStorage, never shared between tabs).
+  (function restoreTabChat() {
+    document.querySelectorAll('form[action="{% url 'chat:new' %}"]').forEach(function (f) {
+      f.addEventListener('submit', function () {
+        try { sessionStorage.removeItem('kcc_chat_tab_token'); } catch (e) {}
+      });
+    });
+    if (convId) return;
+    var tabToken = '';
+    try { tabToken = sessionStorage.getItem('kcc_chat_tab_token') || ''; } catch (e) {}
+    if (!tabToken) return;
+    convId = tabToken;
+    isNewChat = false;
+    var fd = new FormData();
+    fd.append('token', tabToken);
+    fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+    fetch("{% url 'chat:history' %}", {
+      method: 'POST',
+      body: fd,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (d) {
+        if (!d || !d.ok || !d.messages || !d.messages.length) return;
+        removeWelcome();
+        d.messages.forEach(function (m) { bubble(m.content, m.role, m.engine, null); });
+      })
+      .catch(function () {});
+  })();
+  {% endif %}
 
   scrollBottom();
 })();

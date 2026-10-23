@@ -1,15 +1,13 @@
 import logging
-from datetime import timedelta
 
 from django.conf import settings
-from django.contrib.sessions.models import Session
 from django.core.cache import cache
-from django.db.models import Q
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404, JsonResponse
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from . import presence
 from .models import Conversation, Message
 from .services import ai
 
@@ -37,23 +35,14 @@ def _ensure_session_key(request):
 
 
 def _purge_anonymous_sessions():
-    """Delete public chats whose browser session is gone/expired.
+    """Delete public chats whose browser session is gone or whose tab was closed.
 
-    Anonymous chats are per browser session: expired session rows are removed,
-    conversations no longer backed by a live session are deleted, and anything
-    older than 24h is dropped so public data never accumulates.
+    Anonymous chats are per browser session: closed tabs are flagged by the
+    page beacon and removed after a short grace period, expired session rows are
+    removed, and anything older than 24h is dropped so public data never
+    accumulates. ActivityLog rows are intentionally left untouched.
     """
-    try:
-        now = timezone.now()
-        Session.objects.filter(expire_date__lt=now).delete()
-        live_keys = Session.objects.values_list('session_key', flat=True)
-        Conversation.objects.filter(user__isnull=True).filter(
-            Q(session_key='')
-            | ~Q(session_key__in=live_keys)
-            | Q(updated_at__lt=now - timedelta(hours=24))
-        ).delete()
-    except Exception:
-        logger.exception('Anonymous session cleanup failed')
+    presence.purge_expired_anonymous()
 
 
 def _sessions(request):
@@ -71,14 +60,32 @@ def _new_conversation(request):
     return Conversation.objects.create(user=None, session_key=_ensure_session_key(request))
 
 
-def _resolve_conversation(request, conv_id, new_chat=False):
+def _conversation_for(request, ref):
+    """Resolve a conversation by its opaque URL token, scoped to the visitor.
+
+    Anonymous visitors can only reach conversations owned by their browser
+    session, so a token copied to another device resolves to nothing. Signed-in
+    users are scoped to their own account; legacy numeric ids keep working for
+    them so old bookmarks still open.
+    """
+    if not ref:
+        return None
+    ref = str(ref).strip()
+    if not ref:
+        return None
+    owned = _sessions(request)
+    conversation = owned.filter(token=ref).first()
+    if conversation is None and request.user.is_authenticated and ref.isdigit():
+        conversation = owned.filter(pk=int(ref)).first()
+    return conversation
+
+
+def _resolve_conversation(request, conv_ref, new_chat=False):
     """Conversation para sa send: bagong chat mula welcome (new_chat), pinili (kung
     sarili), kundi latest, kundi bago."""
     if new_chat:
         return _new_conversation(request)
-    conversation = None
-    if conv_id and conv_id.isdigit():
-        conversation = _sessions(request).filter(pk=int(conv_id)).first()
+    conversation = _conversation_for(request, conv_ref)
     if conversation is None:
         conversation = _sessions(request).first()
     if conversation is None:
@@ -92,17 +99,32 @@ def _rate_key(request):
     return f'kcc:chat_min:anon:{_ensure_session_key(request)}'
 
 
-def chat_page(request, pk=None):
+def _selected_token(request):
+    """Conversation the visitor has open — kept in the session, never the URL."""
+    return request.session.get('kcc_chat_open') or None
+
+
+def chat_page(request):
+    """Render the chat at the site root (/). The URL never carries a session id."""
     _purge_anonymous_sessions()
     sessions = _sessions(request)
-    if pk is not None:
-        conversation = get_object_or_404(sessions, pk=pk)
+    if request.user.is_authenticated:
+        token = _selected_token(request)
+        conversation = _conversation_for(request, token)
     else:
-        # Welcome state muna — walang auto-load ng latest conversation.
+        # Guests: each tab owns its own chat. The tab token lives in the
+        # browser's sessionStorage, never in the server session (which is shared
+        # across tabs), so a new tab always starts fresh.
+        token = None
         conversation = None
+    if token and conversation is None:
+        # Deleted/expired/foreign selection: drop it and show a fresh welcome.
+        request.session.pop('kcc_chat_open', None)
+        request.session.modified = True
     context = {
-        'sessions': sessions,
+        'sessions': sessions if request.user.is_authenticated else [],
         'current_conversation_id': conversation.pk if conversation else None,
+        'current_conversation_token': conversation.token if conversation else None,
         'chat_messages': conversation.messages.all() if conversation else [],
         'primary_name': settings.AI_PRIMARY_NAME,
         'fallback_name': settings.AI_FALLBACK_NAME,
@@ -112,20 +134,91 @@ def chat_page(request, pk=None):
         'engine_preference': conversation.engine_preference if conversation else 'primary',
         'language_preference': conversation.language if conversation else 'auto',
     }
-    return render(request, 'chat/chat.html', context)
+    response = render(request, 'chat/chat.html', context)
+    # Keep the chat out of caches, indexes and referrer headers.
+    response['Cache-Control'] = 'private, no-store, max-age=0'
+    response['Referrer-Policy'] = 'same-origin'
+    response['X-Robots-Tag'] = 'noindex, nofollow, noarchive'
+    return response
+
+
+def _select_conversation(request, token):
+    conversation = _conversation_for(request, token)
+    if conversation is None:
+        raise Http404('Chat not found')
+    request.session['kcc_chat_open'] = conversation.token
+    request.session['kcc_chat_started'] = True
+    request.session.modified = True
+    return conversation
+
+
+@require_POST
+def chat_open(request):
+    _select_conversation(request, request.POST.get('token') or '')
+    return redirect('chat:page')
+
+
+def chat_open_link(request, token):
+    """Old /chat/<token>/ bookmarks: select the chat, then bounce to the root URL."""
+    _select_conversation(request, token)
+    request.session['kcc_chat_started'] = True
+    request.session.modified = True
+    return redirect('chat:page')
 
 
 @require_POST
 def chat_new(request):
     """Bagong chat = welcome screen. Ang conversation ay gagawin lang sa unang mensahe."""
+    request.session.pop('kcc_chat_open', None)
+    request.session['kcc_chat_started'] = True
+    request.session.modified = True
     return redirect('chat:page')
 
 
 @require_POST
-def chat_delete(request, pk):
-    conversation = get_object_or_404(_sessions(request), pk=pk)
+def chat_history(request):
+    """Messages for this tab's chat (looked up by the sessionStorage token)."""
+    conversation = _conversation_for(request, request.POST.get('token') or '')
+    if conversation is None:
+        raise Http404('Chat not found')
+    return JsonResponse({
+        'ok': True,
+        'token': conversation.token,
+        'title': conversation.title,
+        'messages': [
+            {'role': m.role, 'content': m.content, 'engine': m.engine}
+            for m in conversation.messages.all()
+        ],
+    })
+
+
+@require_POST
+def chat_delete(request, token):
+    conversation = _conversation_for(request, token)
+    if conversation is None:
+        raise Http404('Chat not found')
+    if request.session.get('kcc_chat_open') == conversation.token:
+        request.session.pop('kcc_chat_open', None)
+        request.session.modified = True
     conversation.delete()
     return redirect('chat:page')
+
+
+@require_POST
+def chat_leave(request):
+    """Beacon fired when a public visitor closes the tab/browser.
+
+    The chat is only *marked* for deletion: if the visitor comes back within the
+    grace period the mark is cleared. Signed-in users are never affected, and
+    ActivityLog entries stay in the database.
+    """
+    if request.user.is_authenticated:
+        return JsonResponse({'ok': True, 'kept': True})
+    presence.mark_closing(
+        request, request.session.session_key,
+        token=(request.POST.get('chat_token') or '').strip() or None,
+    )
+    return JsonResponse({'ok': True})
 
 
 @require_POST
@@ -157,6 +250,10 @@ def chat_send(request):
         request, request.POST.get('conv'),
         new_chat=request.POST.get('newchat') == '1',
     )
+    # Remember the open chat in the session so a refresh at / keeps it.
+    request.session['kcc_chat_open'] = conversation.token
+    request.session['kcc_chat_started'] = True
+    request.session.modified = True
     is_first_message = not conversation.messages.exists()
 
     # Persist the user's model choice (validated against the whitelist).
@@ -201,6 +298,7 @@ def chat_send(request):
             'engine': 'KNIGHT KB',
             'sources': [],
             'conversation_id': conversation.pk,
+            'conversation_token': conversation.token,
             'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
         })
 
@@ -249,5 +347,6 @@ def chat_send(request):
         'engine': engine,
         'sources': sources,
         'conversation_id': conversation.pk,
+        'conversation_token': conversation.token,
         'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
     })

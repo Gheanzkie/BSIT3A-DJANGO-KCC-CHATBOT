@@ -26,7 +26,7 @@ class RoleRedirectTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('chat:page'))
+        self.assertEqual(response.url, reverse('welcome'))
 
     def test_superuser_keeps_dashboard(self):
         su = get_user_model().objects.create_user(
@@ -41,4 +41,4 @@ class RoleRedirectTests(TestCase):
         response = self.client.post(reverse('login'), {
             'email': 'user2@example.com', 'password': 'user-pass-123'})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('chat:page'))
+        self.assertEqual(response.url, reverse('welcome'))
