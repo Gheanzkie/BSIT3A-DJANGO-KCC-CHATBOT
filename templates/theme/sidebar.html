@@ -72,6 +72,15 @@
           </a>
         </li>
 
+        <li class="nav-item mb-1">
+          <a class="nav-link {% if request.resolver_match.url_name == 'announcements' or request.resolver_match.url_name == 'announcement_edit' %}active{% endif %}" href="{% url 'announcements' %}">
+            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-bullhorn"></i></span>
+            <span class="nav-link-title">Create Announcement
+              {% if announcements_count %}<span class="badge ms-1 kcc-badge-accent" style="font-size:0.6rem;vertical-align:middle;">{{ announcements_count }}</span>{% endif %}
+            </span>
+          </a>
+        </li>
+
         {% else %}
         <!-- ============ PUBLIC: flat nav (no sessions, no new chat) ============ -->
         {% if user.is_authenticated %}

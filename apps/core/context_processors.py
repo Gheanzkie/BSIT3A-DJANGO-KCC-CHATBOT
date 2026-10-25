@@ -5,10 +5,22 @@ def announcement(request):
         items = list(Announcement.objects.filter(is_active=True).order_by('-created_at')[:10])
     except Exception:
         return {}
-    return {
+
+    data = {
         'sidebar_announcement': items[0] if items else None,
         'sidebar_announcements': items,
     }
+
+    # Admin sidebar badge: every announcement (active + archived), not just
+    # the 10 active ones the public card shows.
+    user = getattr(request, 'user', None)
+    if user is not None and user.is_authenticated and user.is_superuser:
+        try:
+            data['announcements_count'] = Announcement.objects.count()
+        except Exception:
+            data['announcements_count'] = len(items)
+
+    return data
 
 
 def chat_sessions(request):

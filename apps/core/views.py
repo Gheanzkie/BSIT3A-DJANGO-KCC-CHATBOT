@@ -302,8 +302,10 @@ def announcement_list(request):
         return redirect('announcements')
 
     if _is_superuser(request.user):
+        # prefetch images: the table reads a.images.all twice plus .count per row
+        # (2 queries per announcement without this).
         return render(request, 'announcements/list.html', {
-            'announcements': Announcement.objects.all()[:100],
+            'announcements': Announcement.objects.prefetch_related('images').all()[:100],
         })
     # Public/registered history view — active announcements only.
     return render(request, 'announcements/history.html', {

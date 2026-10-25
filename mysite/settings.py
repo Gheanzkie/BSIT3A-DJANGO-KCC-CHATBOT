@@ -134,14 +134,28 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+_DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.mysql')
+
+# MySQL/MariaDB: force strict mode + utf8mb4. Without STRICT_TRANS_TABLES MySQL
+# silently truncates overflowing values instead of raising (Django's mysql.W002
+# warning), which loses data on long announcement titles/messages. OPTIONS is
+# only populated for MySQL so sqlite/postgres test runs are unaffected.
+_DB_OPTIONS = {}
+if 'mysql' in _DB_ENGINE:
+    _DB_OPTIONS = {
+        'charset': 'utf8mb4',
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+    }
+
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.mysql'),
+        'ENGINE': _DB_ENGINE,
         'NAME': os.environ.get('DB_NAME', 'kcc_chatbot'),
         'USER': os.environ.get('DB_USER', 'root'),
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '3306'),
+        'OPTIONS': _DB_OPTIONS,
     }
 }
 
