@@ -34,7 +34,7 @@ kcc_chatbot_assistant/
 │   │   ├── knowledge/             # File-based knowledge base (.txt training files)
 │   │   ├── management/            # Django management commands
 │   │   ├── services/ai.py         # KNIGHT engine chain (Groq → Gemini), KB retrieval, usage stats
-│   │   ├── tests/                 # Chat + AI tests (58 tests total project-wide)
+│   │   ├── tests/                 # Chat + AI tests (65 tests total project-wide)
 │   │   ├── models.py              # Conversation, Message
 │   │   └── urls.py / views.py     # Chat page, send, session open/delete, leave beacon
 │   ├── core/                      # Landing, auth, dashboard, announcements, tickets, activity log
@@ -235,7 +235,7 @@ The suite runs on Django's own test runner:
 python manage.py test
 ```
 
-58 tests currently pass (chat flow, token access control, public-chat lifecycle, AI retry/escalation, source formatting, core redirects). `pytest.ini` is also committed for anyone who installs `pytest-django`:
+65 tests currently pass (chat flow, token access control, public-chat lifecycle, AI retry/escalation, source formatting, core redirects, single-KNIGHT naming contract, and the reasoning-parameter fallback). `pytest.ini` is also committed for anyone who installs `pytest-django`:
 
 ```bash
 pip install pytest pytest-django
