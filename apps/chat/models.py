@@ -7,10 +7,15 @@ from .tokens import generate_chat_token
 class Conversation(models.Model):
     """One ongoing chat thread per user (latest conversation is shown on /chat/)."""
 
+    # Isang KNIGHT lang ang nakikita ng user. Dalawang provider ang gumagana sa
+    # likod (Groq muna, Gemini ang safety net) at awtomatiko ang paglipat kapag
+    # may down o rate-limited, kaya wala nang model picker sa chat.
     ENGINE_CHOICES = [
-        ('primary', 'KNIGHT v1.0'),
-        ('fallback', 'KNIGHT v1.2'),
+        ('auto', 'KNIGHT'),
     ]
+    # Legacy values: old conversations may still store 'primary' / 'fallback'.
+    # They keep working (see services/ai.py _ENGINE_ORDER) so no saved chat breaks.
+    ENGINE_VALUES = ('auto', 'primary', 'fallback')
     LANGUAGE_CHOICES = [
         ('auto', 'Auto'),
         ('tl', 'Tagalog'),

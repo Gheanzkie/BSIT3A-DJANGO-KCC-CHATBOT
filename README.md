@@ -11,7 +11,7 @@ An AI-powered knowledge companion chatbot for Kabankalan Catholic College (KCC) 
 
 - **Framework:** Django 5.0.14
 - **Database:** MySQL / MariaDB (developed against XAMPP MariaDB 10.4.32), with a bundled SQLite copy for quick local runs
-- **AI engines:** KNIGHT v1.0 (Groq) primary, KNIGHT v1.2 (Google Gemini) fallback, Gemini embeddings
+- **AI engine:** one **KNIGHT**, two providers behind it — Groq (`openai/gpt-oss-20b`) answers first, Google Gemini (`gemini-3.8-flash`) takes over automatically when Groq is down or rate-limited. Gemini embeddings power semantic KB search.
 - **UI:** Bootstrap 5 / Tabler CSS, Font Awesome 6 — dark theme by default, light theme toggle in the sidebar
 - **Python:** 3.13+ (dev-tested on 3.14)
 
@@ -143,7 +143,13 @@ GROQ_API_KEY=your_groq_key
 GEMINI_API_KEY=your_gemini_key
 AI_CHAT_MODEL_GROQ=openai/gpt-oss-20b
 AI_CHAT_MODEL_GEMINI=gemini-3.8-flash
+AI_NAME=KNIGHT
+AI_REASONING_EFFORT=low
+# AI_REASONING_EFFORT_PRIMARY=medium
+# AI_REASONING_EFFORT_FALLBACK=low
 ```
+
+`AI_NAME` is the single brand shown in the chat bubble (default `KNIGHT`). `AI_PRIMARY_NAME` / `AI_FALLBACK_NAME` are diagnostics only — they label the provider rows on the admin dashboard, they are not shown to chat users.
 
 Other optional settings (dev defaults): `DJANGO_DEBUG=True`, `DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,...`. `SECRET_KEY` comes from `DJANGO_SECRET_KEY`, else a git-ignored `.secret_key` file that is auto-generated on first run.
 
@@ -169,7 +175,9 @@ Visit `http://127.0.0.1:8000/` for the welcome page.
 - **KNIGHT AI Chat** — answers grounded on the file-based knowledge base; Groq primary with automatic Gemini fallback, per-engine reasoning-effort overrides, and an escalation retry when hidden reasoning exhausts the output budget
 - **Public chat** — visitors can chat without an account; the conversation is bound to the browser session and purged when the tab closes (a `leave` beacon marks it, a sweep deletes it)
 - **Trainable knowledge base** — drop `.txt` files in `apps/chat/knowledge/` (first line = title, remaining lines = content); auto-reloaded with no restart. Staff can also add facts straight from chat with `remember: <info>` / `tandaan: <info>`
-- **Conversations** — per-user threads with engine preference (auto / KNIGHT v1.0 / KNIGHT v1.2) and language (auto / Tagalog / English); the sidebar lists saved chats on every page
+- **One KNIGHT** — no model picker in the UI. The chat shows a single `KNIGHT` label; provider selection (Groq → Gemini) is automatic, with a 90-second cooldown on a provider that just failed. Legacy `primary` / `fallback` values in old conversation rows still resolve correctly
+- **Reasoning** — `reasoning_effort` is sent to both providers (`AI_REASONING_EFFORT`, or per-provider `AI_REASONING_EFFORT_PRIMARY` / `AI_REASONING_EFFORT_FALLBACK`). If a provider rejects the parameter with HTTP 400, the request is retried once without it instead of failing; if hidden reasoning exhausts the output budget, one bounded retry runs with `AI_REASONING_ESCALATION_TOKENS`
+- **Conversations** — per-user threads with language preference (auto / Tagalog / English); the sidebar lists saved chats on every page
 - **Usage stats** — per-engine and per-user tracking (`usage_stats.json`, `usage_by_user.json`)
 - **Rate limiting** — chat send throttling via `CHAT_MAX_PER_MINUTE` (default 20/min)
 

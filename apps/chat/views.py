@@ -131,7 +131,7 @@ def chat_page(request):
         'ai_configured': bool(settings.GROQ_API_KEY or settings.GEMINI_API_KEY),
         'engine_choices': Conversation.ENGINE_CHOICES,
         'language_choices': Conversation.LANGUAGE_CHOICES,
-        'engine_preference': conversation.engine_preference if conversation else 'primary',
+            'engine_preference': conversation.engine_preference if conversation else 'auto',
         'language_preference': conversation.language if conversation else 'auto',
     }
     response = render(request, 'chat/chat.html', context)
@@ -258,8 +258,10 @@ def chat_send(request):
 
     # Persist the user's model choice (validated against the whitelist).
     engine_pref = request.POST.get('model') or conversation.engine_preference
-    if engine_pref not in dict(Conversation.ENGINE_CHOICES):
-        engine_pref = 'primary'
+    # 'auto' ang normal na daan ngayon (iisang KNIGHT). Legacy 'primary' /
+    # 'fallback' ay tinatanggap pa rin para sa mga lumang conversation row.
+    if engine_pref not in Conversation.ENGINE_VALUES:
+        engine_pref = 'auto'
     conversation.engine_preference = engine_pref
     # Language: auto-detect mula sa UNANG tanong ng user — Tagalog kung may
     # Tagalog hints, English kung wala. Sinusundan ito sa lahat ng susunod na sagot.

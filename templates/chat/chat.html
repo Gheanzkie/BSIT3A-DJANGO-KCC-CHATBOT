@@ -225,11 +225,17 @@
       <div class="kcc-composer">
         <div class="kcc-composer-inner">
           <div class="kcc-pills">
+            {% if engine_choices|length > 1 %}
             <select id="modelSelect" class="form-select form-select-sm kcc-pill" title="Piliin ang model">
               {% for value, label in engine_choices %}
               <option value="{{ value }}" {% if value == engine_preference %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
+            {% else %}
+            <span class="kcc-pill" title="Isang KNIGHT: Groq ang una, Gemini ang backup kapag down o rate-limited">
+              <i class="fas fa-shield-halved me-1"></i>KNIGHT
+            </span>
+            {% endif %}
           </div>
           <form id="chatForm">
             {% csrf_token %}

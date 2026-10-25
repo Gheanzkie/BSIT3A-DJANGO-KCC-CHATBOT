@@ -361,6 +361,25 @@ def _is_transient(exc):
     return status in (429, 500, 502, 503, 504)
 
 
+def _rejects_reasoning_param(exc):
+    """True kapag 400 ang sagot at ang reklamo ay tungkol sa reasoning parameter.
+
+    Ginagamit para i-drop ang reasoning_effort at mag-retry nang isang beses
+    sa halip na pumalya ang buong sagot sa provider na hindi ito sinusuportahan.
+    """
+    resp = getattr(exc, 'response', None)
+    if resp is None or getattr(resp, 'status_code', None) != 400:
+        return False
+    try:
+        text = (resp.text or '')[:600].lower()
+    except Exception:
+        return False
+    return any(token in text for token in (
+        'reasoning_effort', 'reasoning effort', 'unsupported parameter',
+        'unknown parameter', 'invalid parameter', 'unrecognized',
+    ))
+
+
 def _post_retry(url, *, headers=None, payload=None, params=None, timeout=None, attempts=None):
     """_post() na may bounded retry + exponential backoff para sa transient errors only."""
     if attempts is None:
@@ -483,13 +502,25 @@ def _chat_openai(base_url, api_key, model, system_prompt, history, user_message,
                        if slot == 'fallback' else REQUEST_TIMEOUT)
             attempts = (int(getattr(settings, 'AI_RETRY_ATTEMPTS_FALLBACK', 1))
                         if slot == 'fallback' else None)
-            resp = _post_retry(
-                f'{base_url.rstrip("/")}/chat/completions',
-                headers={'Authorization': f'Bearer {api_key}'},
-                payload=body,
-                timeout=timeout,
-                attempts=attempts,
-            )
+            url = f'{base_url.rstrip("/")}/chat/completions'
+            auth = {'Authorization': f'Bearer {api_key}'}
+
+            def _send():
+                return _post_retry(url, headers=auth, payload=body,
+                                   timeout=timeout, attempts=attempts)
+
+            try:
+                resp = _send()
+            except requests.HTTPError as exc:
+                # reasoning_effort is provider-specific: Groq accepts it on
+                # gpt-oss, but a model/gateway that does not know it answers 400.
+                # Drop the parameter and retry once instead of failing the answer.
+                if 'reasoning_effort' in body and _rejects_reasoning_param(exc):
+                    logger.info('%s rejected reasoning_effort; retrying without it.', model)
+                    body.pop('reasoning_effort', None)
+                    resp = _send()
+                else:
+                    raise
             data = resp.json()
         except requests.RequestException as exc:
             raise AIUnavailable(f'Chat request failed ({model}): {exc}') from exc
@@ -531,6 +562,16 @@ def _chat_openai(base_url, api_key, model, system_prompt, history, user_message,
         raise AIUnavailable(f'{model} returned an empty answer (reasoning-only response).')
 
 
+def _knight_name():
+    """Isang pangalan lang ang nakikita ng user: KNIGHT.
+
+    Parehong provider (Groq at Gemini) ang gumagana sa likod, pero iisa lang ang
+    brand na ipinapakita sa chat. Ang AI_PRIMARY_NAME/AI_FALLBACK_NAME ay para
+    lang sa admin dashboard diagnostics.
+    """
+    return getattr(settings, 'AI_NAME', '') or 'KNIGHT'
+
+
 def _chat_slot(slot, system_prompt, history, user_message, user=None, effort=None):
     if effort is None:
         effort = _slot_reasoning_effort(slot)
@@ -538,14 +579,15 @@ def _chat_slot(slot, system_prompt, history, user_message, user=None, effort=Non
         return (
             _chat_openai(settings.AI_PRIMARY_BASE_URL, settings.GROQ_API_KEY,
                          settings.AI_CHAT_MODEL_GROQ, system_prompt, history, user_message,
-                         usage_key='groq', user=user, effort=effort),
-            settings.AI_PRIMARY_NAME,
+                         usage_key='groq', user=user, effort=effort, slot='primary'),
+            _knight_name(),
         )
     return (
         _chat_openai(settings.AI_FALLBACK_BASE_URL, settings.GEMINI_API_KEY,
                      settings.AI_CHAT_MODEL_GEMINI, system_prompt, history, user_message,
-                     usage_key='gemini', user=user, effort='', slot='fallback'),
-        settings.AI_FALLBACK_NAME,
+                     usage_key='gemini', user=user, effort=_slot_reasoning_effort('fallback'),
+                     slot='fallback'),
+        _knight_name(),
     )
 
 

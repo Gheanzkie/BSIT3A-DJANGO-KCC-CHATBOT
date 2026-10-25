@@ -249,6 +249,10 @@ AI_WEB_RESEARCH = os.environ.get('AI_WEB_RESEARCH', 'True').strip().lower() in (
 AI_PRIMARY_BASE_URL = os.environ.get('AI_PRIMARY_BASE_URL', 'https://api.groq.com/openai/v1')
 AI_FALLBACK_BASE_URL = os.environ.get('AI_FALLBACK_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta/openai')
 
+# Iisang brand na ipinapakita sa chat: KNIGHT. Ang dalawang provider sa likod
+# (Groq + Gemini) ay panloob na detalye; ang PRIMARY/FALLBACK names ay para lang
+# sa admin dashboard diagnostics.
+AI_NAME = os.environ.get('AI_NAME', 'KNIGHT')
 AI_PRIMARY_NAME = os.environ.get('AI_PRIMARY_NAME', 'KNIGHT v1.0')
 AI_FALLBACK_NAME = os.environ.get('AI_FALLBACK_NAME', 'KNIGHT v1.2')
 

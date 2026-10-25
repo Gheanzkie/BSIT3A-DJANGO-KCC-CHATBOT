@@ -186,7 +186,7 @@ def home(request):
     usage = ai_service.get_usage()
     models_info = [
         {
-            'slot': f'Primary — {settings.AI_PRIMARY_NAME}',
+            'slot': f'KNIGHT · Groq primary — {settings.AI_PRIMARY_NAME}',
             'provider': 'Groq',
             'model': settings.AI_CHAT_MODEL_GROQ,
             'endpoint': settings.AI_PRIMARY_BASE_URL,
@@ -195,7 +195,7 @@ def home(request):
             'usage': usage.get('groq', {}),
         },
         {
-            'slot': f'Fallback — {settings.AI_FALLBACK_NAME}',
+            'slot': f'KNIGHT · Gemini fallback — {settings.AI_FALLBACK_NAME}',
             'provider': 'Gemini',
             'model': settings.AI_CHAT_MODEL_GEMINI,
             'endpoint': settings.AI_FALLBACK_BASE_URL,

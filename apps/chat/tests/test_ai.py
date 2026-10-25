@@ -321,3 +321,81 @@ class ReasoningUpgradeTests(SimpleTestCase):
         with mock.patch.object(ai, 'chat', chat_mock):
             ai.correct_prompt('asan ang regstrar ofis?')
         self.assertEqual(chat_mock.call_args.kwargs.get('effort'), 'low')
+
+
+class SingleKnightNameTests(SimpleTestCase):
+    """Isang brand lang sa chat kahit dalawang provider sa likod."""
+
+    @override_settings(AI_NAME='KNIGHT')
+    def test_knight_name_uses_ai_name(self):
+        self.assertEqual(ai._knight_name(), 'KNIGHT')
+
+    @override_settings(AI_NAME='')
+    def test_knight_name_falls_back_to_knight(self):
+        self.assertEqual(ai._knight_name(), 'KNIGHT')
+
+    @override_settings(AI_NAME='KNIGHT')
+    def test_both_slots_report_the_same_name(self):
+        with mock.patch.object(ai, '_chat_openai', return_value='ok'):
+            primary = ai._chat_slot('primary', 'sys', [], 'hi')
+            fallback = ai._chat_slot('fallback', 'sys', [], 'hi')
+        self.assertEqual(primary[0], fallback[0])
+        self.assertEqual(primary[1], 'KNIGHT')
+        self.assertEqual(fallback[1], 'KNIGHT')
+
+    def test_conversation_choices_expose_one_model(self):
+        from apps.chat.models import Conversation
+        self.assertEqual([v for v, _ in Conversation.ENGINE_CHOICES], ['auto'])
+        self.assertIn('primary', Conversation.ENGINE_VALUES)
+        self.assertIn('fallback', Conversation.ENGINE_VALUES)
+
+
+class ReasoningParamFallbackTests(SimpleTestCase):
+    """Provider na tumatanggi sa reasoning_effort: i-drop at retry, hindi pumalya."""
+
+    def _call(self, responses, effort='low'):
+        calls = []
+
+        def fake_post(url, **kwargs):
+            # _post() passes the body as requests' json= keyword.
+            calls.append(dict(kwargs.get('json') or {}))
+            item = responses[len(calls) - 1]
+            if isinstance(item, Exception):
+                raise item
+            return item
+
+        with mock.patch.object(ai.requests, 'post', side_effect=fake_post), \
+                mock.patch.object(ai, '_record_usage'), \
+                override_settings(AI_MAX_OUTPUT_TOKENS=1024, AI_REASONING_ESCALATION_TOKENS=0):
+            content = ai._chat_openai('http://x', 'key', 'm', 'sys', [], 'hi', effort=effort)
+        return content, calls
+
+    def _http_400(self, text):
+        resp = FakeResponse(status=400, text=text)
+        err = requests.HTTPError('400 Client Error', response=resp)
+        err.response = resp
+        return err
+
+    def test_drops_reasoning_effort_and_retries_once(self):
+        content, calls = self._call([
+            self._http_400('{"error":{"message":"unsupported parameter: reasoning_effort"}}'),
+            FakeResponse(payload=_chat_ok_payload('Sagot ni KNIGHT')),
+        ])
+        self.assertEqual(content, 'Sagot ni KNIGHT')
+        self.assertEqual(calls[0].get('reasoning_effort'), 'low')
+        self.assertNotIn('reasoning_effort', calls[1])
+
+    def test_unrelated_400_is_not_retried(self):
+        with self.assertRaises(ai.AIUnavailable):
+            self._call([self._http_400('{"error":"context length exceeded"}')])
+
+    def test_rejects_reasoning_param_detects_only_400(self):
+        self.assertFalse(ai._rejects_reasoning_param(self._http_400_subclass(500)))
+        self.assertTrue(ai._rejects_reasoning_param(
+            self._http_400('unknown parameter reasoning_effort')))
+
+    def _http_400_subclass(self, status):
+        resp = FakeResponse(status=status, text='reasoning_effort is invalid')
+        err = requests.HTTPError(f'{status}', response=resp)
+        err.response = resp
+        return err
