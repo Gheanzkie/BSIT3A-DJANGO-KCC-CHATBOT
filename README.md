@@ -1,60 +1,89 @@
 # KCC Chatbot Assistant
 
-An AI-powered knowledge companion chatbot for Kabankalan Catholic College (KCC) built with Django and MySQL/MariaDB. Ships with a Tabler-based dark UI, email-based authentication, user management with AJAX CRUD, and the **KNIGHT** chat engine (Groq primary with Google Gemini fallback) grounded on a file-based KCC knowledge base.
+An AI-powered knowledge companion chatbot for Kabankalan Catholic College (KCC) built with Django and MySQL/MariaDB. Ships with a Tabler-based dark/light UI, email-based authentication, a **KNIGHT** chat engine (Groq primary with Google Gemini fallback) grounded on a file-based KCC knowledge base, plus admin modules for announcements, support tickets and activity auditing.
 
 ## Developers
 
 - **Ghean De La Cruz**
 - **John Marie Alarcon**
 
-## Admin Login
-
-| Field    | Value            |
-|----------|------------------|
-| Email    | `admin@admin.com` |
-| Username | `admin`           |
-| Password | *(set during setup)* |
-
 ## Tech Stack
 
 - **Framework:** Django 5.0.14
-- **Database:** MySQL / MariaDB (developed against XAMPP MariaDB 10.4.32)
+- **Database:** MySQL / MariaDB (developed against XAMPP MariaDB 10.4.32), with a bundled SQLite copy for quick local runs
 - **AI engines:** KNIGHT v1.0 (Groq) primary, KNIGHT v1.2 (Google Gemini) fallback, Gemini embeddings
-- **UI:** Bootstrap 5 / Tabler CSS, Font Awesome 6
+- **UI:** Bootstrap 5 / Tabler CSS, Font Awesome 6 — dark theme by default, light theme toggle in the sidebar
 - **Python:** 3.13+ (dev-tested on 3.14)
+
+## Admin Login
+
+| Field    | Value                     |
+|----------|---------------------------|
+| Email    | *(your superuser email)*  |
+| Username | `admin`                   |
+| Password | *(set during setup)*      |
+
+Login is email-based. Create the account with `python manage.py createsuperuser` — it lands on `/home/` (the admin dashboard). Regular accounts are redirected into the chat instead.
 
 ## Project Structure
 
 ```
 kcc_chatbot_assistant/
 ├── apps/
-│   ├── chat/                    # KNIGHT chatbot app
-│   │   ├── knowledge/           # File-based knowledge base (.txt training files)
-│   │   ├── management/          # Django management commands
-│   │   ├── services/ai.py       # KNIGHT engine chain (Groq → Gemini), KB retrieval, usage stats
-│   │   ├── tests/               # Chat app tests
-│   │   ├── models.py            # Conversation, Message
-│   │   └── urls.py / views.py   # Chat page, send, session CRUD
-│   ├── core/                    # Welcome, login, logout, register, dashboard
-│   └── users/                   # User model, profile edit, user management CRUD (AJAX)
+│   ├── chat/                      # KNIGHT chatbot app
+│   │   ├── knowledge/             # File-based knowledge base (.txt training files)
+│   │   ├── management/            # Django management commands
+│   │   ├── services/ai.py         # KNIGHT engine chain (Groq → Gemini), KB retrieval, usage stats
+│   │   ├── tests/                 # Chat + AI tests (58 tests total project-wide)
+│   │   ├── models.py              # Conversation, Message
+│   │   └── urls.py / views.py     # Chat page, send, session open/delete, leave beacon
+│   ├── core/                      # Landing, auth, dashboard, announcements, tickets, activity log
+│   │   ├── models.py              # Announcement, AnnouncementImage, Ticket, ActivityLog
+│   │   ├── context_processors.py  # Sidebar sessions, open-ticket badge, announcement counts
+│   │   └── urls.py / views.py     # All non-chat routes (see Routes below)
+│   └── users/                     # Profile edit + password change (POST only)
 ├── db/
-│   └── kcc_chatbot.sql          # Schema-only database dump
-├── mysite/                      # Project settings, URLs, WSGI
-├── static/                      # Tabler CSS/JS, vendor libs, KCC logo & background
-├── templates/                   # HTML templates (welcome, auth, chat, users, theme)
-├── kcc_chatbot.sql              # Full database dump (schema + data) from XAMPP
-├── pytest.ini                   # Test runner config
+│   └── kcc_chatbot.sql            # Schema-only database dump
+├── mysite/                        # Settings, root URLconf, WSGI/ASGI
+├── static/                        # Tabler CSS/JS, vendor libs, KCC logo & background
+├── templates/
+│   ├── announcements/             # list.html (admin maker), edit.html, history.html (public)
+│   ├── activity/list.html         # Admin activity log
+│   ├── reports/list.html          # Admin ticket queue
+│   ├── chat/, auth/, users/
+│   ├── partials/modals.html       # Login, register, profile, report modals
+│   └── theme/                     # base.html, sidebar.html, footer.html, messages.html
+├── db.sqlite3                     # SQLite copy of the database (tracked in the repo)
+├── kcc_chatbot.sql                # Full MariaDB dump (schema + data) from XAMPP
+├── pytest.ini                     # Optional pytest runner config
 └── requirements.txt
 ```
 
-## Database Dumps
+## Database
 
-Two SQL dumps are included, both exported from the XAMPP MariaDB server with `mysqldump --databases` (so each already contains `CREATE DATABASE` / `USE` statements):
+### MariaDB dumps
 
-| File                 | Contents                  |
-|----------------------|---------------------------|
-| `db/kcc_chatbot.sql` | Schema only (CREATE TABLE)|
-| `kcc_chatbot.sql`    | Full dump (schema + data) |
+Both dumps were exported from the XAMPP MariaDB server with `mysqldump --databases`, so each already contains `CREATE DATABASE` / `USE` statements:
+
+| File                 | Contents                   |
+|----------------------|----------------------------|
+| `db/kcc_chatbot.sql` | Schema only (CREATE TABLE) |
+| `kcc_chatbot.sql`    | Full dump (schema + data)  |
+
+### Bundled SQLite copy
+
+`db.sqlite3` is committed to the repository, so you can run the project without a MySQL server:
+
+```ini
+DB_ENGINE=django.db.backends.sqlite3
+DB_NAME=db.sqlite3
+```
+
+The file carries the full application schema plus whatever data was present when it was committed — including `auth_user` rows and chat history. Treat it as **sensitive**: do not reuse the bundled accounts' passwords anywhere else.
+
+### MySQL strict mode
+
+`mysite/settings.py` attaches `charset=utf8mb4` and `SET sql_mode='STRICT_TRANS_TABLES'` whenever the configured engine is MySQL/MariaDB. Without strict mode MySQL silently truncates over-length values instead of raising, which loses announcement titles/messages. SQLite and PostgreSQL are unaffected — the options are only added for MySQL engines.
 
 ## Setup
 
@@ -79,14 +108,18 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+`mysqlclient` needs the MariaDB/MySQL client headers; on Windows, building against the XAMPP/MariaDB connector usually needs the matching MSVC toolchain. If you only want the SQLite copy, you can skip it and install `Django`, `requests` and `Pillow` alone.
+
 ### 4. Set up the database
 
-Start MySQL/MariaDB (e.g. XAMPP control panel) and import one of the dumps:
+Either import a MariaDB dump:
 
 ```bash
 mysql -u root -p < db/kcc_chatbot.sql      # schema only
 mysql -u root -p < kcc_chatbot.sql         # schema + data
 ```
+
+...or point `DB_ENGINE` at the committed `db.sqlite3` (see above) and skip the import.
 
 ### 5. Configure environment
 
@@ -131,47 +164,84 @@ Visit `http://127.0.0.1:8000/` for the welcome page.
 
 ## Features
 
-- **KNIGHT AI Chat** — Answers grounded on the file-based knowledge base; Groq primary engine with automatic Gemini fallback, per-engine reasoning-effort overrides, and an escalation retry when hidden reasoning exhausts the output budget
-- **Trainable Knowledge Base** — Drop `.txt` files in `apps/chat/knowledge/` (first line = title, remaining lines = content); auto-reloaded with no restart. Staff can also add facts straight from chat with `remember: <info>` / `tandaan: <info>`
-- **Conversations** — Per-user chat threads with engine preference (auto / KNIGHT v1.0 / KNIGHT v1.2) and language (auto / Tagalog / English)
-- **Usage Stats** — Per-engine and per-user usage tracking (`usage_stats.json`, `usage_by_user.json` in the chat app)
-- **Welcome Page** — Professional dark-themed landing page with KCC branding
-- **Authentication** — Email-based login, registration with validation
-- **Dashboard** — Admin overview with user stats
-- **User Management** — Superadmin can add, edit, deactivate and delete users via AJAX
-- **Profile Editor** — Sidebar popup for editing profile and changing password
-- **Rate Limiting** — Chat send throttling via `CHAT_MAX_PER_MINUTE` (default 20/min)
-- **Responsive UI** — Mobile-friendly Tabler dark theme throughout
+### Chat
+
+- **KNIGHT AI Chat** — answers grounded on the file-based knowledge base; Groq primary with automatic Gemini fallback, per-engine reasoning-effort overrides, and an escalation retry when hidden reasoning exhausts the output budget
+- **Public chat** — visitors can chat without an account; the conversation is bound to the browser session and purged when the tab closes (a `leave` beacon marks it, a sweep deletes it)
+- **Trainable knowledge base** — drop `.txt` files in `apps/chat/knowledge/` (first line = title, remaining lines = content); auto-reloaded with no restart. Staff can also add facts straight from chat with `remember: <info>` / `tandaan: <info>`
+- **Conversations** — per-user threads with engine preference (auto / KNIGHT v1.0 / KNIGHT v1.2) and language (auto / Tagalog / English); the sidebar lists saved chats on every page
+- **Usage stats** — per-engine and per-user tracking (`usage_stats.json`, `usage_by_user.json`)
+- **Rate limiting** — chat send throttling via `CHAT_MAX_PER_MINUTE` (default 20/min)
+
+### Admin modules
+
+- **Announcement Maker** (`/announcements/`) — publish title + message with multiple uploaded pictures, then publish/hide or delete from the same table. The sidebar nav entry shows a live count of every announcement (active + hidden)
+- **Public announcement board** — signed-out visitors get a read-only history of active announcements. Images open in a fullscreen lightbox with click-to-zoom at native resolution, drag-to-pan, arrow-key navigation and a picture counter. The same lightbox is used inside the floating announcements panel
+- **KB sync** — publishing or editing an announcement pushes it into the AI knowledge store, so KNIGHT can answer about it; hiding or deleting removes it again
+- **Ticket queue** (`/tickets/`) — visitor reports triaged by status (open/resolved) with a badge count in the sidebar; resolved tickets are archived read-only
+- **Activity log** (`/activity/`) — searchable audit trail of logins, registrations and requests with user, IP and path
+- **Dashboard** (`/home/`) — conversation/message/ticket totals plus AI model and key status (masked)
+
+### Account & UI
+
+- **Authentication** — email-based login, registration with password validation, and rate limiting with lockout on repeated failures
+- **Profile editor** — sidebar popup for editing profile details and changing password
+- **Floating quick actions** — Help, Report a Problem and Announcements panels that load beside the sidebar item that opened them
+- **Theme toggle** — dark by default; light mode persists in `localStorage`
+- **Responsive UI** — collapsible sidebar with backdrop and fab button on mobile
 
 ## Routes
 
-| URL                   | Description                       |
-|-----------------------|-----------------------------------|
-| `/`                   | Welcome / landing page            |
-| `/login/`             | Login page                        |
-| `/register/`          | Registration page                 |
-| `/logout/`            | Logout                            |
-| `/home/`              | Dashboard (requires login)        |
-| `/chat/`              | Chat page (latest conversation)   |
-| `/chat/new/`          | Start a new conversation          |
-| `/chat/send/`         | Send a message (AJAX)             |
-| `/chat/<id>/`         | Open a conversation               |
-| `/chat/<id>/delete/`  | Delete a conversation             |
-| `/users/`             | User management (superadmin)      |
-| `/users/profile/`     | Profile / password edit           |
-| `/users/ajax/*`       | User CRUD endpoints (AJAX)        |
-| `/admin/`             | Django admin panel                |
+| URL                          | Method     | Description                                        |
+|------------------------------|------------|----------------------------------------------------|
+| `/`                          | GET        | Welcome / landing page                             |
+| `/login/`                    | GET, POST  | Login page                                         |
+| `/register/`                 | POST       | Registration (modal)                               |
+| `/logout/`                   | POST       | Logout                                             |
+| `/home/`                     | GET        | Admin dashboard (superuser)                        |
+| `/help/`                     | GET        | Help page                                          |
+| `/report/`                   | POST       | Submit a report/ticket from the visitor panel      |
+| `/announcements/`            | GET, POST  | Admin: maker + list. Public: read-only history     |
+| `/announcements/<pk>/edit/`  | GET, POST  | Edit an announcement (superuser)                   |
+| `/announcements/<pk>/update/`| POST       | Publish/hide or delete (superuser)                 |
+| `/tickets/`                  | GET        | Admin ticket queue (superuser)                     |
+| `/tickets/<pk>/update/`      | POST       | Resolve, reopen or delete a ticket (superuser)     |
+| `/activity/`                 | GET        | Admin activity log with `?q=` search (superuser)   |
+| `/chat/`                     | GET        | Chat page                                          |
+| `/chat/open/`                | POST       | Open/select a conversation                         |
+| `/chat/new/`                 | POST       | Start a new conversation                           |
+| `/chat/send/`                | POST       | Send a message (AJAX)                              |
+| `/chat/leave/`               | POST       | Leave beacon for public chats                      |
+| `/chat/history/`             | POST       | Conversation history (JSON)                        |
+| `/chat/<token>/`             | GET        | Open a conversation by token                       |
+| `/chat/<token>/delete/`      | POST       | Delete a conversation                              |
+| `/users/profile/`            | POST       | Update profile                                     |
+| `/users/password/`           | POST       | Change password                                    |
+| `/admin/`                    | GET        | Django admin panel                                 |
 
 ## Testing
 
+The suite runs on Django's own test runner:
+
 ```bash
+python manage.py test
+```
+
+58 tests currently pass (chat flow, token access control, public-chat lifecycle, AI retry/escalation, source formatting, core redirects). `pytest.ini` is also committed for anyone who installs `pytest-django`:
+
+```bash
+pip install pytest pytest-django
 pytest
 ```
 
-Config lives in `pytest.ini` (`DJANGO_SETTINGS_MODULE = mysite.settings`); chat tests in `apps/chat/tests/`.
-
 ## Docs
 
-- [SESSION_LOG.md](SESSION_LOG.md) — Full development session log including security audit findings and bug fixes
-- `AUDIT_REPORT.md` — Security audit report
-- `apps/chat/knowledge/_README.txt` — How to train KNIGHT
+- [SESSION_LOG.md](SESSION_LOG.md) — development session log including security audit findings and bug fixes
+- `AUDIT_REPORT.md` — security audit report
+- `apps/chat/knowledge/_README.txt` — how to train KNIGHT
+
+## Repository Notes
+
+- `.env`, `.secret_key`, `apps/chat/ai_config.env`, `media/`, `.venv/`, `__pycache__/` and the AI usage JSON files are git-ignored.
+- `db.sqlite3` **is** committed (force-added past `.gitignore`), so anyone cloning gets the database contents including user rows — keep that in mind before making the repository public.
+- Uploaded announcement images live under `media/` and are **not** committed; database rows that reference them resolve to nothing on a fresh clone.
