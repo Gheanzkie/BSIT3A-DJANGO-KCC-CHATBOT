@@ -1,4 +1,4 @@
-from django.conf import settings
+﻿from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import user_passes_test
@@ -24,7 +24,7 @@ GENERIC_EXISTS_MESSAGE = 'That username or email is already in use.'
 
 
 def _client_ip(request):
-    # REMOTE_ADDR only — X-Forwarded-For is client-controlled unless behind a trusted proxy.
+    # REMOTE_ADDR only â€” X-Forwarded-For is client-controlled unless behind a trusted proxy.
     return request.META.get('REMOTE_ADDR', '')
 
 
@@ -170,8 +170,8 @@ def _mask_key(key):
     if not key:
         return ''
     if len(key) <= 8:
-        return '•' * len(key)
-    return f'{key[:6]}…{key[-4:]}'
+        return 'â€¢' * len(key)
+    return f'{key[:6]}â€¦{key[-4:]}'
 
 
 def home(request):
@@ -186,7 +186,7 @@ def home(request):
     usage = ai_service.get_usage()
     models_info = [
         {
-            'slot': f'KNIGHT · Groq primary — {settings.AI_PRIMARY_NAME}',
+            'slot': f'KNIGHT Â· Groq primary â€” {settings.AI_PRIMARY_NAME}',
             'provider': 'Groq',
             'model': settings.AI_CHAT_MODEL_GROQ,
             'endpoint': settings.AI_PRIMARY_BASE_URL,
@@ -195,7 +195,7 @@ def home(request):
             'usage': usage.get('groq', {}),
         },
         {
-            'slot': f'KNIGHT · Gemini fallback — {settings.AI_FALLBACK_NAME}',
+            'slot': f'KNIGHT Â· Gemini fallback â€” {settings.AI_FALLBACK_NAME}',
             'provider': 'Gemini',
             'model': settings.AI_CHAT_MODEL_GEMINI,
             'endpoint': settings.AI_FALLBACK_BASE_URL,
@@ -264,9 +264,32 @@ def report_view(request):
         messages.error(request, 'Please describe the problem (at least 5 characters).')
         return redirect('welcome')
 
+    if request.user.is_authenticated:
+        # Registered users: reports land in the Message Reports module (admin),
+        # not in the retired Tickets channel.
+        from apps.chat.models import MessageReport
+
+        reason_map = {
+            'content': MessageReport.REASON_WRONG,
+            'bug': MessageReport.REASON_OTHER,
+            'account': MessageReport.REASON_OTHER,
+            'other': MessageReport.REASON_OTHER,
+        }
+        report = MessageReport.objects.create(
+            user=request.user,
+            reason=reason_map.get(category, MessageReport.REASON_OTHER),
+            details=text,
+        )
+        if ajax:
+            return JsonResponse({'ok': True, 'report_id': report.pk,
+                                 'message': f'Thanks! Report #{report.pk} was sent to the admin.'})
+        messages.success(request, f'Thanks! Report #{report.pk} was sent to the admin.')
+        return redirect('welcome')
+
+    # Anonymous visitors keep the lightweight ticket record (no admin module).
     ticket = Ticket.objects.create(
-        user=request.user if request.user.is_authenticated else None,
-        session_key=(request.session.session_key or '') if not request.user.is_authenticated else '',
+        user=None,
+        session_key=request.session.session_key or '',
         category=category,
         message=text,
     )
@@ -307,7 +330,7 @@ def announcement_list(request):
         return render(request, 'announcements/list.html', {
             'announcements': Announcement.objects.prefetch_related('images').all()[:100],
         })
-    # Public/registered history view — active announcements only.
+    # Public/registered history view â€” active announcements only.
     return render(request, 'announcements/history.html', {
         'announcements': Announcement.objects.filter(is_active=True).order_by('-created_at')[:100],
     })
@@ -400,25 +423,12 @@ def activity_list(request):
 
 @user_passes_test(_is_superuser, login_url='login')
 def ticket_list(request):
-    active_status = request.GET.get('status', '')
-    tickets = Ticket.objects.select_related('user').order_by('status', '-created_at')
-    if active_status in dict(Ticket.STATUS_CHOICES):
-        tickets = tickets.filter(status=active_status)
-    else:
-        active_status = ''
+    """Retired: Tickets are no longer an admin module.
 
-    counts = {
-        Ticket.STATUS_OPEN: Ticket.objects.filter(status=Ticket.STATUS_OPEN).count(),
-        Ticket.STATUS_RESOLVED: Ticket.objects.filter(status=Ticket.STATUS_RESOLVED).count(),
-    }
-    total = counts[Ticket.STATUS_OPEN] + counts[Ticket.STATUS_RESOLVED]
-
-    return render(request, 'reports/list.html', {
-        'tickets': tickets[:500],
-        'counts': counts,
-        'total_count': total,
-        'active_status': active_status,
-    })
+    Registered-user reports are handled in Message Reports; this URL is kept as
+    a redirect so old bookmarks and links do not 404.
+    """
+    return redirect('message_reports')
 
 
 @require_POST
@@ -430,7 +440,7 @@ def ticket_update(request, pk):
     # Done tickets are archived for the admin: no further actions, no deletion.
     if ticket.status == Ticket.STATUS_RESOLVED:
         messages.info(request, f'Ticket #{ticket.pk} is done and kept for admin.')
-        return redirect('tickets')
+        return redirect('message_reports')
 
     if action == 'resolve':
         ticket.status = Ticket.STATUS_RESOLVED
@@ -447,4 +457,59 @@ def ticket_update(request, pk):
         ticket.delete()
         messages.success(request, f'Ticket #{pk_value} deleted.')
 
-    return redirect('tickets')
+    return redirect('message_reports')
+
+
+# ---------- ADMIN MESSAGE-REPORT MODULE ----------
+
+@user_passes_test(_is_superuser, login_url='login')
+def message_report_list(request):
+    from apps.chat.models import MessageReport
+
+    active_status = request.GET.get('status', '')
+    reports = MessageReport.objects.select_related('user', 'conversation').order_by('status', '-created_at')
+    if active_status in dict(MessageReport.STATUS_CHOICES):
+        reports = reports.filter(status=active_status)
+    else:
+        active_status = ''
+
+    counts = {
+        MessageReport.STATUS_OPEN: MessageReport.objects.filter(status=MessageReport.STATUS_OPEN).count(),
+        MessageReport.STATUS_RESOLVED: MessageReport.objects.filter(status=MessageReport.STATUS_RESOLVED).count(),
+    }
+    return render(request, 'reports/message_reports.html', {
+        'reports': reports[:500],
+        'counts': counts,
+        'total_count': counts[MessageReport.STATUS_OPEN] + counts[MessageReport.STATUS_RESOLVED],
+        'active_status': active_status,
+    })
+
+
+@require_POST
+@user_passes_test(_is_superuser, login_url='login')
+def message_report_reply(request, pk):
+    from apps.chat.models import MessageReport, Notification
+
+    report = get_object_or_404(MessageReport, pk=pk)
+    reply = (request.POST.get('admin_reply') or '').strip()
+    if not reply:
+        messages.error(request, 'Write a reply before sending.')
+        return redirect('message_reports')
+
+    report.admin_reply = reply[:4000]
+    report.replied_by = request.user
+    report.replied_at = timezone.now()
+    report.status = MessageReport.STATUS_RESOLVED
+    report.save(update_fields=['admin_reply', 'replied_by', 'replied_at', 'status'])
+
+    # The registered user gets an in-app notification (badge + toast).
+    Notification.objects.create(
+        user=report.user,
+        report=report,
+        title=f'Admin replied to your report #{report.pk}',
+        body=report.admin_reply,
+    )
+    messages.success(request, f'Reply sent to {report.user.username}.')
+    return redirect('message_reports')
+
+

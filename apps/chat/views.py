@@ -1,14 +1,15 @@
 import logging
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from . import presence
-from .models import Conversation, Message
+from .models import Conversation, Message, MessageReport, Notification
 from .services import ai
 
 logger = logging.getLogger(__name__)
@@ -186,7 +187,7 @@ def chat_history(request):
         'token': conversation.token,
         'title': conversation.title,
         'messages': [
-            {'role': m.role, 'content': m.content, 'engine': m.engine}
+            {'id': m.pk, 'role': m.role, 'content': m.content, 'engine': m.engine}
             for m in conversation.messages.all()
         ],
     })
@@ -280,7 +281,9 @@ def chat_send(request):
         if note:
             try:
                 item = ai.remember(note)
-                reply = f'Added to my knowledge base: "{item.title}". Ask me about it anytime!'
+                saved_name = item.source.split('/')[-1]
+                reply = (f'Saved to knowledge: "{item.title}" ({saved_name}). '
+                         f'Ask me about it anytime!')
             except (OSError, ValueError):
                 logger.exception('Knowledge write failed')
                 reply = 'I could not save the info right now — please try again.'
@@ -301,6 +304,7 @@ def chat_send(request):
             'sources': [],
             'conversation_id': conversation.pk,
             'conversation_token': conversation.token,
+            'message_id': assistant_msg.pk,
             'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
         })
 
@@ -337,6 +341,7 @@ def chat_send(request):
         role=Message.ROLE_ASSISTANT,
         content=reply,
         engine=engine,
+        sources=sources or [],
     )
     conversation.save()  # bump updated_at
 
@@ -350,5 +355,122 @@ def chat_send(request):
         'sources': sources,
         'conversation_id': conversation.pk,
         'conversation_token': conversation.token,
+        'message_id': assistant_msg.pk,
         'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
     })
+
+
+# ---------- MESSAGE REPORTS (registered users) ----------
+
+@require_POST
+@login_required
+def chat_report(request):
+    """Registered user flags one KNIGHT reply. Snapshot is stored for the admin."""
+    raw_id = (request.POST.get('message_id') or '').strip()
+    reason = (request.POST.get('reason') or MessageReport.REASON_OTHER).strip()
+    details = (request.POST.get('details') or '').strip()[:2000]
+    if reason not in dict(MessageReport.REASON_CHOICES):
+        reason = MessageReport.REASON_OTHER
+
+    try:
+        message_id = int(raw_id)
+    except (TypeError, ValueError):
+        return JsonResponse({'ok': False, 'error': 'Missing reply.'}, status=400)
+
+    # Scoped: the reply must live in a conversation this account owns.
+    message = (
+        Message.objects.select_related('conversation')
+        .filter(pk=message_id, conversation__in=_sessions(request),
+                role=Message.ROLE_ASSISTANT)
+        .first()
+    )
+    if message is None:
+        return JsonResponse({'ok': False, 'error': 'Reply not found.'}, status=404)
+
+    rate_key = f'kcc:msg_report:{request.user.pk}'
+    used = cache.get(rate_key, 0)
+    if used >= 10:
+        return JsonResponse(
+            {'ok': False, 'error': 'Too many reports. Please try again later.'},
+            status=429,
+        )
+    cache.set(rate_key, used + 1, 3600)
+
+    question_text = ''
+    previous = (
+        message.conversation.messages
+        .filter(role=Message.ROLE_USER, created_at__lte=message.created_at)
+        .order_by('-created_at')
+        .first()
+    )
+    if previous:
+        question_text = previous.content
+
+    report = MessageReport.objects.create(
+        message=message,
+        conversation=message.conversation,
+        user=request.user,
+        reason=reason,
+        details=details,
+        question_text=question_text,
+        answer_text=message.content,
+        sources=message.sources or [],
+        engine=message.engine or '',
+    )
+    return JsonResponse({
+        'ok': True,
+        'report_id': report.pk,
+        'message': 'Salamat! Naipadala na sa admin ang report mo.',
+    })
+
+
+# ---------- NOTIFICATIONS (registered users) ----------
+
+def _unread_count(user):
+    return Notification.objects.filter(user=user, is_read=False).count()
+
+
+@require_GET
+@login_required
+def notifications_list(request):
+    items = Notification.objects.filter(user=request.user).order_by('-created_at')[:50]
+    return JsonResponse({
+        'ok': True,
+        'unread': _unread_count(request.user),
+        'notifications': [
+            {
+                'id': n.pk,
+                'title': n.title,
+                'body': n.body,
+                'is_read': n.is_read,
+                'report_id': n.report_id,
+                'created_at': timezone.localtime(n.created_at).strftime('%b %d, %Y %H:%M'),
+            }
+            for n in items
+        ],
+    })
+
+
+@login_required
+def notifications_page(request):
+    items = (
+        Notification.objects.filter(user=request.user)
+        .select_related('report')
+        .order_by('-created_at')[:100]
+    )
+    return render(request, 'chat/notifications.html', {
+        'notifications': items,
+        'unread_count': _unread_count(request.user),
+    })
+
+
+@require_POST
+@login_required
+def notifications_mark_read(request):
+    qs = Notification.objects.filter(user=request.user, is_read=False)
+    raw_ids = (request.POST.get('ids') or '').strip()
+    if raw_ids:
+        ids = [int(x) for x in raw_ids.split(',') if x.strip().isdigit()]
+        qs = qs.filter(pk__in=ids)
+    updated = qs.update(is_read=True)
+    return JsonResponse({'ok': True, 'updated': updated, 'unread': _unread_count(request.user)})

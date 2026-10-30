@@ -121,6 +121,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.core.context_processors.tickets',
+                'apps.core.context_processors.notifications',
                 'apps.core.context_processors.announcement',
                 'apps.core.context_processors.chat_sessions',
             ],

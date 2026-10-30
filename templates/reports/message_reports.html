@@ -1,0 +1,132 @@
+{% extends "theme/base.html" %}
+{% block content %}
+
+<div class="page-header d-print-none">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">Admin</div>
+      <h2 class="page-title">Message Reports</h2>
+    </div>
+  </div>
+</div>
+
+<div class="row row-cards mt-2">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="btn-group">
+          <a href="{% url 'message_reports' %}" class="btn btn-sm {% if not active_status %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            All ({{ total_count }})
+          </a>
+          <a href="{% url 'message_reports' %}?status=open" class="btn btn-sm {% if active_status == 'open' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            Open ({{ counts.open }})
+          </a>
+          <a href="{% url 'message_reports' %}?status=resolved" class="btn btn-sm {% if active_status == 'resolved' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            Resolved ({{ counts.resolved }})
+          </a>
+        </div>
+        <span class="text-muted" style="font-size:0.8rem;">Replies here notify the registered user in-app</span>
+      </div>
+
+      <div class="card-body d-flex flex-column gap-3">
+        {% for r in reports %}
+        <div class="card">
+          <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+              <span class="badge {% if r.status == 'open' %}bg-danger{% else %}bg-success{% endif %} me-1">
+                {{ r.get_status_display }}
+              </span>
+              <strong>Report #{{ r.pk }}</strong>
+              <span class="text-muted ms-2" style="font-size:0.8rem;">{{ r.get_reason_display }}</span>
+            </div>
+            <span class="text-muted" style="font-size:0.78rem;">
+              {{ r.created_at|date:"M d, Y H:i" }}
+            </span>
+          </div>
+          <div class="card-body" style="font-size:0.85rem;">
+            <div class="mb-2">
+              <span class="text-muted">From:</span>
+              <strong>{{ r.user.username }}</strong>
+              <span class="text-muted">({{ r.user.email }})</span>
+            </div>
+
+            <div class="mb-2">
+              <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">User question</div>
+              <div class="kcc-snapshot">{{ r.question_text|default:"(not captured)"|linebreaksbr }}</div>
+            </div>
+
+            <div class="mb-2">
+              <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">KNIGHT answer (snapshot)</div>
+              <div class="kcc-snapshot">{{ r.answer_text|default:"(empty)"|linebreaksbr }}</div>
+            </div>
+
+            <div class="mb-2">
+              <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">Where the info came from</div>
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                {% for s in r.sources %}
+                  {% if s.url %}
+                    <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer" class="badge bg-secondary text-decoration-none">
+                      {% if s.type == 'kb' %}KB{% else %}Web{% endif %}: {{ s.title|default:s.url|truncatechars:50 }}
+                    </a>
+                  {% else %}
+                    <span class="badge bg-secondary">
+                      {% if s.type == 'kb' %}KB{% else %}Web{% endif %}: {{ s.title|default:"KCC Knowledge Base"|truncatechars:50 }}
+                    </span>
+                  {% endif %}
+                {% empty %}
+                  <span class="text-muted" style="font-size:0.78rem;">No citation stored{% if r.engine %} &middot; engine: {{ r.engine }}{% endif %}</span>
+                {% endfor %}
+              </div>
+            </div>
+
+            {% if r.details %}
+            <div class="mb-2">
+              <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">User's note</div>
+              <div class="kcc-snapshot">{{ r.details|linebreaksbr }}</div>
+            </div>
+            {% endif %}
+
+            {% if r.admin_reply %}
+            <div class="alert alert-success mb-0 mt-3" style="font-size:0.82rem;">
+              <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">Your reply</div>
+              <div style="white-space:pre-wrap;">{{ r.admin_reply }}</div>
+              {% if r.replied_at %}
+              <div class="text-muted mt-1" style="font-size:0.72rem;">
+                Sent {{ r.replied_at|date:"M d, Y H:i" }}{% if r.replied_by %} by {{ r.replied_by.username }}{% endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% else %}
+            <form method="post" action="{% url 'message_report_reply' r.pk %}" class="mt-3">
+              {% csrf_token %}
+              <label class="form-label" style="font-size:0.78rem;">Reply to {{ r.user.username }} (they get a notification)</label>
+              <textarea name="admin_reply" rows="3" class="form-control" required
+                        placeholder="Sagot sa report — ipapadala sa user bilang notification."></textarea>
+              <button type="submit" class="btn btn-sm btn-primary mt-2">
+                <i class="fas fa-paper-plane me-1"></i> Send reply
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-5">No message reports yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .kcc-snapshot {
+    background: rgba(148,163,184,0.08);
+    border: 1px solid rgba(148,163,184,0.2);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+    margin-top: 0.2rem;
+    white-space: pre-wrap;
+    font-size: 0.82rem;
+  }
+</style>
+
+{% endblock %}

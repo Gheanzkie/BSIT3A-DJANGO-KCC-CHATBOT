@@ -12,6 +12,23 @@ from django.test import SimpleTestCase, override_settings
 from apps.chat.services import ai
 
 
+# Keep the suite hermetic: no real embedding calls to Gemini, ever.
+# Retrieval then falls back to keyword search (offline path).
+_EMBED_PATCHES = []
+
+
+def setUpModule():
+    for name in ('embed_text', 'embed_texts'):
+        patcher = mock.patch.object(ai, name, side_effect=ai.AIUnavailable('offline in tests'))
+        patcher.start()
+        _EMBED_PATCHES.append(patcher)
+
+
+def tearDownModule():
+    while _EMBED_PATCHES:
+        _EMBED_PATCHES.pop().stop()
+
+
 class FakeResponse:
     def __init__(self, payload=None, status=200, headers=None, text=''):
         self._payload = payload if payload is not None else {}
@@ -399,3 +416,117 @@ class ReasoningParamFallbackTests(SimpleTestCase):
         err = requests.HTTPError(f'{status}', response=resp)
         err.response = resp
         return err
+
+
+
+class KnowledgeDiscoveryTests(SimpleTestCase):
+    """Any folder created under knowledge/ must be discovered with no code change."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.kb = Path(self._tmp.name)
+        self._patch = mock.patch.object(ai, 'KB_DIR', self.kb)
+        self._patch.start()
+        self.addCleanup(self._patch.stop)
+        # remember() runs an AI cleanup pass; keep tests offline.
+        self._clean_patch = mock.patch.object(
+            ai, '_clean_note', side_effect=lambda text, engine='auto': text)
+        self._clean_patch.start()
+        self.addCleanup(self._clean_patch.stop)
+        self.addCleanup(self._tmp.cleanup)
+
+    def _write(self, rel, title, body='body text'):
+        path = self.kb / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f'{title}\n{body}\n', encoding='utf-8')
+        return path
+
+    def test_discovers_arbitrary_nested_folders(self):
+        self._write('topic/deep/deeper/answer.txt', 'Deep Answer')
+        self._write('flat.txt', 'Flat Answer')
+        items = {i.source: i for i in ai._load_knowledge()}
+        self.assertIn('topic/deep/deeper/answer.txt', items)
+        self.assertIn('flat.txt', items)
+        self.assertEqual(items['topic/deep/deeper/answer.txt'].category, 'topic/deep/deeper')
+        self.assertEqual(items['flat.txt'].category, 'General')
+
+    def test_markdown_is_loaded_too(self):
+        self._write('topic/notes.md', 'Markdown Title')
+        self.assertIn('topic/notes.md', {i.source for i in ai._load_knowledge()})
+
+    def test_ignores_underscore_and_hidden_files(self):
+        self._write('_README.txt', 'Ignored')
+        self._write('.hidden/secret.txt', 'Ignored too')
+        self._write('real.txt', 'Real')
+        self.assertEqual({i.source for i in ai._load_knowledge()}, {'real.txt'})
+
+    def test_resolve_kb_dir_finds_nested_folder_by_name(self):
+        (self.kb / 'kcc' / 'notes').mkdir(parents=True)
+        self.assertEqual(ai._resolve_kb_dir('notes'), self.kb / 'kcc' / 'notes')
+
+    def test_remember_returns_file_path_not_folder(self):
+        (self.kb / 'kcc' / 'notes').mkdir(parents=True)
+        item = ai.remember('Remembered Title\nSome fact.')
+        path = self.kb / item.source
+        self.assertTrue(path.is_file(), f'{item.source} is not a file')
+        self.assertEqual(item.category, 'kcc/notes')
+        self.assertTrue(item.source.endswith('.txt'))
+        self.assertIn(item.source, {i.source for i in ai._load_knowledge()})
+
+
+
+class RememberCleanupTests(SimpleTestCase):
+    """remember() must tidy the text via AI and use a readable filename."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.kb = Path(self._tmp.name)
+        (self.kb / 'kcc' / 'notes').mkdir(parents=True)
+        self._patch = mock.patch.object(ai, 'KB_DIR', self.kb)
+        self._patch.start()
+        self.addCleanup(self._patch.stop)
+        self.addCleanup(self._tmp.cleanup)
+
+    def test_clean_note_uses_ai_output(self):
+        with mock.patch.object(ai, 'chat', return_value=('Clean Title\n\nClean body.', 'groq')):
+            self.assertEqual(ai._clean_note('messy text long enough'), 'Clean Title\n\nClean body.')
+
+    def test_clean_note_falls_back_when_ai_unavailable(self):
+        with mock.patch.object(ai, 'chat', side_effect=ai.AIUnavailable('down')):
+            self.assertEqual(ai._clean_note('messy text long enough'), 'messy text long enough')
+
+    def test_clean_note_strips_code_fence(self):
+        with mock.patch.object(ai, 'chat', return_value=('```text\nTitle\n\nBody here.\n```', 'groq')):
+            self.assertEqual(ai._clean_note('messy text long enough'), 'Title\n\nBody here.')
+
+    def test_remember_uses_meaningful_filename(self):
+        with mock.patch.object(ai, 'chat', return_value=('BSIT Tuition Fee\n\nIt is not yet verified.', 'groq')):
+            item = ai.remember('bsit tuition fee unverified')
+        self.assertEqual(item.source, 'kcc/notes/bsit-tuition-fee.txt')
+        self.assertEqual(item.title, 'BSIT Tuition Fee')
+        self.assertTrue((self.kb / item.source).is_file())
+
+    def test_remember_merges_into_existing_topic(self):
+        with mock.patch.object(ai, 'chat', return_value=('Office Hours\n\nRegistrar is open 8am.', 'groq')):
+            first = ai.remember('registrar hours')
+        with mock.patch.object(ai, 'chat', return_value=('Office Hours\n\nClosed on Sundays.', 'groq')):
+            second = ai.remember('registrar hours again')
+        self.assertEqual(first.source, 'kcc/notes/office-hours.txt')
+        self.assertEqual(second.source, 'kcc/notes/office-hours.txt')
+        text = (self.kb / second.source).read_text(encoding='utf-8')
+        self.assertIn('Registrar is open 8am.', text)
+        self.assertIn('Closed on Sundays.', text)
+        self.assertFalse((self.kb / 'kcc/notes/office-hours-2.txt').exists())
+
+    def test_remember_does_not_duplicate_identical_line(self):
+        with mock.patch.object(ai, 'chat', return_value=('Office Hours\n\nRegistrar is open 8am.', 'groq')):
+            ai.remember('registrar hours')
+            item = ai.remember('registrar hours')
+        text = (self.kb / item.source).read_text(encoding='utf-8')
+        self.assertEqual(text.lower().count('registrar is open 8am'), 1)
+
+    def test_remember_skips_cleanup_when_disabled(self):
+        with mock.patch.object(ai, 'chat') as mocked:
+            item = ai.remember('Web Fact Title\n\nFrom the web.', clean=False)
+        mocked.assert_not_called()
+        self.assertEqual(item.source, 'kcc/notes/web-fact-title.txt')

@@ -96,6 +96,20 @@
   .kcc-bubble-bot { background: transparent; border: 0; color: #e2e8f0; padding-left: 0; padding-right: 1rem; }
   .kcc-engine { font-size: 0.68rem; color: #64748b; margin-top: 0.28rem; }
 
+  /* per-reply 3-dot menu (registered users only) */
+  .kcc-msg-tools { display: flex; align-items: center; gap: 0.35rem; margin-top: 0.25rem; }
+  .kcc-msg-menu-btn {
+    background: transparent; border: 1px solid transparent; color: #64748b;
+    border-radius: 8px; padding: 0 0.4rem; line-height: 1.4; font-size: 0.85rem; cursor: pointer;
+  }
+  .kcc-msg-menu-btn:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; border-color: rgba(255,255,255,0.12); }
+  html.kcc-light .kcc-msg-menu-btn:hover { background: rgba(15,23,42,0.06); color: #0f172a; border-color: #cbd5e1; }
+  .kcc-report-preview {
+    background: rgba(148,163,184,0.08); border: 1px solid rgba(148,163,184,0.2);
+    border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 0.8rem; white-space: pre-wrap;
+    max-height: 180px; overflow-y: auto;
+  }
+
   /* sources / citations */
   .kcc-sources { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.35rem; }
   .kcc-source-chip {
@@ -213,6 +227,14 @@
               <div class="kcc-holder">
                 <div class="kcc-bubble kcc-bubble-bot">{{ m.content }}</div>
                 {% if m.engine %}<div class="kcc-engine">{{ m.engine }}</div>{% endif %}
+                {% if user.is_authenticated %}
+                <div class="kcc-msg-tools">
+                  <button type="button" class="kcc-msg-menu-btn kcc-report-open"
+                          data-mid="{{ m.pk }}" title="Report this answer" aria-label="Report this answer">
+                    <i class="fas fa-ellipsis"></i>
+                  </button>
+                </div>
+                {% endif %}
               </div>
             </div>
             {% endif %}
@@ -253,6 +275,58 @@
   </div>
 </div>
 
+{% if user.is_authenticated %}
+<!-- REPORT MODAL (registered users) -->
+<div class="modal fade" id="kccReportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-flag me-2"></i>Report this answer</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">Answer you are reporting</div>
+          <div id="kccReportPreview" class="kcc-report-preview mt-1"></div>
+        </div>
+        <div class="mb-2">
+          <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">Where the info came from</div>
+          <div id="kccReportSources" class="d-flex flex-wrap gap-1 mt-1" style="font-size:0.75rem;"></div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label" for="kccReportReason" style="font-size:0.82rem;">Reason</label>
+          <select id="kccReportReason" class="form-select form-select-sm">
+            <option value="wrong">Maling sagot / Wrong answer</option>
+            <option value="incomplete">Kulang ang sagot / Incomplete</option>
+            <option value="outdated">Luma na ang info / Outdated</option>
+            <option value="inappropriate">Hindi angkop / Inappropriate</option>
+            <option value="other" selected>Iba pa / Other</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label" for="kccReportDetails" style="font-size:0.82rem;">Details (optional)</label>
+          <textarea id="kccReportDetails" class="form-control" rows="3"
+                    placeholder="Ano ang mali o kulang sa sagot?"></textarea>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button type="button" id="kccReportCopy" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-copy me-1"></i> Copy details
+          </button>
+          <span id="kccReportCopyState" class="text-muted" style="font-size:0.75rem;"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span id="kccReportState" class="text-muted me-auto" style="font-size:0.8rem;"></span>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="kccReportSend" class="btn btn-primary btn-sm">
+          <i class="fas fa-paper-plane me-1"></i> Send report
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <script>
 (function () {
   var form = document.getElementById('chatForm');
@@ -265,6 +339,7 @@
 
   var convId = '{{ current_conversation_token|default_if_none:"" }}';
   var isNewChat = !convId; // welcome state = bagong chat
+  var CAN_REPORT = {% if user.is_authenticated %}true{% else %}false{% endif %};
 
   function getCookie(name) {
     var value = '; ' + document.cookie;
@@ -316,7 +391,7 @@
 
   function scrollBottom() { win.scrollTop = win.scrollHeight; }
 
-  function bubble(text, role, engine, sources) {
+  function bubble(text, role, engine, sources, messageId) {
     var isUser = role === 'user';
     var hasSources = !isUser && Array.isArray(sources) && sources.length > 0;
     var row = document.createElement('div');
@@ -360,11 +435,133 @@
         });
         holder.appendChild(srcBox);
       }
+      if (CAN_REPORT && messageId) {
+        var tools = document.createElement('div');
+        tools.className = 'kcc-msg-tools';
+        var mbtn = document.createElement('button');
+        mbtn.type = 'button';
+        mbtn.className = 'kcc-msg-menu-btn kcc-report-open';
+        mbtn.setAttribute('data-mid', String(messageId));
+        mbtn.title = 'Report this answer';
+        mbtn.setAttribute('aria-label', 'Report this answer');
+        mbtn.innerHTML = '<i class="fas fa-ellipsis"></i>';
+        tools.appendChild(mbtn);
+        holder.appendChild(tools);
+      }
       row.appendChild(holder);
     }
 
     inner.appendChild(row);
-    scrollBottom();
+  {% if user.is_authenticated %}
+  // ---- Report a reply (registered users only) ----
+  (function reportFlow() {
+    var modalEl = document.getElementById('kccReportModal');
+    if (!modalEl || typeof bootstrap === 'undefined') return;
+    var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    var previewEl = document.getElementById('kccReportPreview');
+    var sourcesEl = document.getElementById('kccReportSources');
+    var reasonEl = document.getElementById('kccReportReason');
+    var detailsEl = document.getElementById('kccReportDetails');
+    var stateEl = document.getElementById('kccReportState');
+    var copyStateEl = document.getElementById('kccReportCopyState');
+    var sendBtn = document.getElementById('kccReportSend');
+    var copyBtn = document.getElementById('kccReportCopy');
+    var currentMid = null;
+    var currentAnswer = '';
+    var currentQuestion = '';
+    var currentSources = [];
+
+    function chipText(s) { return (s.type === 'kb' ? 'KB: ' : 'Web: ') + (s.title || s.url || 'KCC Knowledge Base'); }
+
+    document.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest('.kcc-report-open') : null;
+      if (!btn) return;
+      e.preventDefault();
+      currentMid = btn.getAttribute('data-mid');
+      var holder = btn.closest('.kcc-holder') || btn.parentNode;
+      var bubbleEl = holder.querySelector ? holder.querySelector('.kcc-bubble-bot') : null;
+      currentAnswer = bubbleEl ? bubbleEl.textContent : '';
+      currentSources = [];
+      if (holder.querySelectorAll) {
+        holder.querySelectorAll('.kcc-source-chip').forEach(function (c) {
+          currentSources.push(c.textContent.trim());
+        });
+      }
+      var row = btn.closest('.kcc-row');
+      var prev = row ? row.previousElementSibling : null;
+      currentQuestion = '';
+      while (prev) {
+        var ub = prev.querySelector ? prev.querySelector('.kcc-bubble-user') : null;
+        if (ub) { currentQuestion = ub.textContent; break; }
+        prev = prev.previousElementSibling;
+      }
+      previewEl.textContent = currentAnswer;
+      sourcesEl.innerHTML = '';
+      if (currentSources.length) {
+        currentSources.forEach(function (t) {
+          var b = document.createElement('span');
+          b.className = 'badge bg-secondary';
+          b.textContent = t;
+          sourcesEl.appendChild(b);
+        });
+      } else {
+        sourcesEl.textContent = 'Walang citation na naka-attach sa sagot na ito.';
+      }
+      stateEl.textContent = '';
+      copyStateEl.textContent = '';
+      detailsEl.value = '';
+      modal.show();
+    });
+
+    copyBtn.addEventListener('click', function () {
+      var lines = [];
+      if (currentQuestion) lines.push('Question: ' + currentQuestion);
+      lines.push('KNIGHT answer: ' + currentAnswer);
+      if (currentSources.length) lines.push('Sources: ' + currentSources.join(' | '));
+      var payload = lines.join('\n');
+      function done() { copyStateEl.textContent = 'Copied.'; }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(payload).then(done).catch(function () { copyStateEl.textContent = 'Copy failed.'; });
+      } else {
+        copyStateEl.textContent = 'Clipboard not available.';
+      }
+    });
+
+    sendBtn.addEventListener('click', function () {
+      if (!currentMid) return;
+      sendBtn.disabled = true;
+      stateEl.textContent = 'Sending...';
+      var fd = new FormData();
+      fd.append('message_id', currentMid);
+      fd.append('reason', reasonEl.value);
+      fd.append('details', detailsEl.value);
+      fetch("{% url 'chat:report' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: fd
+      })
+        .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
+        .then(function (r) {
+          sendBtn.disabled = false;
+          if (r.d && r.d.ok) {
+            stateEl.textContent = r.d.message || 'Report sent.';
+            setTimeout(function () { modal.hide(); }, 1200);
+          } else {
+            stateEl.textContent = (r.d && r.d.error) || 'Could not send the report.';
+          }
+        })
+        .catch(function () {
+          sendBtn.disabled = false;
+          stateEl.textContent = 'Network error. Try again.';
+        });
+    });
+  })();
+  {% endif %}
+
+  scrollBottom();
     return row;
   }
 
@@ -407,7 +604,7 @@
         typing.remove();
         btn.disabled = false;
         if (r.d && r.d.ok) {
-          bubble(r.d.reply, 'assistant', r.d.engine, r.d.sources);
+          bubble(r.d.reply, 'assistant', r.d.engine, r.d.sources, r.d.message_id);
           if (r.d.conversation_token) {
             convId = String(r.d.conversation_token);
             // Tab-scoped: stored per tab, so a new tab gets a fresh chat.
@@ -475,7 +672,7 @@
       .then(function (d) {
         if (!d || !d.ok || !d.messages || !d.messages.length) return;
         removeWelcome();
-        d.messages.forEach(function (m) { bubble(m.content, m.role, m.engine, null); });
+        d.messages.forEach(function (m) { bubble(m.content, m.role, m.engine, null, m.id); });
       })
       .catch(function () {});
   })();

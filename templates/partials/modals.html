@@ -1,4 +1,4 @@
-<!-- ============ FLOATING AUTH MODALS ============ -->
+﻿<!-- ============ FLOATING AUTH MODALS ============ -->
 
 <div class="modal fade" id="kccLoginModal" tabindex="-1" aria-labelledby="kccLoginTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -77,43 +77,6 @@
       <div class="modal-footer justify-content-center" style="font-size:0.85rem;">
         Already have an account?
         <button type="button" class="btn btn-link p-0 ms-1" data-kcc-switch="#kccLoginModal">Log in</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ REPORT A PROBLEM ============ -->
-
-<div class="modal fade" id="kccReportModal" tabindex="-1" aria-labelledby="kccReportTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="kccReportTitle"><i class="fas fa-flag me-2"></i>Report a Problem</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p class="text-muted" style="font-size:0.85rem;">Tell the admin what went wrong. Your account is attached automatically if you are logged in.</p>
-        <form id="kccReportForm">
-          {% csrf_token %}
-          <div class="alert alert-danger d-none" data-kcc-error role="alert"></div>
-          <div class="alert alert-success d-none" data-kcc-success role="alert"></div>
-          <div class="mb-3">
-            <label class="form-label">Category</label>
-            <select name="category" class="form-select">
-              <option value="bug">Bug / Error</option>
-              <option value="content">Wrong answer / content</option>
-              <option value="account">Account / login</option>
-              <option value="other" selected>Other</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">What happened?</label>
-            <textarea name="message" rows="5" maxlength="2000" required class="form-control" placeholder="Describe the problem..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary w-100">
-            <i class="fas fa-paper-plane me-1"></i> Send to admin
-          </button>
-        </form>
       </div>
     </div>
   </div>
@@ -270,13 +233,6 @@
   // Login / register -> reload so the sidebar shows the logged-in state.
   wire('kccLoginForm', "{% url 'login' %}", function () { window.location.reload(); });
   wire('kccRegisterForm', "{% url 'register' %}", function () { window.location.reload(); });
-
-  // Report -> stay in the modal and show the confirmation.
-  wire('kccReportForm', "{% url 'report' %}", function (data, form) {
-    form.reset();
-    var ok = form.querySelector('[data-kcc-success]');
-    if (ok) { ok.textContent = data.message || 'Report sent.'; ok.classList.remove('d-none'); }
-  });
 
   {% if user.is_authenticated %}
   wire('kccProfileForm', "{% url 'users:profile' %}", function () { window.location.reload(); });

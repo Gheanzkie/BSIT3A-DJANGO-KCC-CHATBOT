@@ -1,13 +1,13 @@
-"""KNIGHT AI service — Groq + Gemini chat with a fallback chain.
+"""KNIGHT AI service â€” Groq + Gemini chat with a fallback chain.
 
 BOTH chat engines speak the OpenAI-compatible /chat/completions format
 (Groq primary, Google Gemini fallback). Nothing is hardcoded: base URL,
 model name, and key all come from .env / settings.
 
-KNOWLEDGE — file-based, walang MySQL:
+KNOWLEDGE â€” file-based, walang MySQL:
   Lahat ng alam ni KNIGHT ay galing sa mga .txt file sa apps/chat/knowledge/.
   First line ng file = title; ang natitira = content. Pwede ang sub-folders
-  (folder name = category). Magdagdag lang ng txt file — automatic nang
+  (folder name = category). Magdagdag lang ng txt file â€” automatic nang
   mababasa, walang command na kailangan i-run. Ang semantic-search cache
   (knowledge/_embeddings.json) ay auto-generated at auto-refresh.
 
@@ -17,14 +17,14 @@ Default slots:
   Embeddings             : Google Gemini (AI_EMBED_MODEL = gemini-embedding-001)
 
 Reasoning (upgrade): AI_REASONING_EFFORT ang global default; may per-engine
-overrides (AI_REASONING_EFFORT_PRIMARY / _FALLBACK — 'none' = huwag ipadala ang
+overrides (AI_REASONING_EFFORT_PRIMARY / _FALLBACK â€” 'none' = huwag ipadala ang
 param). Ang utility calls (prompt fix, auto-learn) ay 'low' pa rin para tipid sa
 quota. Kapag naubos ng hidden reasoning ang output budget (empty reply,
 finish_reason 'length'), isang escalation retry (AI_REASONING_ESCALATION_TOKENS)
 bago sumuko sa provider.
 
 Kung walang embedding key (o pumalya ang embeddings), keyword search pa rin
-ang gagamitin — tuloy pa rin ang sagot.
+ang gagamitin â€” tuloy pa rin ang sagot.
 """
 
 import hashlib
@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 REQUEST_TIMEOUT = getattr(settings, 'AI_HTTP_TIMEOUT', 30)
 MAX_ITEM_CHARS = 1200  # cap per knowledge item sa prompt (keep prompts small)
 
-GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta'  # native API — embeddings lang
+GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta'  # native API â€” embeddings lang
 
 # --- Usage stats (para sa dashboard): tokens + calls per engine ---
 USAGE_FILE = Path(__file__).resolve().parent.parent / 'usage_stats.json'
@@ -155,7 +155,7 @@ _ENGINE_ORDER = {
 _LANGUAGE_RULES = {
     'tl': 'ALWAYS answer in Tagalog (Filipino), even if the question is in English.',
     'en': 'ALWAYS answer in English, even if the question is in Tagalog.',
-    'auto': "Match the user's language — Tagalog if the question is Tagalog, English if English.",
+    'auto': "Match the user's language â€” Tagalog if the question is Tagalog, English if English.",
 }
 
 # --- Greeting auto-reply (file: apps/chat/replies.txt; built-in fallback sa ibaba) ---
@@ -190,8 +190,8 @@ _GREETINGS = {
     ],
 }
 
-# --- Friendly small-talk replies — built-in fallback
-# --- (ang ini-edit ng user ay apps/chat/replies.txt — auto-reload kapag nai-save) ---
+# --- Friendly small-talk replies â€” built-in fallback
+# --- (ang ini-edit ng user ay apps/chat/replies.txt â€” auto-reload kapag nai-save) ---
 _SMALLTALK = {
     'train': {
         'tl': [
@@ -247,7 +247,7 @@ _SMALLTALK = {
 
 # --- Editable replies file (apps/chat/replies.txt) ---
 # Ang _GREETINGS at _SMALLTALK sa itaas ay built-in fallback lang. Ang sinusunod
-# ni KNIGHT ay ang [section] groups sa replies.txt — pwede i-edit anumang oras,
+# ni KNIGHT ay ang [section] groups sa replies.txt â€” pwede i-edit anumang oras,
 # auto-reload kapag nai-save (walang kailangang i-restart).
 
 REPLIES_FILE = Path(__file__).resolve().parent.parent / 'replies.txt'  # apps/chat/replies.txt
@@ -276,7 +276,7 @@ def _parse_replies(path):
 
 
 def _replies():
-    """Sections galing sa replies.txt — auto-reload kapag nabago ang file."""
+    """Sections galing sa replies.txt â€” auto-reload kapag nabago ang file."""
     try:
         mtime = REPLIES_FILE.stat().st_mtime
     except OSError:
@@ -288,7 +288,7 @@ def _replies():
 
 
 def _reply_variants(category, lang):
-    """Variants para sa category+lang — file muna, built-in fallback kung wala."""
+    """Variants para sa category+lang â€” file muna, built-in fallback kung wala."""
     variants = _replies().get(f'{category}-{lang}')
     if variants:
         return variants
@@ -593,7 +593,7 @@ def _chat_slot(slot, system_prompt, history, user_message, user=None, effort=Non
 
 _PROMPT_FIX_SYSTEM = """You are a spelling and grammar corrector for a Filipino student chatbot.
 Fix the spelling, typo, at grammar ng mensahe ng user habang pinapanatili ang meaning at wika nito.
-I-return LAMANG ang naitama na teksto — walang paliwanag, walang quotes, walang ibang sagot.
+I-return LAMANG ang naitama na teksto â€” walang paliwanag, walang quotes, walang ibang sagot.
 Kung tama na ang teksto, ibalik ito nang buo at walang babaguhin."""
 
 
@@ -603,7 +603,7 @@ def correct_prompt(message, engine='auto', user=None):
     if not original or len(original) < 12 or len(original) > 500:
         return original
     try:
-        # Utility call: typo-fix lang — low effort, hindi ito reasoning task (tipid sa quota).
+        # Utility call: typo-fix lang â€” low effort, hindi ito reasoning task (tipid sa quota).
         # Run it on the fast engine when available so a slow provider is not paid twice.
         fix_engine = 'primary' if getattr(settings, 'GROQ_API_KEY', '') else engine
         fixed, _engine = chat(_PROMPT_FIX_SYSTEM, [], original, engine=fix_engine, user=user, effort='low')
@@ -673,7 +673,7 @@ def _is_greeting(text):
 
 
 def greeting_reply(text, language='auto'):
-    """Canned greeting reply — 'auto' detects Tagalog from the greeting itself."""
+    """Canned greeting reply â€” 'auto' detects Tagalog from the greeting itself."""
     if language == 'auto':
         tokens = set(re.sub(r"[^a-z\s']", ' ', text.lower()).split())
         language = 'tl' if tokens & _TAGALOG_HINT_WORDS else 'mix'
@@ -725,7 +725,7 @@ def _smalltalk_reply(text, language):
     words = set(t.split())
     lang = _reply_language(text, language)
 
-    # Train/learn questions — kailangan may "you" marker (para hindi ma-catch
+    # Train/learn questions â€” kailangan may "you" marker (para hindi ma-catch
     # ang campus questions tulad ng "saan ang training office").
     if (_TRAIN_HINTS_RE.search(t) or _TRAIN_HINT2_RE.search(t)) and words & _YOU_WORDS:
         return random.choice(_reply_variants('train', lang))
@@ -733,7 +733,7 @@ def _smalltalk_reply(text, language):
         return random.choice(_reply_variants('who', lang))
     if _CAPABILITY_RE.search(t):
         return random.choice(_reply_variants('capabilities', lang))
-    # Thanks/bye — huwag mahuli ang totoong tanong ("salamat, paano mag enroll?")
+    # Thanks/bye â€” huwag mahuli ang totoong tanong ("salamat, paano mag enroll?")
     if not words & _QUESTION_WORDS:
         if _THANKS_RE.search(t):
             return random.choice(_reply_variants('thanks', lang))
@@ -767,11 +767,37 @@ def _keywords(text):
 
 
 # ---------------------------------------------------------------------------
-# Knowledge base — file-based (apps/chat/knowledge/*.txt). Walang MySQL.
+# Knowledge base â€” file-based (apps/chat/knowledge/*.txt). Walang MySQL.
 # ---------------------------------------------------------------------------
 
 KB_DIR = Path(__file__).resolve().parent.parent / 'knowledge'  # apps/chat/knowledge/
 _KB_CACHE_NAME = '_embeddings.json'
+# Only the *names* below are used; their actual location is resolved at runtime
+# so folders can be moved/renamed/created freely without editing this file.
+REMEMBER_FOLDER_NAME = 'notes'
+ANNOUNCEMENT_FOLDER_NAME = 'announcements'
+
+
+def _resolve_kb_dir(name, default_parent=None):
+    """Return the folder called `name` anywhere under knowledge/.
+
+    Lookup order: exact child of knowledge/, then any nested folder with that
+    name (case-insensitive), else the path is created under `default_parent`
+    (knowledge/ when omitted). This is what keeps the loader free of hardcoded
+    sub-folder paths: create knowledge/anything/... and it is found.
+    """
+    target = (name or '').strip().strip('/\\')
+    if not target:
+        return KB_DIR
+    direct = KB_DIR / target
+    if direct.is_dir():
+        return direct
+    lowered = target.lower()
+    if KB_DIR.is_dir():
+        for path in sorted(KB_DIR.rglob('*')):
+            if path.is_dir() and path.name.lower() == lowered:
+                return path
+    return (default_parent or KB_DIR) / target
 
 
 class KItem(NamedTuple):
@@ -788,10 +814,11 @@ def _load_knowledge():
     items = []
     if not KB_DIR.is_dir():
         return items
-    for path in sorted(KB_DIR.rglob('*.txt')):
+    paths = list(KB_DIR.rglob('*.txt')) + list(KB_DIR.rglob('*.md'))
+    for path in sorted(paths):
         rel = path.relative_to(KB_DIR)
         if any(part.startswith(('_', '.')) for part in rel.parts):
-            continue  # _README, hidden files — hindi kasama
+            continue  # _README, hidden files â€” hindi kasama
         try:
             raw = path.read_text(encoding='utf-8').strip()
         except OSError:
@@ -821,7 +848,7 @@ def _kb_fingerprint(items):
 
 
 def _kb_embeddings(items):
-    """Vectors para sa mga items — naka-cache sa knowledge/_embeddings.json.
+    """Vectors para sa mga items â€” naka-cache sa knowledge/_embeddings.json.
     Auto-refresh kapag may binago, dinagdag, o tinanggal na file."""
     cache_path = KB_DIR / _KB_CACHE_NAME
     fp = _kb_fingerprint(items)
@@ -842,7 +869,7 @@ def _kb_embeddings(items):
 
 
 def _retrieve(question, top_k=None, min_score=None):
-    """Return the most relevant knowledge entries — galing sa knowledge/*.txt."""
+    """Return the most relevant knowledge entries â€” galing sa knowledge/*.txt."""
     top_k = top_k or settings.AI_KB_TOP_K
     min_score = settings.AI_KB_MIN_SCORE if min_score is None else min_score
 
@@ -863,14 +890,17 @@ def _retrieve(question, top_k=None, min_score=None):
         except (AIConfigError, AIUnavailable) as exc:
             logger.warning('Semantic search failed, using keyword search: %s', exc)
 
-    # 2) Keyword fallback — gumagana kahit walang keys, at bilang backup
+    # 2) Keyword fallback â€” gumagana kahit walang keys, at bilang backup
     q_words = _keywords(question)
     if not q_words:
         return []
     scored = []
     for item in items:
-        words = _keywords(f'{item.title} {item.content}')
-        score = len(q_words & words)
+        title_words = _keywords(item.title)
+        body_words = _keywords(item.content)
+        # Title hits weigh more than body hits: a file titled after the
+        # question should outrank one that only mentions the words.
+        score = 2 * len(q_words & title_words) + len(q_words & body_words)
         if score > 0:
             scored.append((score, item))
     scored.sort(key=lambda t: t[0], reverse=True)
@@ -886,56 +916,121 @@ def _build_context(items):
 
 
 # ---------------------------------------------------------------------------
-# Chat-driven knowledge adds — writes a .txt under knowledge/
+# Chat-driven knowledge adds â€” writes a .txt under knowledge/
 # ---------------------------------------------------------------------------
 
-REMEMBER_SUBFOLDER = 'kcc'  # chat-added notes -> kcc/ folder (isang folder nlng, walang bagong folder)
 REMEMBER_MAX_CHARS = 1200
+
+
+_CLEAN_NOTE_PROMPT = """You tidy up a knowledge-base note for a campus chatbot.
+
+Rewrite the text you receive into a clean, factual knowledge entry.
+
+Rules:
+- FIRST line: a short, clear English title (max 60 characters, no trailing period).
+- Then ONE blank line, then the body: 1-5 short sentences in clear English.
+- Fix grammar, spelling, spacing and sentence structure.
+- Keep every fact, name, number, date, office, place and amount exactly as given.
+- Remove filler, greetings, repeated words and personal commentary.
+- Never invent facts. If a detail is unclear, keep the original wording for it.
+- Plain text only: no markdown, no bullet symbols, no code fences, no preamble
+  like "Here is", and no quotation marks around the whole answer.
+"""
 
 
 def _remember_slug(title):
     slug = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
-    return (slug or 'note')[:40]
+    return (slug or 'note')[:60]
 
 
-def remember(text, subfolder=REMEMBER_SUBFOLDER):
+def _clean_note(text, engine='auto'):
+    """Ayusin ang grammar/sentence/format ng note bago ito i-save.
+
+    Returns the cleaned text, or the original kung unavailable ang AI.
+    """
+    original = (text or '').strip()
+    if len(original) < 15:
+        return original
+    try:
+        fixed, _engine = chat(_CLEAN_NOTE_PROMPT, [], original, engine=engine, effort='low')
+    except (AIConfigError, AIUnavailable) as exc:
+        logger.info('Note cleanup skipped (%s)', exc)
+        return original
+
+    fixed = (fixed or '').strip()
+    if fixed.startswith('```'):
+        fixed = re.sub(r'^```[a-zA-Z]*\s*', '', fixed)
+        fixed = re.sub(r'\s*```$', '', fixed).strip()
+    if len(fixed) < 10:
+        return original
+    return fixed
+
+
+def remember(text, subfolder=None, clean=True):
     """I-save ang info na galing sa chat bilang bagong knowledge file.
 
-    Ang file ay awtomatikong babasahin ng _load_knowledge() (at
-    nagre-refresh ang embeddings cache dahil sa fingerprint).
+    - clean=True  -> AI muna ang nag-aayos ng grammar/sentence/format
+    - filename    -> galing sa title (makabuluhang pangalan, hindi random note-*)
     """
     text = (text or '').strip()
     if not text:
         raise ValueError('Empty note.')
+
+    if clean:
+        text = _clean_note(text)
+
     text = text[:REMEMBER_MAX_CHARS]
 
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()] or [text]
-    title = lines[0]
-    rest = '\n'.join(lines[1:]) or title
+    title = lines[0].lstrip('#').strip()[:80] or 'KCC Note'
+    rest = '\n'.join(lines[1:]).strip() or title
 
-    subfolder = (subfolder or '').strip().strip('/\\')
-    note_dir = KB_DIR / subfolder if subfolder else KB_DIR
+    # Folder is resolved at runtime (by name), never a hardcoded path.
+    note_dir = _resolve_kb_dir(subfolder or REMEMBER_FOLDER_NAME)
+    rel_source = (note_dir.relative_to(KB_DIR).as_posix()
+                  if note_dir.is_relative_to(KB_DIR) else note_dir.as_posix())
     note_dir.mkdir(parents=True, exist_ok=True)
 
-    unique = hashlib.md5(text.encode('utf-8')).hexdigest()[:6]
-    filename = f'note-{datetime.now().strftime("%Y%m%d-%H%M%S")}-{unique}-{_remember_slug(title)}.txt'
-    (note_dir / filename).write_text(text + '\n', encoding='utf-8')
+    # Meaningful, readable filename derived from the title.
+    base = _remember_slug(title)
+    target = note_dir / f'{base}.txt'
+
+    # Dedupe guard: same topic -> merge into the existing entry instead of
+    # creating "topic-2.txt", so repeated "remember:" calls do not pile up.
+    if target.exists():
+        try:
+            old = target.read_text(encoding='utf-8')
+        except OSError:
+            old = ''
+        old_lower = old.lower()
+        extra = [ln for ln in rest.splitlines()
+                 if ln.strip() and ln.strip().lower() not in old_lower]
+        if extra:
+            target.write_text(old.rstrip() + '\n' + '\n'.join(extra) + '\n', encoding='utf-8')
+        return KItem(
+            title=title,
+            content=rest,
+            source=f'{rel_source}/{target.name}',
+            category=rel_source,
+        )
+
+    target.write_text(f'{title}\n{rest}\n', encoding='utf-8')
+    filename = target.name
 
     return KItem(
         title=title,
         content=rest,
-        source=f'{subfolder}/{filename}' if subfolder else filename,
-        category=subfolder or 'General',
+        source=f'{rel_source}/{filename}',
+        category=rel_source,
     )
 
 
 # --- Announcements -> knowledge base (text only, walang images) ---
 
-ANNOUNCEMENT_SUBFOLDER = 'announcements'
 
 
 def _announcement_path(pk):
-    return KB_DIR / ANNOUNCEMENT_SUBFOLDER / f'announcement-{int(pk)}.txt'
+    return _resolve_kb_dir(ANNOUNCEMENT_FOLDER_NAME) / f'announcement-{int(pk)}.txt'
 
 
 def sync_announcement_knowledge(pk, title, message, created_at=None, active=True):
@@ -979,7 +1074,7 @@ def remove_announcement_knowledge(pk):
 
 _AUTO_LEARN_PROMPT = """You extract factual information from a chat message for a campus knowledge base.
 
-The message may be in Tagalog, English, or mixed. Capture ANY factual information about KCC (offices, schedules, fees, people, rooms, processes, policies) that the message states — this INCLUDES facts embedded in questions (e.g. "Diba bukas ang registrar ng 8am?" implies the registrar opens at 8am).
+The message may be in Tagalog, English, or mixed. Capture ANY factual information about KCC (offices, schedules, fees, people, rooms, processes, policies) that the message states â€” this INCLUDES facts embedded in questions (e.g. "Diba bukas ang registrar ng 8am?" implies the registrar opens at 8am).
 
 Reply with ONLY valid JSON:
 {"facts": [{"title": "<short title in English>", "content": "<the fact in 1-3 English sentences>"}]}
@@ -1003,7 +1098,7 @@ def _parse_facts(raw):
 
 
 def auto_learn(message, engine='primary'):
-    """Kunin ang bagong KCC facts mula sa user message — (Noted) LANG, walang save sa KB.
+    """Kunin ang bagong KCC facts mula sa user message â€” (Noted) LANG, walang save sa KB.
 
     Returns list of noted titles ([] kung wala o pumalya).
     """
@@ -1011,7 +1106,7 @@ def auto_learn(message, engine='primary'):
     if len(message) < 10:
         return []
     try:
-        # Utility call: JSON fact extraction — low effort (tipid sa quota).
+        # Utility call: JSON fact extraction â€” low effort (tipid sa quota).
         raw, _ = chat(_AUTO_LEARN_PROMPT, [], message, engine=engine, effort='low')
     except (AIConfigError, AIUnavailable) as exc:
         logger.info('Auto-learn skipped (%s)', exc)
@@ -1021,7 +1116,7 @@ def auto_learn(message, engine='primary'):
     if not facts:
         return []
 
-    # (Noted) mode: HUWAG nang i-save sa knowledge base — acknowledge lang ang nakuha.
+    # (Noted) mode: HUWAG nang i-save sa knowledge base â€” acknowledge lang ang nakuha.
     noted = []
     for fact in facts[:5]:
         if not isinstance(fact, dict):
@@ -1035,7 +1130,7 @@ def auto_learn(message, engine='primary'):
 
 
 # ---------------------------------------------------------------------------
-# Web research — kapag wala sa KB, hanapin online (DuckDuckGo) at i-save ang nahanap
+# Web research â€” kapag wala sa KB, hanapin online (DuckDuckGo) at i-save ang nahanap
 # ---------------------------------------------------------------------------
 
 WEB_SEARCH_TIMEOUT = 12
@@ -1110,7 +1205,7 @@ def _parse_ddg_lite(html):
 
 
 def web_search(query, max_results=4):
-    """DuckDuckGo search (HTML + Lite fallback) — returns [{title, snippet, url}] ([] kung pumalya)."""
+    """DuckDuckGo search (HTML + Lite fallback) â€” returns [{title, snippet, url}] ([] kung pumalya)."""
     query = _build_search_query(query)
     for endpoint, parser in (
         ('https://html.duckduckgo.com/html/', _parse_ddg_html),
@@ -1178,7 +1273,8 @@ def _save_web_fact(results):
     if top.get('url'):
         content += f"\nSource: {top['url']}"
     try:
-        return remember(f'{title}\n{content}', subfolder='')
+        # Web facts are already structured: skip the cleanup LLM call.
+        return remember(f'{title}\n{content}', clean=False)
     except (OSError, ValueError):
         return None
 
@@ -1214,7 +1310,7 @@ def answer_question(question, history=None, engine='auto', language='auto', user
     """
     history = history or []
 
-    # Auto-fix ng maling prompt (typos/grammar) bago sagutin — model mismo ang nag-cocorrect.
+    # Auto-fix ng maling prompt (typos/grammar) bago sagutin â€” model mismo ang nag-cocorrect.
     if getattr(settings, 'AI_PROMPT_FIX', True):
         question = correct_prompt(question, engine=engine, user=user) or question
 
@@ -1229,7 +1325,7 @@ def answer_question(question, history=None, engine='auto', language='auto', user
         web = web_search(question)
 
     if items and web:
-        # KB match + may web results — pagsamahin ang dalawa (KB ang official, web ang supplement).
+        # KB match + may web results â€” pagsamahin ang dalawa (KB ang official, web ang supplement).
         system_prompt = _KNIGHT_COMBINED_TEMPLATE.format(
             context=_build_context(items),
             web=_web_context(web),
@@ -1240,7 +1336,7 @@ def answer_question(question, history=None, engine='auto', language='auto', user
                 'sources': _web_sources(web)}
 
     if not items:
-        # Walang KB match — sagot mula sa web research kung meron, tapos small talk / scope guidance.
+        # Walang KB match â€” sagot mula sa web research kung meron, tapos small talk / scope guidance.
         if web:
             try:
                 reply, engine_name = chat(
