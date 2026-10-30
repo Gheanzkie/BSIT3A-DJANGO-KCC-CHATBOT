@@ -246,6 +246,7 @@ pytest
 
 - [SESSION_LOG.md](SESSION_LOG.md) — development session log including security audit findings and bug fixes
 - `AUDIT_REPORT.md` — security audit report
+- [KCC-CHATBOT-ASSISTANCE.docx](KCC-CHATBOT-ASSISTANCE.docx) — capstone project paper, aligned with the implemented system (AI chat, file-based KB, ticket queue + reply flagging, admin/student access control)
 - `apps/chat/knowledge/_README.txt` — how to train KNIGHT
 
 ## Repository Notes
