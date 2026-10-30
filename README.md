@@ -246,7 +246,7 @@ pytest
 
 - [SESSION_LOG.md](SESSION_LOG.md) — development session log including security audit findings and bug fixes
 - `AUDIT_REPORT.md` — security audit report
-- [KCC-CHATBOT-ASSISTANCE.docx](KCC-CHATBOT-ASSISTANCE.docx) — capstone project paper, aligned with the implemented system (AI chat, file-based KB, ticket queue + reply flagging, admin/student access control)
+- Capstone project paper — full text in the [Capstone Paper](#capstone-paper) section below (also bundled as `KCC-CHATBOT-ASSISTANCE.docx`)
 - `apps/chat/knowledge/_README.txt` — how to train KNIGHT
 
 ## Repository Notes
@@ -254,3 +254,62 @@ pytest
 - `.env`, `.secret_key`, `apps/chat/ai_config.env`, `media/`, `.venv/`, `__pycache__/` and the AI usage JSON files are git-ignored.
 - `db.sqlite3` **is** committed (force-added past `.gitignore`), so anyone cloning gets the database contents including user rows — keep that in mind before making the repository public.
 - Uploaded announcement images live under `media/` and are **not** committed; database rows that reference them resolve to nothing on a fresh clone.
+
+## Capstone Paper
+
+> Full text of the project paper, aligned with the implemented system. Also bundled as `KCC-CHATBOT-ASSISTANCE.docx`.
+
+### KCC CHATBOT ASSISTANCE
+
+#### INTRODUCTION
+
+**Background of the Project**
+
+Kabankalan Catholic College serves as a faith-centered educational institution committed to delivering accessible and quality higher education grounded in Catholic values and academic excellence. However, many new students, transferees, and freshmen often struggle to navigate enrollment procedures, scholarship requirements, grading policies, religious formation activities, and campus services because information is scattered across bulletin boards, Facebook posts, student handbooks, and verbal instructions from staff. This fragmented approach leads to repeated inquiries at administrative offices, long waiting times for basic questions, miscommunication of academic and institutional policies, and confusion during enrollment and orientation periods.
+
+To address these inefficiencies, the proposed project will focus on developing a centralized, web-based Kcc Chatbot Assistance with AI-powered query handling. The chatbot will provide instant, 24/7 responses to frequently asked questions about admissions, enrollment, scholarships, academic policies, campus services, and student formation activities, while escalating complex or personalized inquiries to authorized personnel. This will provide new students with a fast, accessible, and reliable information channel and reduce the repetitive workload of front-desk, admissions, and student affairs staff.
+
+**Statement of the Problem or Project Objectives**
+
+The main objective of this project is to design, develop, and evaluate a web-based Kabankalan Catholic College Student Assistant Chatbot System with AI-powered query handling to streamline information delivery and student support services for new students.
+
+Specifically, the project aims to accomplish the following technical objectives:
+
+1. Develop an AI-powered conversational module that interprets student inquiries in natural language and returns accurate, context-aware responses about admissions, enrollment, scholarships, academic policies, and campus services.
+
+2. Build a trainable, file-based knowledge base of .txt training files that only admin can add or update without modifying source code and that are auto-reloaded without a restart, together with the ability to teach KNIGHT new facts directly from the chat using the remember: / tandaan: command.
+
+3. Implement an inquiry escalation and ticketing feature where visitors and account holders submit reports (categorized as bug/error, wrong answer/content, account/login, or other) into an admin ticket queue triaged by open/resolved status, and where registered users flag a specific KNIGHT reply with the question, answer, sources, and engine snapshotted so staff review the full conversation context.
+
+4. Establish role-based access control distinguishing the Administrator (superuser, with full access to announcements, the ticket queue, and the activity log) from regular student accounts (chat-only), together with a request-level activity log capturing user, IP, method, path, and status code to support data confidentiality and integrity in line with the Data Privacy Act.
+
+5. Conduct user acceptance testing (UAT) with new students, admissions staff, and IT personnel to evaluate system usability, response accuracy, and operational efficiency.
+
+**Significance of the Project**
+
+The proposed system will provide direct practical value to the following beneficiaries:
+
+- **New Students and Freshmen:** Receive instant, 24/7 answers to common questions about enrollment, policies, and campus life, reducing confusion and wait times during enrollment and orientation.
+- **Admissions, Registrar, and Student Affairs Staff:** Reduce repetitive frontline inquiries, allowing personnel to focus on complex student cases and personalized assistance.
+- **School Administrators and Academic Heads:** Gain insights from chat analytics to identify recurring student concerns and improve communication strategies and service delivery.
+- **Future Researchers and Students:** Serve as a reference framework for developing AI-assisted conversational systems in educational and Catholic institutional settings.
+
+**Alignment with Institutional Research Agenda and Sustainable Development Goals**
+
+*Institutional Research Agenda Alignment:* Aligns with the Institutional IT and Educational Services Research priority by leveraging artificial intelligence and web technologies to modernize student support and information delivery processes in line with the college's mission of holistic, faith-based formation.
+
+*Sustainable Development Goal Alignment:*
+
+- **SDG 4 (Quality Education):** Enhances access to accurate academic and enrollment information, supporting a more responsive and inclusive educational environment.
+- **SDG 9 (Industry, Innovation, and Infrastructure):** Fosters technological innovation in institutional service infrastructure through AI-assisted digital transformation.
+
+#### SCOPE AND LIMITATIONS
+
+**System Scope & Technical Architecture**
+
+**Limitations**
+
+- The system will operate within the institution's local network setup or hosted web server environment for Kabankalan Catholic College only.
+- The chatbot will be limited to information contained within its managed knowledge base and will not provide personalized academic advising, grade computations, or official enrollment transactions.
+- Integration with the college's official student information system (SIS), online payment, and SMS notifications are excluded from the current development phase and may be recommended for future feature updates.
+- AI-generated responses will require periodic review and validation by authorized staff to maintain accuracy and alignment with institutional policies and Catholic teachings.
