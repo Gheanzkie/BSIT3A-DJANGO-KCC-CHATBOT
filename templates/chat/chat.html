@@ -248,7 +248,6 @@
               <div class="kcc-holder">
                 <div class="kcc-bubble kcc-bubble-bot">{{ m.content }}</div>
                 {% if m.engine %}<div class="kcc-engine">{{ m.engine }}</div>{% endif %}
-                {% if user.is_authenticated %}
                 <div class="kcc-msg-tools">
                   <button type="button" class="kcc-msg-menu-btn kcc-report-open"
                           data-mid="{{ m.pk }}" title="Report this answer" aria-label="Report this answer"
@@ -256,7 +255,6 @@
                     <i class="fas fa-ellipsis"></i>
                   </button>
                 </div>
-                {% endif %}
               </div>
             </div>
             {% endif %}
@@ -297,7 +295,6 @@
   </div>
 </div>
 
-{% if user.is_authenticated %}
 <!-- REPORT MODAL (registered users) -->
 <div class="kcc-modal-backdrop" id="kccReportModal" aria-hidden="true">
   <div class="kcc-modal-wrap">
@@ -347,7 +344,6 @@
     </div>
   </div>
 </div>
-{% endif %}
 
 <script>
 (function () {
@@ -361,7 +357,7 @@
 
   var convId = '{{ current_conversation_token|default_if_none:"" }}';
   var isNewChat = !convId; // welcome state = bagong chat
-  var CAN_REPORT = {% if user.is_authenticated %}true{% else %}false{% endif %};
+  var IS_AUTH = {% if user.is_authenticated %}true{% else %}false{% endif %};
 
   function getCookie(name) {
     var value = '; ' + document.cookie;
@@ -457,7 +453,7 @@
         });
         holder.appendChild(srcBox);
       }
-      if (CAN_REPORT && messageId) {
+      if (messageId) {
         var tools = document.createElement('div');
         tools.className = 'kcc-msg-tools';
         var mbtn = document.createElement('button');
@@ -479,7 +475,6 @@
     return row;
   }
 
-  {% if user.is_authenticated %}
   // ---- Report a reply (registered users only) ----
   // --- Report modal: dependency-free (no Bootstrap required) ---
   (function () {
@@ -490,6 +485,8 @@
     function closeModal() { modalEl.classList.remove('kcc-open'); modalEl.setAttribute('aria-hidden', 'true'); }
 
     window.kccOpenReport = function (btn) {
+      // Guests can tap the 3-dot too - they are asked to sign in first.
+      if (!IS_AUTH) { kccAskLogin(); return; }
       var holder = btn.closest('.kcc-holder') || btn.parentNode;
       var bubbleEl = holder.querySelector ? holder.querySelector('.kcc-bubble-bot') : null;
       var answer = bubbleEl ? bubbleEl.textContent : '';
@@ -533,6 +530,15 @@
       var det = document.getElementById('kccReportDetails');
       if (det) det.value = '';
       openModal();
+    };
+
+    window.kccAskLogin = function () {
+      var loginEl = document.getElementById('kccLoginModal');
+      if (loginEl && window.bootstrap && window.bootstrap.Modal) {
+        window.bootstrap.Modal.getOrCreateInstance(loginEl).show();
+        return;
+      }
+      window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname);
     };
 
     modalEl.addEventListener('click', function (e) {
@@ -593,7 +599,6 @@
     });
   })();
 
-  {% endif %}
 
   scrollBottom();
 
