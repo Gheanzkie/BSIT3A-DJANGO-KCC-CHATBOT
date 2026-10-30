@@ -49,14 +49,14 @@
             {% else %}<span class="badge bg-success">Resolved</span>{% endif %}
           </td>
           <td class="text-end">
-            <button class="btn btn-sm btn-outline-secondary" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#r{{ r.pk }}" aria-expanded="false">
+            <button class="btn btn-sm btn-outline-secondary kcc-toggle" type="button"
+                    data-target="r{{ r.pk }}" aria-expanded="false" title="Show details">
               <i class="fas fa-chevron-down"></i>
             </button>
           </td>
         </tr>
-        <tr class="collapse" id="r{{ r.pk }}">
-          <td colspan="7" class="bg-light">
+        <tr class="kcc-expand-row" id="r{{ r.pk }}" style="display:none;">
+          <td colspan="7">
             <div class="row g-3 py-1">
               <div class="col-md-6">
                 <div class="text-muted text-uppercase" style="font-size:0.66rem;letter-spacing:.06em;">Question</div>
@@ -108,5 +108,29 @@
     </table>
   </div>
 </div>
+
+<style>
+  .kcc-expand-row > td {
+    background: rgba(148, 163, 184, 0.12);
+    border-top: 1px solid rgba(148, 163, 184, 0.25);
+    color: inherit;
+  }
+  .kcc-expand-row .text-muted { opacity: 0.75; }
+  .kcc-expand-row .small { color: inherit; }
+  .kcc-toggle i { transition: transform 0.15s ease; display: inline-block; }
+  .kcc-toggle[aria-expanded="true"] i { transform: rotate(180deg); }
+</style>
+
+<script>
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.kcc-toggle') : null;
+    if (!btn) return;
+    var row = document.getElementById(btn.getAttribute('data-target'));
+    if (!row) return;
+    var isOpen = row.style.display !== 'none';
+    row.style.display = isOpen ? 'none' : 'table-row';
+    btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+  });
+</script>
 
 {% endblock %}

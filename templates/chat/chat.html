@@ -100,7 +100,8 @@
   .kcc-msg-tools { display: flex; align-items: center; gap: 0.35rem; margin-top: 0.25rem; }
   .kcc-msg-menu-btn {
     background: transparent; border: 1px solid transparent; color: #64748b;
-    border-radius: 8px; padding: 0 0.4rem; line-height: 1.4; font-size: 0.85rem; cursor: pointer;
+    border-radius: 8px; padding: 0.15rem 0.55rem; line-height: 1.5; font-size: 0.95rem;
+    cursor: pointer; pointer-events: auto; position: relative; z-index: 2;
   }
   .kcc-msg-menu-btn:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; border-color: rgba(255,255,255,0.12); }
   html.kcc-light .kcc-msg-menu-btn:hover { background: rgba(15,23,42,0.06); color: #0f172a; border-color: #cbd5e1; }
@@ -454,7 +455,10 @@
     inner.appendChild(row);
   {% if user.is_authenticated %}
   // ---- Report a reply (registered users only) ----
-  (function reportFlow() {
+  // Bootstrap's bundle is loaded at the end of <body>, after this inline script
+  // runs - so bind on DOMContentLoaded, otherwise `bootstrap` is undefined and
+  // the 3-dot button silently does nothing.
+  document.addEventListener('DOMContentLoaded', function reportFlow() {
     var modalEl = document.getElementById('kccReportModal');
     if (!modalEl || typeof bootstrap === 'undefined') return;
     var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -558,7 +562,7 @@
           stateEl.textContent = 'Network error. Try again.';
         });
     });
-  })();
+  });
   {% endif %}
 
   scrollBottom();
