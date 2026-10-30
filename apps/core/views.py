@@ -488,7 +488,7 @@ def message_report_list(request):
 @require_POST
 @user_passes_test(_is_superuser, login_url='login')
 def message_report_reply(request, pk):
-    from apps.chat.models import MessageReport, Notification
+    from apps.chat.models import Conversation, Message, MessageReport
 
     report = get_object_or_404(MessageReport, pk=pk)
     reply = (request.POST.get('admin_reply') or '').strip()
@@ -502,13 +502,21 @@ def message_report_reply(request, pk):
     report.status = MessageReport.STATUS_RESOLVED
     report.save(update_fields=['admin_reply', 'replied_by', 'replied_at', 'status'])
 
-    # The registered user gets an in-app notification (badge + toast).
-    Notification.objects.create(
-        user=report.user,
-        report=report,
-        title=f'Admin replied to your report #{report.pk}',
-        body=report.admin_reply,
+    # The reply is posted straight into the user's own chat thread, so they see
+    # it the next time they open the session (no separate notification system).
+    conversation = report.conversation
+    if conversation is None or conversation.user_id != report.user_id:
+        conversation = Conversation.objects.create(
+            user=report.user,
+            title=f'Admin reply to report #{report.pk}',
+        )
+    Message.objects.create(
+        conversation=conversation,
+        role=Message.ROLE_ASSISTANT,
+        content=report.admin_reply,
+        engine='From admin',
     )
+    conversation.save()  # bump updated_at so it shows as the latest session
     messages.success(request, f'Reply sent to {report.user.username}.')
     return redirect('message_reports')
 

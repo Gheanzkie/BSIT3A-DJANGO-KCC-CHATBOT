@@ -1010,46 +1010,6 @@
       })();
     </script>
 
-    {% if user.is_authenticated and not user.is_superuser %}
-    <!-- Unread admin replies to reported answers: toast + badge refresh -->
-    <div id="kccNotifToast" class="position-fixed" style="right:1rem;bottom:1rem;z-index:1080;max-width:340px;display:none;">
-      <div class="card shadow">
-        <div class="card-body p-3">
-          <div class="d-flex align-items-start gap-2">
-            <i class="fas fa-bell mt-1" style="color:var(--kcc-accent);"></i>
-            <div class="flex-grow-1 min-w-0">
-              <strong id="kccNotifTitle" style="font-size:0.85rem;"></strong>
-              <div id="kccNotifBody" class="text-secondary mt-1" style="font-size:0.8rem;white-space:pre-wrap;"></div>
-              <a href="{% url 'chat:notifications' %}" class="d-inline-block mt-2" style="font-size:0.8rem;">View notifications</a>
-            </div>
-            <button type="button" class="btn-close btn-sm" id="kccNotifClose" aria-label="Close"></button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script>
-      (function () {
-        var box = document.getElementById('kccNotifToast');
-        if (!box) return;
-        document.getElementById('kccNotifClose').addEventListener('click', function () { box.style.display = 'none'; });
-        fetch("{% url 'chat:notifications_feed' %}", { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (d) {
-            if (!d || !d.ok || !d.notifications) return;
-            var first = null;
-            for (var i = 0; i < d.notifications.length; i++) {
-              if (!d.notifications[i].is_read) { first = d.notifications[i]; break; }
-            }
-            if (!first) return;
-            document.getElementById('kccNotifTitle').textContent = first.title;
-            document.getElementById('kccNotifBody').textContent = first.body;
-            box.style.display = 'block';
-          })
-          .catch(function () {});
-      })();
-    </script>
-    {% endif %}
-
     {% block extra_js %}{% endblock %}
   </body>
 </html>

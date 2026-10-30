@@ -286,27 +286,27 @@
       </div>
       <div class="modal-body">
         <div class="mb-2">
-          <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">Answer you are reporting</div>
+          <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">Answer reported</div>
           <div id="kccReportPreview" class="kcc-report-preview mt-1"></div>
         </div>
         <div class="mb-2">
-          <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">Where the info came from</div>
+          <div class="text-muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">Sources</div>
           <div id="kccReportSources" class="d-flex flex-wrap gap-1 mt-1" style="font-size:0.75rem;"></div>
         </div>
         <div class="mb-2">
           <label class="form-label" for="kccReportReason" style="font-size:0.82rem;">Reason</label>
           <select id="kccReportReason" class="form-select form-select-sm">
-            <option value="wrong">Maling sagot / Wrong answer</option>
-            <option value="incomplete">Kulang ang sagot / Incomplete</option>
-            <option value="outdated">Luma na ang info / Outdated</option>
-            <option value="inappropriate">Hindi angkop / Inappropriate</option>
-            <option value="other" selected>Iba pa / Other</option>
+            <option value="wrong" selected>Wrong answer</option>
+            <option value="incomplete">Incomplete answer</option>
+            <option value="outdated">Outdated information</option>
+            <option value="inappropriate">Inappropriate content</option>
+            <option value="other">Other</option>
           </select>
         </div>
         <div class="mb-2">
           <label class="form-label" for="kccReportDetails" style="font-size:0.82rem;">Details (optional)</label>
           <textarea id="kccReportDetails" class="form-control" rows="3"
-                    placeholder="Ano ang mali o kulang sa sagot?"></textarea>
+                    placeholder="What is wrong or missing in this answer?"></textarea>
         </div>
         <div class="d-flex align-items-center gap-2">
           <button type="button" id="kccReportCopy" class="btn btn-sm btn-outline-secondary">
@@ -505,7 +505,7 @@
           sourcesEl.appendChild(b);
         });
       } else {
-        sourcesEl.textContent = 'Walang citation na naka-attach sa sagot na ito.';
+        sourcesEl.textContent = 'No source attached to this answer.';
       }
       stateEl.textContent = '';
       copyStateEl.textContent = '';

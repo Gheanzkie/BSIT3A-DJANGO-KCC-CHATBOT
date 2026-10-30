@@ -1,6 +1,6 @@
 ﻿from django.contrib import admin
 
-from .models import Conversation, Message, MessageReport, Notification
+from .models import Conversation, Message, MessageReport
 
 
 @admin.register(Conversation)
@@ -27,10 +27,4 @@ class MessageReportAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'user__email', 'answer_text', 'details']
     readonly_fields = ['question_text', 'answer_text', 'sources', 'engine', 'created_at', 'replied_at']
 
-
-@admin.register(Notification)
-class NotificationAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'title', 'kind', 'is_read', 'created_at']
-    list_filter = ['is_read', 'kind']
-    search_fields = ['user__username', 'user__email', 'title', 'body']
 

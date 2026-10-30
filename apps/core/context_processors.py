@@ -55,21 +55,3 @@ def tickets(request):
         from .models import Ticket
         return {'open_tickets_count': Ticket.objects.filter(status=Ticket.STATUS_OPEN).count()}
     return {}
-
-
-def notifications(request):
-    """Unread admin-reply notifications for the signed-in user + open-report badge for admin."""
-    user = getattr(request, 'user', None)
-    if user is None or not user.is_authenticated:
-        return {}
-    try:
-        from apps.chat.models import MessageReport, Notification
-        if user.is_superuser:
-            return {
-                'open_message_reports_count': MessageReport.objects.filter(
-                    status=MessageReport.STATUS_OPEN
-                ).count(),
-            }
-        return {'notifications_unread': Notification.objects.filter(user=user, is_read=False).count()}
-    except Exception:
-        return {}

@@ -6,10 +6,10 @@ from django.core.cache import cache
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_POST
 
 from . import presence
-from .models import Conversation, Message, MessageReport, Notification
+from .models import Conversation, Message, MessageReport
 from .services import ai
 
 logger = logging.getLogger(__name__)
@@ -420,57 +420,5 @@ def chat_report(request):
     return JsonResponse({
         'ok': True,
         'report_id': report.pk,
-        'message': 'Salamat! Naipadala na sa admin ang report mo.',
+        'message': 'Thanks! Your report was sent to the admin.',
     })
-
-
-# ---------- NOTIFICATIONS (registered users) ----------
-
-def _unread_count(user):
-    return Notification.objects.filter(user=user, is_read=False).count()
-
-
-@require_GET
-@login_required
-def notifications_list(request):
-    items = Notification.objects.filter(user=request.user).order_by('-created_at')[:50]
-    return JsonResponse({
-        'ok': True,
-        'unread': _unread_count(request.user),
-        'notifications': [
-            {
-                'id': n.pk,
-                'title': n.title,
-                'body': n.body,
-                'is_read': n.is_read,
-                'report_id': n.report_id,
-                'created_at': timezone.localtime(n.created_at).strftime('%b %d, %Y %H:%M'),
-            }
-            for n in items
-        ],
-    })
-
-
-@login_required
-def notifications_page(request):
-    items = (
-        Notification.objects.filter(user=request.user)
-        .select_related('report')
-        .order_by('-created_at')[:100]
-    )
-    return render(request, 'chat/notifications.html', {
-        'notifications': items,
-        'unread_count': _unread_count(request.user),
-    })
-
-
-@require_POST
-@login_required
-def notifications_mark_read(request):
-    qs = Notification.objects.filter(user=request.user, is_read=False)
-    raw_ids = (request.POST.get('ids') or '').strip()
-    if raw_ids:
-        ids = [int(x) for x in raw_ids.split(',') if x.strip().isdigit()]
-        qs = qs.filter(pk__in=ids)
-    updated = qs.update(is_read=True)
-    return JsonResponse({'ok': True, 'updated': updated, 'unread': _unread_count(request.user)})

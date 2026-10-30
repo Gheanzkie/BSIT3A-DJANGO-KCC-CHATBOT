@@ -138,30 +138,3 @@ class MessageReport(models.Model):
 
     def __str__(self):
         return f'Report #{self.pk} [{self.reason}] {self.status}'
-
-
-class Notification(models.Model):
-    """In-app notice for a registered user (currently: admin answered a report)."""
-
-    KIND_REPORT_REPLY = 'report_reply'
-    KIND_CHOICES = [(KIND_REPORT_REPLY, 'Admin reply to report')]
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications'
-    )
-    report = models.ForeignKey(
-        MessageReport, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='notifications',
-    )
-    kind = models.CharField(max_length=20, choices=KIND_CHOICES, default=KIND_REPORT_REPLY)
-    title = models.CharField(max_length=160)
-    body = models.TextField(blank=True, default='')
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-
-    class Meta:
-        ordering = ['-created_at']
-        indexes = [models.Index(fields=['user', 'is_read', '-created_at'])]
-
-    def __str__(self):
-        return f'Notification #{self.pk} -> {self.user_id}: {self.title[:40]}'
