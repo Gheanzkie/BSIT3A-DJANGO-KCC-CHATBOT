@@ -475,6 +475,10 @@
     }
 
     inner.appendChild(row);
+
+    return row;
+  }
+
   {% if user.is_authenticated %}
   // ---- Report a reply (registered users only) ----
   // --- Report modal: dependency-free (no Bootstrap required) ---
@@ -592,8 +596,6 @@
   {% endif %}
 
   scrollBottom();
-    return row;
-  }
 
   function removeWelcome() {
     if (welcome) { welcome.remove(); welcome = null; }
