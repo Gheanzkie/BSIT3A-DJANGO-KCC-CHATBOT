@@ -1,55 +1,6 @@
-# KCC SCHOOL OFFICES AND SERVICES
-
-
-
-## 1. Registrar's Office
-
-Handles:
-
-- Student enrollment records.
-
-- Academic documents.
-
-- Transcript requests.
-
-- Certificates.
-
-- Student academic information.
-
-
-
-## 2. Accounting Office
-
-Handles:
-
-- Tuition assessment.
-
-- School fee payments.
-
-- Financial transactions.
-
-- Payment verification.
-
-- Outstanding balances.
-
-
-
-## 3. Economic Enterprise Office
-
-A KCC announcement identified this office as the location for P.E. uniform claiming. It was formerly referred to as the Accounting Office in that announcement.
-
-
-
-Location mentioned: Beside the School Canteen.
-
-
-
-## 4. Student Affairs and Services Office (SSAO)
-
-Handles student affairs and student-related services. Exact service procedures should be confirmed with the office.
-
-
-
-## 5. College of Criminology
-
-Handles program-related academic activities and student concerns.
+KCC School Offices and Services
+The Registrar’s Office manages student enrollment records, academic documents, transcript requests, certificates, and student academic information.
+The Accounting Office handles tuition assessment, school fee payments, financial transactions, payment verification, and outstanding balances.
+The Economic Enterprise Office, formerly referred to as the Accounting Office in a KCC announcement, is the location for P.E. uniform claiming and is situated beside the School Canteen.
+The Student Affairs and Services Office (SSAO) handles student affairs and student‑related services; exact procedures should be confirmed with the office.
+The College of Criminology handles program‑related academic activities and student concerns.
