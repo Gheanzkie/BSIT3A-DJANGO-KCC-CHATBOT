@@ -187,7 +187,8 @@ def chat_history(request):
         'token': conversation.token,
         'title': conversation.title,
         'messages': [
-            {'id': m.pk, 'role': m.role, 'content': m.content, 'engine': m.engine}
+            {'id': m.pk, 'role': m.role, 'content': m.content, 'engine': m.engine,
+             'attachments': m.attachments or []}
             for m in conversation.messages.all()
         ],
     })
@@ -225,10 +226,25 @@ def chat_leave(request):
 @require_POST
 def chat_send(request):
     text = (request.POST.get('message') or '').strip()
-    if not text:
+    upload = request.FILES.get('attachment')
+    if not text and upload is None:
         return JsonResponse({'ok': False, 'error': 'Empty message.'}, status=400)
     if len(text) > 2000:
         return JsonResponse({'ok': False, 'error': 'Message is too long (max 2000 chars).'}, status=400)
+
+    # Photos (attachments) are for signed-in users only — no anonymous uploads.
+    if upload is not None:
+        if not request.user.is_authenticated:
+            return JsonResponse(
+                {'ok': False, 'error': 'Please log in first to attach a photo.',
+                 'login_required': True},
+                status=403,
+            )
+        try:
+            ai.validate_image(upload)
+        except ai.ImageRejected as exc:
+            return JsonResponse({'ok': False, 'error': str(exc)}, status=400)
+    kb_images = []
 
     # Throttle: max CHAT_MAX_PER_MINUTE na mensahe kada visitor sa 60-second window.
     limit = getattr(settings, 'CHAT_MAX_PER_MINUTE', 20)
@@ -267,29 +283,28 @@ def chat_send(request):
     # Language: auto-detect mula sa UNANG tanong ng user — Tagalog kung may
     # Tagalog hints, English kung wala. Sinusundan ito sa lahat ng susunod na sagot.
     if is_first_message or conversation.language not in ('tl', 'en'):
-        conversation.language = ai._reply_language(text, 'auto')
+        conversation.language = ai._reply_language(text or 'photo', 'auto')
     lang_pref = conversation.language
 
-    Message.objects.create(conversation=conversation, role=Message.ROLE_USER, content=text)
+    user_attachments = []
+    if upload is not None:
+        rel = ai.store_image(upload, 'chat_uploads')
+        user_attachments = [{'type': 'image', 'url': ai.image_url(rel), 'name': upload.name}]
+    Message.objects.create(
+        conversation=conversation,
+        role=Message.ROLE_USER,
+        content=text,
+        attachments=user_attachments,
+    )
     if is_first_message and not conversation.title:
-        conversation.title = text[:100]
+        conversation.title = (text or 'Photo')[:100]
 
-    # Admin/staff-only: magdagdag ng knowledge habang nagcha-chat ("tandaan: ...").
+    # ADMIN-only: magdagdag ng knowledge habang nagcha-chat ("tandaan: ...").
     teach_prefix = next((p for p in TEACH_PREFIXES if text.lower().startswith(p)), None)
-    if request.user.is_authenticated and request.user.is_staff and teach_prefix:
-        note = text[len(teach_prefix):].strip()
-        if note:
-            try:
-                item = ai.remember(note)
-                saved_name = item.source.split('/')[-1]
-                reply = (f'Saved to knowledge: "{item.title}" ({saved_name}). '
-                         f'Ask me about it anytime!')
-            except (OSError, ValueError):
-                logger.exception('Knowledge write failed')
-                reply = 'I could not save the info right now — please try again.'
-        else:
-            reply = "Use 'remember: <info>' (or 'tandaan: <info>') followed by the info you want to add."
-
+    if teach_prefix and not (request.user.is_authenticated and request.user.is_superuser):
+        # Normal users and anonymous visitors can NEVER write to the knowledge base.
+        reply = ('Only an administrator can add knowledge with "remember:" or "tandaan:". '
+                 'Please ask the KCC admin office to update the information.')
         assistant_msg = Message.objects.create(
             conversation=conversation,
             role=Message.ROLE_ASSISTANT,
@@ -302,15 +317,53 @@ def chat_send(request):
             'reply': reply,
             'engine': 'KNIGHT KB',
             'sources': [],
+            'images': [],
             'conversation_id': conversation.pk,
             'conversation_token': conversation.token,
             'message_id': assistant_msg.pk,
             'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
         })
 
-    # Auto-learn (staff-only): bagong KCC facts mula sa staff/admin -> save sa knowledge/.
+    if request.user.is_authenticated and request.user.is_superuser and teach_prefix:
+        note = text[len(teach_prefix):].strip()
+        if note:
+            try:
+                item = ai.remember(note, image=upload)
+                saved_name = item.source.split('/')[-1]
+                reply = (f'Saved to knowledge: "{item.title}" ({saved_name}). '
+                         f'Ask me about it anytime!')
+                if getattr(item, 'image', ''):
+                    kb_images = [ai.image_url(item.image)]
+                    reply += ' Photo saved to the knowledge base.'
+            except (OSError, ValueError):
+                logger.exception('Knowledge write failed')
+                reply = 'I could not save the info right now — please try again.'
+        else:
+            reply = "Use 'remember: <info>' (or 'tandaan: <info>') followed by the info you want to add."
+
+        assistant_msg = Message.objects.create(
+            conversation=conversation,
+            role=Message.ROLE_ASSISTANT,
+            content=reply,
+            engine='KNIGHT KB',
+            attachments=[{'type': 'image', 'url': u} for u in kb_images],
+        )
+        conversation.save()  # bump updated_at
+        return JsonResponse({
+            'ok': True,
+            'reply': reply,
+            'engine': 'KNIGHT KB',
+            'sources': [],
+            'images': kb_images,
+            'conversation_id': conversation.pk,
+            'conversation_token': conversation.token,
+            'message_id': assistant_msg.pk,
+            'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
+        })
+
+    # Auto-learn (ADMIN-only): bagong KCC facts mula sa admin -> save sa knowledge/.
     learned = []
-    if (request.user.is_authenticated and request.user.is_staff
+    if (request.user.is_authenticated and request.user.is_superuser
             and getattr(settings, 'AI_AUTO_LEARN', True)):
         learned = ai.auto_learn(text, engine=engine_pref)
 
@@ -320,9 +373,13 @@ def chat_send(request):
 
     reply, engine, sources = None, '', []
     try:
-        result = ai.answer_question(text, history, engine=engine_pref, language=lang_pref, user=request.user)
+        result = ai.answer_question(text, history, engine=engine_pref, language=lang_pref,
+                                    user=request.user, image=upload)
         reply, engine = result['reply'], result['engine']
         sources = result.get('sources') or []
+        kb_images = result.get('images') or []
+        # Attached photo + "I can't send photos" in the text = contradiction. Fix it.
+        reply = ai.finalize_photo_reply(reply, bool(kb_images), lang_pref)
     except ai.AIConfigError as exc:
         logger.warning('AI config error: %s', exc)
         reply = MSG_NOT_CONFIGURED
@@ -342,6 +399,7 @@ def chat_send(request):
         content=reply,
         engine=engine,
         sources=sources or [],
+        attachments=[{'type': 'image', 'url': u} for u in kb_images],
     )
     conversation.save()  # bump updated_at
 
@@ -353,6 +411,7 @@ def chat_send(request):
         'reply': reply,
         'engine': engine,
         'sources': sources,
+        'images': kb_images,
         'conversation_id': conversation.pk,
         'conversation_token': conversation.token,
         'message_id': assistant_msg.pk,

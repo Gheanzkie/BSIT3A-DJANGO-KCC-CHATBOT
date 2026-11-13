@@ -27,6 +27,7 @@ Kung walang embedding key (o pumalya ang embeddings), keyword search pa rin
 ang gagamitin â€” tuloy pa rin ang sagot.
 """
 
+import base64
 import hashlib
 import json
 import logging
@@ -35,6 +36,7 @@ import random
 import re
 import threading
 import time
+import uuid
 from datetime import datetime
 
 from django.utils import timezone
@@ -807,6 +809,7 @@ class KItem(NamedTuple):
     content: str
     source: str    # relative path, e.g. 'hr-office.txt'
     category: str  # folder name kung nasa sub-folder; 'General' kung wala
+    image: str = ''  # media-relative photo path (knowledge/photos/...), '' kung wala
 
 
 def _load_knowledge():
@@ -826,14 +829,29 @@ def _load_knowledge():
         if not raw:
             continue
         lines = raw.splitlines()
-        title = lines[0].lstrip('#').strip() or path.stem
-        content = '\n'.join(lines[1:]).strip() or title
+        # Optional "IMAGE: knowledge/photos/<file>" metadata line binds a photo to
+        # this knowledge entry so it can be shown together with the answer.
+        image = ''
+        title = ''
+        body = []
+        for ln in lines:
+            stripped = ln.strip()
+            if stripped.upper().startswith('IMAGE:'):
+                image = stripped.split(':', 1)[1].strip()
+                continue
+            if not title:
+                title = stripped.lstrip('#').strip() or path.stem
+                continue
+            body.append(ln)
+        title = title or path.stem
+        content = '\n'.join(body).strip() or title
         folder = rel.parent.as_posix()
         items.append(KItem(
             title=title,
             content=content,
             source=rel.as_posix(),
             category='General' if folder == '.' else folder,
+            image=image,
         ))
     return items
 
@@ -907,11 +925,19 @@ def _retrieve(question, top_k=None, min_score=None):
     return [it for _, it in scored[:top_k]]
 
 
-def _build_context(items):
+def _build_context(items, with_images=False):
     blocks = []
     for item in items:
         content = item.content[:MAX_ITEM_CHARS]
-        blocks.append(f'[{item.category}] {item.title}\n{content}')
+        block = f'[{item.category}] {item.title}\n{content}'
+        # Only promise a photo when one is actually attached to this reply.
+        if with_images and getattr(item, 'image', ''):
+            block += (
+                '\n(IMPORTANT: a photo for this entry IS attached and is displayed under '
+                'your reply. Never say you cannot send/provide a photo — if the user asks '
+                'for the picture, say here it is.)'
+            )
+        blocks.append(block)
     return '\n\n---\n\n'.join(blocks)
 
 
@@ -966,11 +992,103 @@ def _clean_note(text, engine='auto'):
     return fixed
 
 
-def remember(text, subfolder=None, clean=True):
+# --- Photos: chat uploads + knowledge-base photos ---------------------------
+
+IMAGE_EXTS = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
+IMAGE_MAX_BYTES = 5 * 1024 * 1024  # 5 MB — photos only, walang video
+
+
+class ImageRejected(ValueError):
+    """Raised kapag hindi valid na larawan ang in-upload."""
+
+
+def validate_image(upload):
+    """Photos only: extension + content-type + size. Videos are rejected."""
+    name = (getattr(upload, 'name', '') or '').strip()
+    ext = Path(name).suffix.lower()
+    if ext not in IMAGE_EXTS:
+        raise ImageRejected('Photos only — PNG, JPG, GIF or WEBP (no video).')
+    if int(getattr(upload, 'size', 0) or 0) > IMAGE_MAX_BYTES:
+        raise ImageRejected('Image is too large (max 5 MB).')
+    ctype = (getattr(upload, 'content_type', '') or '').lower()
+    if ctype and not ctype.startswith('image/'):
+        raise ImageRejected('That file is not an image (no video).')
+    return True
+
+
+def store_image(upload, subdir='chat_uploads'):
+    """Save an uploaded image under MEDIA_ROOT/<subdir>. Returns media-relative path."""
+    validate_image(upload)
+    ext = Path(getattr(upload, 'name', '')).suffix.lower() or '.jpg'
+    folder = Path(settings.MEDIA_ROOT) / subdir
+    folder.mkdir(parents=True, exist_ok=True)
+    fname = f'{timezone.now():%Y%m%d%H%M%S}-{uuid.uuid4().hex[:8]}{ext}'
+    dest = folder / fname
+    upload.seek(0)
+    with open(dest, 'wb') as fh:
+        for chunk in upload.chunks():
+            fh.write(chunk)
+    upload.seek(0)
+    return f'{subdir}/{fname}'.replace('\\', '/')
+
+
+def image_url(rel):
+    """Media-relative path -> public URL (e.g. /media/knowledge/photos/x.jpg)."""
+    if not rel:
+        return ''
+    return f"{settings.MEDIA_URL.rstrip('/')}/{rel.lstrip('/')}"
+
+
+def describe_image(upload, prompt=None):
+    """KNIGHT 'evaluates' a photo via Gemini vision. Returns a text description.
+
+    Returns '' when the image cannot be read (no key, provider error, bad file) so
+    the chat still answers from text instead of failing the whole message.
+    """
+    key = getattr(settings, 'GEMINI_API_KEY', '')
+    if not key:
+        return ''
+    try:
+        validate_image(upload)
+    except ImageRejected as exc:
+        logger.info('Image not described: %s', exc)
+        return ''
+    upload.seek(0)
+    raw = upload.read()
+    upload.seek(0)
+    if not raw:
+        return ''
+    mime = (getattr(upload, 'content_type', '') or '').lower() or 'image/jpeg'
+    ask = prompt or (
+        'You are KNIGHT, a campus assistant. Look at this photo and describe it in '
+        '2-4 short sentences: what it shows, any visible text (read it exactly), and '
+        'whether it looks like an official KCC document/announcement, a person, a room, '
+        'or an event. Do not invent details you cannot see.'
+    )
+    url = f'{GEMINI_BASE}/models/{settings.AI_CHAT_MODEL_GEMINI}:generateContent'
+    payload = {'contents': [{'parts': [
+        {'text': ask},
+        {'inline_data': {'mime_type': mime, 'data': base64.b64encode(raw).decode('ascii')}},
+    ]}]}
+    try:
+        resp = _post_retry(url, params={'key': key}, payload=payload,
+                           timeout=int(getattr(settings, 'AI_HTTP_TIMEOUT_FALLBACK', 25)))
+        data = resp.json()
+        parts = data['candidates'][0]['content']['parts']
+        text = ' '.join(p.get('text', '') for p in parts).strip()
+        return text
+    except (requests.RequestException, KeyError, IndexError, TypeError, ValueError) as exc:
+        logger.warning('Image description failed: %s', exc)
+        return ''
+
+
+def remember(text, subfolder=None, clean=True, image=None):
     """I-save ang info na galing sa chat bilang bagong knowledge file.
 
     - clean=True  -> AI muna ang nag-aayos ng grammar/sentence/format
     - filename    -> galing sa title (makabuluhang pangalan, hindi random note-*)
+    - image       -> optional na UploadedFile; naka-save sa knowledge/photos/ at
+                     ini-link sa entry via "IMAGE:" line
     """
     text = (text or '').strip()
     if not text:
@@ -991,6 +1109,10 @@ def remember(text, subfolder=None, clean=True):
                   if note_dir.is_relative_to(KB_DIR) else note_dir.as_posix())
     note_dir.mkdir(parents=True, exist_ok=True)
 
+    # Photo attached to this note -> knowledge/photos/<file> (validated: images only).
+    image_rel = store_image(image, 'knowledge/photos') if image is not None else ''
+    image_line = f'IMAGE: {image_rel}' if image_rel else ''
+
     # Meaningful, readable filename derived from the title.
     base = _remember_slug(title)
     target = note_dir / f'{base}.txt'
@@ -1007,14 +1129,25 @@ def remember(text, subfolder=None, clean=True):
                  if ln.strip() and ln.strip().lower() not in old_lower]
         if extra:
             target.write_text(old.rstrip() + '\n' + '\n'.join(extra) + '\n', encoding='utf-8')
+        if image_line and 'IMAGE:' not in old.upper():
+            target.write_text(target.read_text(encoding='utf-8').rstrip() + '\n' + image_line + '\n',
+                              encoding='utf-8')
+        existing_image = image_rel
+        if not existing_image:
+            for ln in old.splitlines():
+                if ln.strip().upper().startswith('IMAGE:'):
+                    existing_image = ln.split(':', 1)[1].strip()
+                    break
         return KItem(
             title=title,
             content=rest,
             source=f'{rel_source}/{target.name}',
             category=rel_source,
+            image=existing_image,
         )
 
-    target.write_text(f'{title}\n{rest}\n', encoding='utf-8')
+    body = f'{title}\n{image_line}\n{rest}\n' if image_line else f'{title}\n{rest}\n'
+    target.write_text(body, encoding='utf-8')
     filename = target.name
 
     return KItem(
@@ -1022,6 +1155,7 @@ def remember(text, subfolder=None, clean=True):
         content=rest,
         source=f'{rel_source}/{filename}',
         category=rel_source,
+        image=image_rel,
     )
 
 
@@ -1298,42 +1432,116 @@ def _kb_sources(items):
     return [{'title': it.title, 'url': '', 'type': 'kb'} for it in items]
 
 
+# Generic "I want a photo" words never prove a question is about a specific entry.
+_PHOTO_GENERIC = {
+    'picture', 'pictures', 'pic', 'pics', 'photo', 'photos', 'image', 'images',
+    'larawan', 'litrato', 'retrato', 'kuha', 'kuhanan', 'of', 'the', 'ang', 'ng', 'sa',
+}
+
+
+def _kb_image_urls(items, question=''):
+    """Attach a knowledge photo ONLY when the question is really about that entry.
+
+    Requires a distinctive word from the item's title (not a generic photo word
+    like "picture") to appear in the question, and returns at most ONE photo, so
+    an unrelated answer never gets somebody else's picture attached.
+    """
+    q_words = _keywords(question or '') - _PHOTO_GENERIC
+    if not q_words:
+        return []
+    for it in items:
+        rel = getattr(it, 'image', '')
+        if not rel:
+            continue
+        title_words = _keywords(it.title) - _PHOTO_GENERIC
+        if title_words & q_words:
+            return [image_url(rel)]
+    return []
+
+
+_PHOTO_REFUSAL_RE = re.compile(
+    r"(can'?t|cannot|unable|won'?t|not able)\s+(to\s+)?(send|provide|share|attach|show|give|display|upload)|"
+    r"hindi\s+(ako\s+)?(makaka|maipapakita|makakapag|makapag)|"
+    r"pasensya|i'?m sorry,? but i (can'?t|cannot)",
+    re.I,
+)
+
+
+def finalize_photo_reply(reply, has_images, language='auto'):
+    """Keep the text consistent with the attachment.
+
+    When a knowledge photo IS attached, the model must not claim it cannot send one.
+    """
+    text = reply or ''
+    if not has_images or not text:
+        return text
+    if not re.search(r'photo|picture|image|larawan|litrato', text, re.I):
+        return text
+    if _PHOTO_REFUSAL_RE.search(text):
+        if language == 'en':
+            return 'Here is the picture. Let me know if you need more details.'
+        return 'Narito ang larawan. Sabihin lang kung kailangan mo pa ng detalye.'
+    return text
+
+
 def _web_sources(web):
     return [{'title': r.get('title') or '', 'url': r.get('url') or '', 'type': 'web'} for r in web]
 
 
-def answer_question(question, history=None, engine='auto', language='auto', user=None):
-    """Full RAG pipeline. Returns {'reply', 'engine', 'sources'}.
+def answer_question(question, history=None, engine='auto', language='auto', user=None, image=None):
+    """Full RAG pipeline. Returns {'reply', 'engine', 'sources', 'images'}.
 
     engine   : 'auto' | 'primary' | 'fallback'  (provider preference order)
     language : 'auto' | 'tl' | 'en'             (reply language)
+    image    : optional uploaded photo. KNIGHT evaluates it with Gemini vision and
+               answers about it; knowledge photos come back in 'images'.
     """
     history = history or []
+    question = (question or '').strip()
+
+    if image is not None:
+        if not question:
+            question = 'Describe and evaluate this photo for me.'
+        desc = describe_image(image)
+        vision_note = desc or '(the photo could not be read automatically)'
+        question = (
+            f'{question}\n\n[Attached photo — automatic description: {vision_note}]\n'
+            'Answer the user about this photo. If it is an official KCC document or '
+            'announcement, explain what it says; otherwise describe and evaluate it.'
+        )
 
     # Auto-fix ng maling prompt (typos/grammar) bago sagutin â€” model mismo ang nag-cocorrect.
-    if getattr(settings, 'AI_PROMPT_FIX', True):
+    # Skipped for photos: the injected vision description must reach the model intact.
+    if image is None and getattr(settings, 'AI_PROMPT_FIX', True):
         question = correct_prompt(question, engine=engine, user=user) or question
 
-    small = _smalltalk_reply(question, language)
-    if small:
-        return {'reply': small, 'engine': 'KNIGHT', 'sources': []}
+    # Photo messages always reach the model (a greeting must not swallow the image).
+    if image is None:
+        small = _smalltalk_reply(question, language)
+        if small:
+            return {'reply': small, 'engine': 'KNIGHT', 'sources': [], 'images': []}
 
     items = _retrieve(question)
+    # Never attach a knowledge photo when the user uploaded their own image, and
+    # only attach when the question is genuinely about that knowledge entry.
+    kb_images = [] if image is not None else _kb_image_urls(items, question)
+    show_images = bool(kb_images)
     web = []
-    if (getattr(settings, 'AI_WEB_RESEARCH', True) and len(question.strip()) >= 10
-            and needs_research(question, items)):
+    # Photo messages are answered from the image itself — no web search.
+    if (image is None and getattr(settings, 'AI_WEB_RESEARCH', True)
+            and len(question.strip()) >= 10 and needs_research(question, items)):
         web = web_search(question)
 
     if items and web:
         # KB match + may web results â€” pagsamahin ang dalawa (KB ang official, web ang supplement).
         system_prompt = _KNIGHT_COMBINED_TEMPLATE.format(
-            context=_build_context(items),
+            context=_build_context(items, with_images=show_images),
             web=_web_context(web),
             language_rule=_LANGUAGE_RULES.get(language, _LANGUAGE_RULES['auto']),
         )
         reply, engine_name = chat(system_prompt, history, question, engine=engine, user=user)
         return {'reply': reply, 'engine': engine_name,
-                'sources': _web_sources(web)}
+                'sources': _web_sources(web), 'images': kb_images}
 
     if not items:
         # Walang KB match â€” sagot mula sa web research kung meron, tapos small talk / scope guidance.
@@ -1346,7 +1554,8 @@ def answer_question(question, history=None, engine='auto', language='auto', user
                     history, question, engine=engine, user=user)
                 if getattr(settings, 'AI_WEB_SAVE_FACTS', False):
                     _save_web_fact(web)
-                return {'reply': reply, 'engine': engine_name, 'sources': _web_sources(web)}
+                return {'reply': reply, 'engine': engine_name, 'sources': _web_sources(web),
+                        'images': kb_images}
             except (AIConfigError, AIUnavailable):
                 pass  # fall through sa smalltalk/canned
         try:
@@ -1354,15 +1563,15 @@ def answer_question(question, history=None, engine='auto', language='auto', user
                 _KNIGHT_SMALLTALK_TEMPLATE.format(
                     language_rule=_LANGUAGE_RULES.get(language, _LANGUAGE_RULES['auto'])),
                 history, question, engine=engine, user=user)
-            return {'reply': reply, 'engine': engine_name, 'sources': []}
+            return {'reply': reply, 'engine': engine_name, 'sources': [], 'images': kb_images}
         except (AIConfigError, AIUnavailable) as exc:
             logger.info('Small-talk fallback engine unavailable (%s); using canned reply.', exc)
             fallback = FALLBACK_NO_MATCH_EN if language == 'en' else FALLBACK_NO_MATCH
-            return {'reply': fallback, 'engine': 'KNIGHT KB', 'sources': []}
+            return {'reply': fallback, 'engine': 'KNIGHT KB', 'sources': [], 'images': kb_images}
 
     system_prompt = _KNIGHT_SYSTEM_TEMPLATE.format(
-        context=_build_context(items),
+        context=_build_context(items, with_images=show_images),
         language_rule=_LANGUAGE_RULES.get(language, _LANGUAGE_RULES['auto']),
     )
     reply, engine_name = chat(system_prompt, history, question, engine=engine, user=user)
-    return {'reply': reply, 'engine': engine_name, 'sources': []}
+    return {'reply': reply, 'engine': engine_name, 'sources': [], 'images': kb_images}

@@ -69,6 +69,9 @@ class Message(models.Model):
     # Citations captured at reply time ({'title','url','type'} dicts). Stored so a
     # report can copy "saan nakuha ang info" even after the answer is old.
     sources = models.JSONField(default=list, blank=True)
+    # Media attached to this message (chat photo uploads or KB photos surfaced in
+    # the reply): [{'type': 'image', 'url': '/media/...', 'name': '...'}].
+    attachments = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

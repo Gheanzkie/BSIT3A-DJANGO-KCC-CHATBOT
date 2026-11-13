@@ -84,6 +84,42 @@
   }
   .kcc-send:hover { transform: scale(1.05); }
   .kcc-send:disabled { opacity: 0.55; transform: none; }
+  .kcc-attach {
+    flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; border: 0;
+    background: rgba(255,255,255,0.08); color: #cbd5e1;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s ease, color .12s ease;
+  }
+  .kcc-attach:hover { background: rgba(16,185,129,0.16); color: #10b981; }
+  .kcc-attach-preview {
+    display: none; align-items: center; gap: 0.55rem; margin-bottom: 0.5rem;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px; padding: 0.4rem 0.55rem; max-width: 100%;
+  }
+  .kcc-attach-preview.show { display: flex; }
+  .kcc-attach-thumb { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+  .kcc-attach-name { font-size: 0.78rem; color: #cbd5e1; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kcc-attach-remove { background: transparent; border: 0; color: #94a3b8; font-size: 1rem; line-height: 1; }
+  .kcc-msg-images { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.45rem; }
+  .kcc-msg-images img { max-width: 220px; max-height: 220px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.3); cursor: zoom-in; }
+  /* in-chat photo viewer (no new tab) */
+  .kcc-lightbox {
+    position: fixed; inset: 0; z-index: 2000; display: none;
+    align-items: center; justify-content: center; padding: 1.5rem;
+    background: rgba(2, 6, 23, 0.88);
+  }
+  .kcc-lightbox.kcc-open { display: flex; }
+  .kcc-lightbox img {
+    max-width: min(92vw, 1100px); max-height: 88vh; border-radius: 12px;
+    border: 1px solid rgba(148,163,184,0.35); background: #0b1220;
+  }
+  .kcc-lightbox-close {
+    position: absolute; top: 1rem; right: 1rem; width: 42px; height: 42px;
+    border-radius: 50%; border: 1px solid rgba(148,163,184,0.5);
+    background: rgba(15,23,42,0.9); color: #e2e8f0; font-size: 1.1rem; line-height: 1;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .kcc-lightbox-close:hover { background: rgba(239,68,68,0.85); color: #fff; }
 
   /* messages */
   .kcc-row { display: flex; margin-bottom: 0.9rem; }
@@ -241,12 +277,13 @@
           {% for m in chat_messages %}
             {% if m.role == 'user' %}
             <div class="kcc-row kcc-row-user">
-              <div class="kcc-bubble kcc-bubble-user">{{ m.content }}</div>
+              <div class="kcc-bubble kcc-bubble-user">{{ m.content }}{% if m.attachments %}<div class="kcc-msg-images">{% for a in m.attachments %}{% if a.type == 'image' %}<img src="{{ a.url }}" alt="attachment" loading="lazy" onclick="kccOpenImage(this.src)">{% endif %}{% endfor %}</div>{% endif %}</div>
             </div>
             {% else %}
             <div class="kcc-row kcc-row-bot">
               <div class="kcc-holder">
                 <div class="kcc-bubble kcc-bubble-bot">{{ m.content }}</div>
+                {% if m.attachments %}<div class="kcc-msg-images">{% for a in m.attachments %}{% if a.type == 'image' %}<img src="{{ a.url }}" alt="attachment" loading="lazy" onclick="kccOpenImage(this.src)">{% endif %}{% endfor %}</div>{% endif %}
                 {% if m.engine %}<div class="kcc-engine">{{ m.engine }}</div>{% endif %}
                 <div class="kcc-msg-tools">
                   <button type="button" class="kcc-msg-menu-btn kcc-report-open"
@@ -279,9 +316,19 @@
             </span>
             {% endif %}
           </div>
+          <div class="kcc-attach-preview" id="chatAttachPreview">
+            <img class="kcc-attach-thumb" id="chatAttachThumb" alt="">
+            <span class="kcc-attach-name" id="chatAttachName"></span>
+            <button type="button" class="kcc-attach-remove" id="chatAttachRemove" aria-label="Remove photo">✕</button>
+          </div>
           <form id="chatForm">
             {% csrf_token %}
             <div class="kcc-input-wrap">
+              <button type="button" class="kcc-attach" id="chatAttach"
+                      title="Attach a photo (login required)" aria-label="Attach a photo">
+                <i class="fas fa-plus"></i>
+              </button>
+              <input type="file" id="chatFile" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
               <textarea id="chatInput" class="kcc-input" rows="1"
                 placeholder="Ask KNIGHT…"></textarea>
               <button type="submit" class="kcc-send" id="chatSubmit" title="Send">
@@ -345,6 +392,12 @@
   </div>
 </div>
 
+<!-- PHOTO LIGHTBOX (in-chat viewer, may exit button) -->
+<div class="kcc-lightbox" id="kccLightbox" aria-hidden="true" role="dialog" aria-label="Photo viewer">
+  <button type="button" class="kcc-lightbox-close" id="kccLightboxClose" aria-label="Close photo">✕</button>
+  <img id="kccLightboxImg" alt="attachment">
+</div>
+
 <script>
 (function () {
   var form = document.getElementById('chatForm');
@@ -358,6 +411,13 @@
   var convId = '{{ current_conversation_token|default_if_none:"" }}';
   var isNewChat = !convId; // welcome state = bagong chat
   var IS_AUTH = {% if user.is_authenticated %}true{% else %}false{% endif %};
+  var attachBtn = document.getElementById('chatAttach');
+  var fileInput = document.getElementById('chatFile');
+  var pendingFile = null;
+  var previewBox = document.getElementById('chatAttachPreview');
+  var previewThumb = document.getElementById('chatAttachThumb');
+  var previewName = document.getElementById('chatAttachName');
+  var previewRemove = document.getElementById('chatAttachRemove');
 
   function getCookie(name) {
     var value = '; ' + document.cookie;
@@ -409,9 +469,29 @@
 
   function scrollBottom() { win.scrollTop = win.scrollHeight; }
 
-  function bubble(text, role, engine, sources, messageId) {
+  function bubble(text, role, engine, sources, messageId, images) {
     var isUser = role === 'user';
     var hasSources = !isUser && Array.isArray(sources) && sources.length > 0;
+
+    function addImages(container, imgs) {
+      if (!container || !Array.isArray(imgs) || !imgs.length) return;
+      var box = document.createElement('div');
+      box.className = 'kcc-msg-images';
+      imgs.forEach(function (it) {
+        var url = typeof it === 'string' ? it : ((it && it.url) || '');
+        if (!url) return;
+        var img = document.createElement('img');
+        img.src = url;
+        img.alt = 'photo';
+        img.loading = 'lazy';
+        img.addEventListener('click', function () {
+          if (window.kccOpenImage) { window.kccOpenImage(url); }
+        });
+        box.appendChild(img);
+      });
+      if (box.children.length) container.appendChild(box);
+    }
+
     var row = document.createElement('div');
     row.className = 'kcc-row ' + (isUser ? 'kcc-row-user' : 'kcc-row-bot');
 
@@ -421,10 +501,12 @@
 
     if (isUser || (!engine && !hasSources)) {
       row.appendChild(body);
+      addImages(body, images);
     } else {
       var holder = document.createElement('div');
       holder.className = 'kcc-holder';
       holder.appendChild(body);
+      addImages(holder, images);
       if (engine) {
         var tag = document.createElement('div');
         tag.className = 'kcc-engine';
@@ -474,6 +556,35 @@
 
     return row;
   }
+
+  // ---- In-chat photo viewer (lightbox) — no new tab ----
+  (function () {
+    var lb = document.getElementById('kccLightbox');
+    var lbImg = document.getElementById('kccLightboxImg');
+    if (!lb || !lbImg) return;
+
+    function closeLightbox() {
+      lb.classList.remove('kcc-open');
+      lb.setAttribute('aria-hidden', 'true');
+      lbImg.removeAttribute('src');
+    }
+
+    window.kccOpenImage = function (url) {
+      if (!url) return;
+      lbImg.src = url;
+      lb.classList.add('kcc-open');
+      lb.setAttribute('aria-hidden', 'false');
+    };
+
+    lb.addEventListener('click', function (e) {
+      if (e.target === lb || (e.target.closest && e.target.closest('#kccLightboxClose'))) {
+        closeLightbox();
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && lb.classList.contains('kcc-open')) closeLightbox();
+    });
+  })();
 
   // ---- Report a reply (registered users only) ----
   // --- Report modal: dependency-free (no Bootstrap required) ---
@@ -606,14 +717,91 @@
     if (welcome) { welcome.remove(); welcome = null; }
   }
 
+  // ---- Photo attach (+) — registered users only ----
+  function showAttachPreview(file) {
+    if (!previewBox) return;
+    if (previewThumb) previewThumb.src = URL.createObjectURL(file);
+    if (previewName) previewName.textContent = file.name;
+    previewBox.classList.add('show');
+  }
+  function clearAttachPreview() {
+    pendingFile = null;
+    if (fileInput) fileInput.value = '';
+    if (previewBox) previewBox.classList.remove('show');
+    if (previewThumb) previewThumb.removeAttribute('src');
+    if (previewName) previewName.textContent = '';
+  }
+  if (attachBtn && fileInput) {
+    attachBtn.addEventListener('click', function () {
+      if (!IS_AUTH) {
+        if (window.kccAskLogin) { window.kccAskLogin(); }
+        else { window.location.href = "{% url 'login' %}"; }
+        return;
+      }
+      fileInput.click();
+    });
+    fileInput.addEventListener('change', function () {
+      var f = fileInput.files && fileInput.files[0];
+      if (!f) return;
+      if (!/^image\//i.test(f.type)) { alert('Photos only — videos are not allowed.'); clearAttachPreview(); return; }
+      if (f.size > 5 * 1024 * 1024) { alert('Max 5 MB ang photo.'); clearAttachPreview(); return; }
+      pendingFile = f;
+      showAttachPreview(f);
+    });
+  }
+  if (previewRemove) previewRemove.addEventListener('click', clearAttachPreview);
+
+  // ---- Paste a picture from the clipboard (Ctrl+V) ----
+  function handlePastedImage(e) {
+    var data = e.clipboardData || window.clipboardData;
+    var items = (data && data.items) || [];
+    var file = null;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].kind === 'file' && /^image\//i.test(items[i].type)) {
+        file = items[i].getAsFile();
+        break;
+      }
+    }
+    if (!file) return;               // plain text paste -> huwag harangin
+    e.preventDefault();
+    if (!IS_AUTH) {
+      if (window.kccAskLogin) { window.kccAskLogin(); }
+      else { window.location.href = "{% url 'login' %}"; }
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) { alert('Max 5 MB ang photo.'); return; }
+    var pasted = file;
+    if (!file.name || !/\.(png|jpe?g|gif|webp)$/i.test(file.name)) {
+      var ext = ((file.type.split('/')[1] || 'png').replace('jpeg', 'jpg'));
+      pasted = new File([file], 'pasted-' + Date.now() + '.' + ext, { type: file.type || 'image/png' });
+    }
+    pendingFile = pasted;
+    if (fileInput) {
+      try {
+        var dt = new DataTransfer();
+        dt.items.add(pasted);
+        fileInput.files = dt.files;
+      } catch (err) {}
+    }
+    showAttachPreview(pasted);
+  }
+  if (input) input.addEventListener('paste', handlePastedImage);
+  document.addEventListener('paste', function (e) {
+    if (e.defaultPrevented) return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') && t !== input) return;
+    handlePastedImage(e);
+  });
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var text = input.value.trim();
-    if (!text) return;
+    if (!text && !pendingFile) return;
 
     removeWelcome();
 
-    bubble(text, 'user');
+    bubble(text || '(photo)', 'user', null, null, null,
+           pendingFile ? [{ url: URL.createObjectURL(pendingFile) }] : null);
     input.value = '';
     input.style.height = 'auto';
     btn.disabled = true;
@@ -627,6 +815,7 @@
     fd.append('model', modelSel ? modelSel.value : 'auto');
     if (convId) fd.append('conv', convId);
     if (isNewChat) fd.append('newchat', '1');
+    if (pendingFile) fd.append('attachment', pendingFile, pendingFile.name);
 
     fetch("{% url 'chat:send' %}", {
       method: 'POST',
@@ -641,7 +830,8 @@
         typing.remove();
         btn.disabled = false;
         if (r.d && r.d.ok) {
-          bubble(r.d.reply, 'assistant', r.d.engine, r.d.sources, r.d.message_id);
+          clearAttachPreview();
+          bubble(r.d.reply, 'assistant', r.d.engine, r.d.sources, r.d.message_id, r.d.images);
           if (r.d.conversation_token) {
             convId = String(r.d.conversation_token);
             // Tab-scoped: stored per tab, so a new tab gets a fresh chat.
@@ -650,6 +840,10 @@
             if (wasNewChat) { isNewChat = false; }
           }
         } else {
+          if (r.d && r.d.login_required) {
+            clearAttachPreview();
+            if (window.kccAskLogin) { window.kccAskLogin(); }
+          }
           bubble((r.d && r.d.error) || 'May error. Subukan ulit.', 'assistant');
         }
       })
@@ -709,7 +903,10 @@
       .then(function (d) {
         if (!d || !d.ok || !d.messages || !d.messages.length) return;
         removeWelcome();
-        d.messages.forEach(function (m) { bubble(m.content, m.role, m.engine, null, m.id); });
+        d.messages.forEach(function (m) {
+          var imgs = (m.attachments || []).map(function (a) { return a && a.url; });
+          bubble(m.content, m.role, m.engine, null, m.id, imgs);
+        });
       })
       .catch(function () {});
   })();
