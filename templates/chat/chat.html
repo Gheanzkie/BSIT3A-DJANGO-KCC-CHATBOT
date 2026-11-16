@@ -64,6 +64,26 @@
     color: #cbd5e1; border-radius: 999px; font-size: 0.78rem; padding: 0.32rem 0.8rem;
   }
   .kcc-pill:focus { box-shadow: 0 0 0 0.15rem rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.5); background: rgba(16,185,129,0.08); }
+  .kcc-voice-wrap { position: relative; display: inline-flex; }
+  .kcc-voice-btn { padding: 0.32rem 0.55rem; line-height: 1.1; display: inline-flex; align-items: center; }
+  .kcc-voice-btn[aria-expanded="true"] { border-color: rgba(16,185,129,0.5); color: #34d399; }
+  .kcc-voice-menu {
+    position: absolute; bottom: calc(100% + 0.4rem); left: 0; z-index: 1200;
+    min-width: 210px; max-width: 280px; max-height: 240px; overflow-y: auto;
+    background: #0f172a; border: 1px solid rgba(255,255,255,0.14); border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45); padding: 0.3rem;
+  }
+  .kcc-voice-item {
+    display: block; width: 100%; text-align: left; background: transparent; border: 0;
+    color: #cbd5e1; font-size: 0.78rem; padding: 0.35rem 0.6rem; border-radius: 7px;
+    cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .kcc-voice-item:hover { background: rgba(255,255,255,0.08); color: #e2e8f0; }
+  .kcc-voice-item.is-active { color: #34d399; font-weight: 600; }
+  html.kcc-light .kcc-voice-menu { background: #ffffff; border-color: #cbd5e1; box-shadow: 0 10px 30px rgba(15,23,42,0.15); }
+  html.kcc-light .kcc-voice-item { color: #334155; }
+  html.kcc-light .kcc-voice-item:hover { background: rgba(15,23,42,0.06); color: #0f172a; }
+  html.kcc-light .kcc-voice-item.is-active { color: #059669; }
   .kcc-input-wrap {
     display: flex; align-items: flex-end; gap: 0.5rem;
     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
@@ -102,24 +122,7 @@
   .kcc-attach-remove { background: transparent; border: 0; color: #94a3b8; font-size: 1rem; line-height: 1; }
   .kcc-msg-images { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.45rem; }
   .kcc-msg-images img { max-width: 220px; max-height: 220px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.3); cursor: zoom-in; }
-  /* in-chat photo viewer (no new tab) */
-  .kcc-lightbox {
-    position: fixed; inset: 0; z-index: 2000; display: none;
-    align-items: center; justify-content: center; padding: 1.5rem;
-    background: rgba(2, 6, 23, 0.88);
-  }
-  .kcc-lightbox.kcc-open { display: flex; }
-  .kcc-lightbox img {
-    max-width: min(92vw, 1100px); max-height: 88vh; border-radius: 12px;
-    border: 1px solid rgba(148,163,184,0.35); background: #0b1220;
-  }
-  .kcc-lightbox-close {
-    position: absolute; top: 1rem; right: 1rem; width: 42px; height: 42px;
-    border-radius: 50%; border: 1px solid rgba(148,163,184,0.5);
-    background: rgba(15,23,42,0.9); color: #e2e8f0; font-size: 1.1rem; line-height: 1;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-  }
-  .kcc-lightbox-close:hover { background: rgba(239,68,68,0.85); color: #fff; }
+  /* Photo viewer uses the single shared #kccLightbox from base.html (no duplicate). */
 
   /* messages */
   .kcc-row { display: flex; margin-bottom: 0.9rem; }
@@ -141,6 +144,7 @@
   }
   .kcc-msg-menu-btn:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; border-color: rgba(255,255,255,0.12); }
   html.kcc-light .kcc-msg-menu-btn:hover { background: rgba(15,23,42,0.06); color: #0f172a; border-color: #cbd5e1; }
+  .kcc-msg-menu-btn.is-playing { color: #38bdf8; border-color: rgba(56,189,248,0.35); background: rgba(56,189,248,0.10); }
   .kcc-modal-backdrop {
     position: fixed; inset: 0; z-index: 1080; display: none;
     align-items: center; justify-content: center; padding: 1rem;
@@ -276,16 +280,21 @@
           <!-- MESSAGES -->
           {% for m in chat_messages %}
             {% if m.role == 'user' %}
-            <div class="kcc-row kcc-row-user">
+            <div class="kcc-row kcc-row-user" data-mid="{{ m.pk }}">
               <div class="kcc-bubble kcc-bubble-user">{{ m.content }}{% if m.attachments %}<div class="kcc-msg-images">{% for a in m.attachments %}{% if a.type == 'image' %}<img src="{{ a.url }}" alt="attachment" loading="lazy" onclick="kccOpenImage(this.src)">{% endif %}{% endfor %}</div>{% endif %}</div>
             </div>
             {% else %}
-            <div class="kcc-row kcc-row-bot">
+            <div class="kcc-row kcc-row-bot" data-mid="{{ m.pk }}">
               <div class="kcc-holder">
                 <div class="kcc-bubble kcc-bubble-bot">{{ m.content }}</div>
                 {% if m.attachments %}<div class="kcc-msg-images">{% for a in m.attachments %}{% if a.type == 'image' %}<img src="{{ a.url }}" alt="attachment" loading="lazy" onclick="kccOpenImage(this.src)">{% endif %}{% endfor %}</div>{% endif %}
                 {% if m.engine %}<div class="kcc-engine">{{ m.engine }}</div>{% endif %}
                 <div class="kcc-msg-tools">
+                  <button type="button" class="kcc-msg-menu-btn kcc-tts-btn"
+                          title="Read this answer aloud" aria-label="Read this answer aloud"
+                          onclick="kccSpeak(this)">
+                    <i class="fas fa-volume-high"></i>
+                  </button>
                   <button type="button" class="kcc-msg-menu-btn kcc-report-open"
                           data-mid="{{ m.pk }}" title="Report this answer" aria-label="Report this answer"
                           onclick="kccOpenReport(this)">
@@ -315,6 +324,14 @@
               <i class="fas fa-shield-halved me-1"></i>KNIGHT v.1
             </span>
             {% endif %}
+            <div class="kcc-voice-wrap">
+              <button type="button" class="kcc-pill kcc-voice-btn" id="kccVoiceBtn"
+                      title="Voice type" aria-label="Change voice type"
+                      aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-comment-dots"></i>
+              </button>
+              <div class="kcc-voice-menu" id="kccVoiceMenu" role="menu" hidden></div>
+            </div>
           </div>
           <div class="kcc-attach-preview" id="chatAttachPreview">
             <img class="kcc-attach-thumb" id="chatAttachThumb" alt="">
@@ -392,11 +409,7 @@
   </div>
 </div>
 
-<!-- PHOTO LIGHTBOX (in-chat viewer, may exit button) -->
-<div class="kcc-lightbox" id="kccLightbox" aria-hidden="true" role="dialog" aria-label="Photo viewer">
-  <button type="button" class="kcc-lightbox-close" id="kccLightboxClose" aria-label="Close photo">✕</button>
-  <img id="kccLightboxImg" alt="attachment">
-</div>
+<!-- PHOTO LIGHTBOX is provided once by theme/base.html (#kccLightbox). -->
 
 <script>
 (function () {
@@ -535,9 +548,17 @@
         });
         holder.appendChild(srcBox);
       }
+      var tools = document.createElement('div');
+      tools.className = 'kcc-msg-tools';
+      var ttsBtn = document.createElement('button');
+      ttsBtn.type = 'button';
+      ttsBtn.className = 'kcc-msg-menu-btn kcc-tts-btn';
+      ttsBtn.title = 'Read this answer aloud';
+      ttsBtn.setAttribute('aria-label', 'Read this answer aloud');
+      ttsBtn.setAttribute('onclick', 'kccSpeak(this)');
+      ttsBtn.innerHTML = '<i class="fas fa-volume-high"></i>';
+      tools.appendChild(ttsBtn);
       if (messageId) {
-        var tools = document.createElement('div');
-        tools.className = 'kcc-msg-tools';
         var mbtn = document.createElement('button');
         mbtn.type = 'button';
         mbtn.className = 'kcc-msg-menu-btn kcc-report-open';
@@ -547,8 +568,8 @@
         mbtn.setAttribute('onclick', 'kccOpenReport(this)');
         mbtn.innerHTML = '<i class="fas fa-ellipsis"></i>';
         tools.appendChild(mbtn);
-        holder.appendChild(tools);
       }
+      holder.appendChild(tools);
       row.appendChild(holder);
     }
 
@@ -557,34 +578,179 @@
     return row;
   }
 
-  // ---- In-chat photo viewer (lightbox) — no new tab ----
-  (function () {
-    var lb = document.getElementById('kccLightbox');
-    var lbImg = document.getElementById('kccLightboxImg');
-    if (!lb || !lbImg) return;
+  // ---- Text-to-speech: read a KNIGHT reply aloud (toggle play/stop) ----
+  var kccSpeakingBtn = null;
+  function kccTtsBusy(btn) {
+    btn.classList.add('is-playing');
+    var i = btn.querySelector('i');
+    if (i) i.className = 'fas fa-stop';
+    btn.title = 'Stop reading';
+    btn.setAttribute('aria-label', 'Stop reading');
+  }
+  function kccTtsIdle(btn) {
+    if (!btn) return;
+    btn.classList.remove('is-playing');
+    var i = btn.querySelector('i');
+    if (i) i.className = 'fas fa-volume-high';
+    btn.title = 'Read this answer aloud';
+    btn.setAttribute('aria-label', 'Read this answer aloud');
+  }
+  var KCC_VOICE_KEY = 'kcc-tts-voice';
+  function kccGetSavedVoice(voices) {
+    var saved = null;
+    try { saved = localStorage.getItem(KCC_VOICE_KEY); } catch (e) { saved = null; }
+    if (!saved) return null;
+    for (var i = 0; i < (voices || []).length; i++) {
+      if ((voices[i].voiceURI || voices[i].name) === saved) return voices[i];
+    }
+    return null;
+  }
+  function kccInitVoicePicker() {
+    var btn = document.getElementById('kccVoiceBtn');
+    var menu = document.getElementById('kccVoiceMenu');
+    if (!btn || !menu || !('speechSynthesis' in window)) return;
+    var synth = window.speechSynthesis;
 
-    function closeLightbox() {
-      lb.classList.remove('kcc-open');
-      lb.setAttribute('aria-hidden', 'true');
-      lbImg.removeAttribute('src');
+    function savedVal() {
+      try { return localStorage.getItem(KCC_VOICE_KEY) || ''; } catch (e) { return ''; }
     }
 
-    window.kccOpenImage = function (url) {
-      if (!url) return;
-      lbImg.src = url;
-      lb.classList.add('kcc-open');
-      lb.setAttribute('aria-hidden', 'false');
-    };
+    function build() {
+      var voices = (synth.getVoices ? synth.getVoices() : []) || [];
+      var saved = savedVal();
+      menu.innerHTML = '';
+      var items = [{ value: '', label: 'Voice: Auto' }];
+      voices.slice().sort(function (a, b) {
+        return (a.lang || '').localeCompare(b.lang || '') || (a.name || '').localeCompare(b.name || '');
+      }).forEach(function (v) {
+        items.push({ value: v.voiceURI || v.name, label: (v.name || 'Voice') + ' — ' + (v.lang || '') });
+      });
+      items.forEach(function (it) {
+        var el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'kcc-voice-item' + (it.value === saved ? ' is-active' : '');
+        el.textContent = it.label;
+        el.addEventListener('click', function () {
+          try { localStorage.setItem(KCC_VOICE_KEY, it.value); } catch (e) {}
+          synth.cancel();
+          if (kccSpeakingBtn) { kccTtsIdle(kccSpeakingBtn); kccSpeakingBtn = null; }
+          closeMenu();
+        });
+        menu.appendChild(el);
+      });
+    }
 
-    lb.addEventListener('click', function (e) {
-      if (e.target === lb || (e.target.closest && e.target.closest('#kccLightboxClose'))) {
-        closeLightbox();
-      }
+    function openMenu() { build(); menu.hidden = false; btn.setAttribute('aria-expanded', 'true'); }
+    function closeMenu() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (menu.hidden) openMenu(); else closeMenu();
+    });
+    document.addEventListener('click', function (e) {
+      if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) closeMenu();
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && lb.classList.contains('kcc-open')) closeLightbox();
+      if (e.key === 'Escape' && !menu.hidden) closeMenu();
     });
-  })();
+
+    build();
+    // Voices load asynchronously in most browsers.
+    if (synth.addEventListener) synth.addEventListener('voiceschanged', build);
+    else synth.onvoiceschanged = build;
+  }
+  window.kccSpeak = function (btn) {
+    if (!btn) return;
+    if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+      alert('Hindi supported ng browser mo ang text-to-speech.');
+      return;
+    }
+    var synth = window.speechSynthesis;
+    var holder = btn.closest ? btn.closest('.kcc-holder') : null;
+    var bubbleEl = holder ? holder.querySelector('.kcc-bubble-bot') : null;
+    var text = bubbleEl ? (bubbleEl.textContent || '').trim() : '';
+    if (!text) return;
+
+    // Toggle off: clicking the active button stops playback.
+    if (kccSpeakingBtn === btn) {
+      synth.cancel();
+      kccTtsIdle(btn);
+      kccSpeakingBtn = null;
+      return;
+    }
+    synth.cancel();
+    if (kccSpeakingBtn) kccTtsIdle(kccSpeakingBtn);
+
+    var isTagalog = /(^|\s)(ang|ng|mga|po|kayo|paano|saan|sino|ano|salamat|kumusta|naman|yung|ito|hindi|oo)(\s|$)/i.test(text);
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = isTagalog ? 'fil-PH' : 'en-US';
+    u.rate = 1;
+    u.pitch = 1;
+    try {
+      var voices = synth.getVoices ? synth.getVoices() : [];
+      var chosen = kccGetSavedVoice(voices);
+      if (chosen) {
+        u.voice = chosen;
+        u.lang = chosen.lang;
+      } else {
+        var want = isTagalog ? /^(fil|tl)/i : /^en/i;
+        for (var vi = 0; vi < voices.length; vi++) {
+          if (want.test(voices[vi].lang)) { u.voice = voices[vi]; u.lang = voices[vi].lang; break; }
+        }
+      }
+    } catch (e) {}
+
+    u.onend = function () { if (kccSpeakingBtn === btn) { kccTtsIdle(btn); kccSpeakingBtn = null; } };
+    u.onerror = function () { if (kccSpeakingBtn === btn) { kccTtsIdle(btn); kccSpeakingBtn = null; } };
+
+    kccSpeakingBtn = btn;
+    kccTtsBusy(btn);
+    synth.speak(u);
+  };
+  window.addEventListener('pagehide', function () {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  });
+  kccInitVoicePicker();
+
+  // ---- In-chat photo viewer — delegates to the shared base.html lightbox ----
+  window.kccOpenImage = function (url) {
+    if (!url) { return; }
+    if (window.kccShowImage) { window.kccShowImage([url], 0); }
+    else { window.open(url, '_blank', 'noopener'); }
+  };
+
+  // ---- Live chat: append new replies (e.g. an admin reply on a report) ----
+  var lastMsgId = {{ last_message_id|default:0 }};
+  var seenMsgIds = {};
+  document.querySelectorAll('.kcc-row[data-mid]').forEach(function (r) {
+    var mid = r.getAttribute('data-mid');
+    if (mid) { seenMsgIds[mid] = true; }
+  });
+
+  function pollChat() {
+    if (!convId || document.hidden) { return; }
+    fetch("/chat/poll/?token=" + encodeURIComponent(convId) + "&after=" + encodeURIComponent(lastMsgId), {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (d) {
+        if (!d || !d.ok || !Array.isArray(d.messages)) { return; }
+        d.messages.forEach(function (m) {
+          if (typeof m.id === 'number' && m.id > lastMsgId) { lastMsgId = m.id; }
+          if (m.role !== 'assistant') { return; }
+          var key = String(m.id);
+          if (seenMsgIds[key]) { return; }
+          seenMsgIds[key] = true;
+          var imgs = (m.attachments || []).map(function (a) { return a && a.url; });
+          if (typeof removeWelcome === 'function') { removeWelcome(); }
+          bubble(m.content, 'assistant', m.engine || 'From admin', [], m.id, imgs);
+          scrollBottom();
+        });
+      })
+      .catch(function () {});
+  }
+  setInterval(pollChat, 6000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { pollChat(); } });
 
   // ---- Report a reply (registered users only) ----
   // --- Report modal: dependency-free (no Bootstrap required) ---
@@ -831,6 +997,7 @@
         btn.disabled = false;
         if (r.d && r.d.ok) {
           clearAttachPreview();
+          if (r.d.message_id) { seenMsgIds[String(r.d.message_id)] = true; if (r.d.message_id > lastMsgId) { lastMsgId = r.d.message_id; } }
           bubble(r.d.reply, 'assistant', r.d.engine, r.d.sources, r.d.message_id, r.d.images);
           if (r.d.conversation_token) {
             convId = String(r.d.conversation_token);

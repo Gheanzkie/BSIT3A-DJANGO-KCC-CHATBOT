@@ -82,16 +82,35 @@
               </div>
               {% endif %}
               <div class="col-12">
-                {% if r.admin_reply %}
+                {% if r.replied_at %}
                   <div class="alert alert-success py-2 mb-0 small">
                     <strong>Replied {{ r.replied_at|date:"M d, H:i" }}</strong>{% if r.replied_by %} by {{ r.replied_by.username }}{% endif %}
-                    <div class="mt-1" style="white-space:pre-wrap;">{{ r.admin_reply }}</div>
+                    {% if r.admin_reply %}<div class="mt-1" style="white-space:pre-wrap;">{{ r.admin_reply }}</div>{% endif %}
+                    {% if r.admin_attachments %}
+                    <div class="kcc-reply-sent">
+                      {% for a in r.admin_attachments %}
+                        {% if a.type == 'image' %}
+                          <a href="{{ a.url }}" target="_blank" rel="noopener noreferrer" title="{{ a.name|default:'photo' }}">
+                            <img src="{{ a.url }}" alt="{{ a.name|default:'photo' }}">
+                          </a>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    {% endif %}
                   </div>
                 {% else %}
-                  <form method="post" action="{% url 'message_report_reply' r.pk %}" class="d-flex gap-2 align-items-start">
+                  <form method="post" action="{% url 'message_report_reply' r.pk %}" enctype="multipart/form-data"
+                        class="kcc-reply-form d-flex gap-2 align-items-start">
                     {% csrf_token %}
-                    <textarea name="admin_reply" rows="2" class="form-control form-control-sm" required
-                              placeholder="Reply — appears in {{ r.user.username }}'s chat as &quot;From admin&quot;"></textarea>
+                    <div class="flex-grow-1">
+                      <textarea name="admin_reply" rows="2" class="form-control form-control-sm kcc-reply-input"
+                                placeholder="Reply — appears in {{ r.user.username }}'s chat as &quot;From admin&quot;. Paste a photo with Ctrl+V."></textarea>
+                      <div class="kcc-reply-preview" hidden></div>
+                    </div>
+                    <input type="file" name="attachment" accept="image/png,image/jpeg,image/gif,image/webp" class="d-none kcc-reply-file">
+                    <button type="button" class="btn btn-sm btn-outline-secondary kcc-reply-attach text-nowrap" title="Attach a photo" aria-label="Attach a photo">
+                      <i class="fas fa-image"></i>
+                    </button>
                     <button type="submit" class="btn btn-sm btn-primary text-nowrap">
                       <i class="fas fa-paper-plane me-1"></i>Send
                     </button>
@@ -119,6 +138,10 @@
   .kcc-expand-row .small { color: inherit; }
   .kcc-toggle i { transition: transform 0.15s ease; display: inline-block; }
   .kcc-toggle[aria-expanded="true"] i { transform: rotate(180deg); }
+  .kcc-reply-preview { margin-top: 0.4rem; display: flex; align-items: center; }
+  .kcc-reply-thumb { max-height: 64px; max-width: 120px; border-radius: 8px; object-fit: cover; }
+  .kcc-reply-sent { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+  .kcc-reply-sent img { max-height: 90px; border-radius: 8px; object-fit: cover; }
 </style>
 
 <script>
@@ -131,6 +154,60 @@
     row.style.display = isOpen ? 'none' : 'table-row';
     btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
   });
+
+  // Reply photo: attach button + Ctrl+V paste + thumbnail preview.
+  (function () {
+    function setup(form) {
+      var file = form.querySelector('.kcc-reply-file');
+      var attach = form.querySelector('.kcc-reply-attach');
+      var input = form.querySelector('.kcc-reply-input');
+      var preview = form.querySelector('.kcc-reply-preview');
+      if (!file || !attach || !preview) return;
+
+      function showPreview() {
+        var f = file.files && file.files[0];
+        if (!f) { preview.hidden = true; preview.innerHTML = ''; return; }
+        if (!/^image\//i.test(f.type)) { alert('Photos only.'); file.value = ''; preview.hidden = true; return; }
+        if (f.size > 5 * 1024 * 1024) { alert('Max 5 MB ang photo.'); file.value = ''; preview.hidden = true; return; }
+        preview.innerHTML = '';
+        var img = document.createElement('img');
+        img.src = URL.createObjectURL(f);
+        img.alt = 'attachment';
+        img.className = 'kcc-reply-thumb';
+        var rm = document.createElement('button');
+        rm.type = 'button';
+        rm.className = 'btn btn-sm btn-link text-danger p-0 ms-2';
+        rm.innerHTML = '<i class="fas fa-xmark me-1"></i>Remove';
+        rm.addEventListener('click', function () { file.value = ''; showPreview(); });
+        preview.appendChild(img);
+        preview.appendChild(rm);
+        preview.hidden = false;
+      }
+
+      attach.addEventListener('click', function () { file.click(); });
+      file.addEventListener('change', showPreview);
+
+      // Ctrl+V / paste an image straight into the reply box.
+      (input || form).addEventListener('paste', function (e) {
+        var items = (e.clipboardData && e.clipboardData.items) || [];
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].type && items[i].type.indexOf('image/') === 0) {
+            var blob = items[i].getAsFile();
+            if (!blob) continue;
+            try {
+              var dt = new DataTransfer();
+              dt.items.add(blob);
+              file.files = dt.files;
+            } catch (err) { /* browser blocks files assignment — use the image button */ }
+            e.preventDefault();
+            showPreview();
+            return;
+          }
+        }
+      });
+    }
+    document.querySelectorAll('.kcc-reply-form').forEach(setup);
+  })();
 </script>
 
 {% endblock %}

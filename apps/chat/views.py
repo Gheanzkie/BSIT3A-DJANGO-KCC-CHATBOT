@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 
 from . import presence
 from .models import Conversation, Message, MessageReport
@@ -127,6 +127,8 @@ def chat_page(request):
         'current_conversation_id': conversation.pk if conversation else None,
         'current_conversation_token': conversation.token if conversation else None,
         'chat_messages': conversation.messages.all() if conversation else [],
+        'last_message_id': (conversation.messages.order_by('-pk')
+                            .values_list('pk', flat=True).first() if conversation else 0) or 0,
         'primary_name': settings.AI_PRIMARY_NAME,
         'fallback_name': settings.AI_FALLBACK_NAME,
         'ai_configured': bool(settings.GROQ_API_KEY or settings.GEMINI_API_KEY),
@@ -190,6 +192,33 @@ def chat_history(request):
             {'id': m.pk, 'role': m.role, 'content': m.content, 'engine': m.engine,
              'attachments': m.attachments or []}
             for m in conversation.messages.all()
+        ],
+    })
+
+
+@require_http_methods(['GET', 'POST'])
+def chat_poll(request):
+    """Lightweight long-poll for LIVE updates (e.g. an admin replying to a report).
+
+    Returns only messages newer than ``after`` for the caller's own conversation,
+    so the chat page can append new replies without a full refresh.
+    """
+    ref = (request.POST.get('token') or request.GET.get('token') or '').strip()
+    conversation = _conversation_for(request, ref)
+    if conversation is None:
+        return JsonResponse({'ok': True, 'messages': [], 'gone': True})
+    try:
+        after = int(request.POST.get('after') or request.GET.get('after') or 0)
+    except (TypeError, ValueError):
+        after = 0
+    newer = conversation.messages.filter(pk__gt=after).order_by('pk')[:100]
+    return JsonResponse({
+        'ok': True,
+        'token': conversation.token,
+        'messages': [
+            {'id': m.pk, 'role': m.role, 'content': m.content, 'engine': m.engine,
+             'attachments': m.attachments or []}
+            for m in newer
         ],
     })
 
@@ -372,12 +401,14 @@ def chat_send(request):
     history = [{'role': m.role, 'content': m.content} for m in reversed(prior[1:])]  # exclude the message just sent
 
     reply, engine, sources = None, '', []
+    answered_by_ai = True
     try:
         result = ai.answer_question(text, history, engine=engine_pref, language=lang_pref,
                                     user=request.user, image=upload)
         reply, engine = result['reply'], result['engine']
         sources = result.get('sources') or []
         kb_images = result.get('images') or []
+        answered_by_ai = result.get('answered', True)
         # Attached photo + "I can't send photos" in the text = contradiction. Fix it.
         reply = ai.finalize_photo_reply(reply, bool(kb_images), lang_pref)
     except ai.AIConfigError as exc:
@@ -403,6 +434,27 @@ def chat_send(request):
     )
     conversation.save()  # bump updated_at
 
+    # AUTO-REPORT: if the bot couldn't answer from the knowledge base, file a
+    # report for the admin automatically (registered users only — FK requires it).
+    auto_reported = False
+    if (not answered_by_ai) and request.user.is_authenticated:
+        try:
+            MessageReport.objects.create(
+                message=assistant_msg,
+                conversation=conversation,
+                user=request.user,
+                reason=MessageReport.REASON_INCOMPLETE,
+                details=('Auto-flagged: KNIGHT could not answer this from the KCC '
+                         'knowledge base. Please review / add the missing info.'),
+                question_text=(text or '')[:2000],
+                answer_text=(reply or '')[:4000],
+                sources=sources or [],
+                engine=engine or '',
+            )
+            auto_reported = True
+        except Exception:
+            logger.exception('Auto-report on unanswered chat failed')
+
     from apps.core.activity import log_activity
     log_activity(request, 'chat')
 
@@ -415,6 +467,7 @@ def chat_send(request):
         'conversation_id': conversation.pk,
         'conversation_token': conversation.token,
         'message_id': assistant_msg.pk,
+        'auto_reported': auto_reported,
         'created_at': timezone.localtime(assistant_msg.created_at).strftime('%H:%M'),
     })
 

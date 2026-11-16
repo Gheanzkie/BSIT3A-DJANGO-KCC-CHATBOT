@@ -128,6 +128,9 @@ class MessageReport(models.Model):
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_OPEN)
     admin_reply = models.TextField(blank=True, default='')
+    # Photos the admin attached to the reply (same shape as Message.attachments):
+    # [{'type': 'image', 'url': '/media/...', 'name': '...'}].
+    admin_attachments = models.JSONField(default=list, blank=True)
     replied_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='answered_message_reports',

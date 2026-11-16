@@ -1519,7 +1519,7 @@ def answer_question(question, history=None, engine='auto', language='auto', user
     if image is None:
         small = _smalltalk_reply(question, language)
         if small:
-            return {'reply': small, 'engine': 'KNIGHT', 'sources': [], 'images': []}
+            return {'reply': small, 'engine': 'KNIGHT', 'sources': [], 'images': [], 'answered': True}
 
     items = _retrieve(question)
     # Never attach a knowledge photo when the user uploaded their own image, and
@@ -1541,7 +1541,7 @@ def answer_question(question, history=None, engine='auto', language='auto', user
         )
         reply, engine_name = chat(system_prompt, history, question, engine=engine, user=user)
         return {'reply': reply, 'engine': engine_name,
-                'sources': _web_sources(web), 'images': kb_images}
+                'sources': _web_sources(web), 'images': kb_images, 'answered': True}
 
     if not items:
         # Walang KB match â€” sagot mula sa web research kung meron, tapos small talk / scope guidance.
@@ -1555,7 +1555,7 @@ def answer_question(question, history=None, engine='auto', language='auto', user
                 if getattr(settings, 'AI_WEB_SAVE_FACTS', False):
                     _save_web_fact(web)
                 return {'reply': reply, 'engine': engine_name, 'sources': _web_sources(web),
-                        'images': kb_images}
+                        'images': kb_images, 'answered': True}
             except (AIConfigError, AIUnavailable):
                 pass  # fall through sa smalltalk/canned
         try:
@@ -1563,15 +1563,17 @@ def answer_question(question, history=None, engine='auto', language='auto', user
                 _KNIGHT_SMALLTALK_TEMPLATE.format(
                     language_rule=_LANGUAGE_RULES.get(language, _LANGUAGE_RULES['auto'])),
                 history, question, engine=engine, user=user)
-            return {'reply': reply, 'engine': engine_name, 'sources': [], 'images': kb_images}
+            return {'reply': reply, 'engine': engine_name, 'sources': [], 'images': kb_images,
+                    'answered': False}
         except (AIConfigError, AIUnavailable) as exc:
             logger.info('Small-talk fallback engine unavailable (%s); using canned reply.', exc)
             fallback = FALLBACK_NO_MATCH_EN if language == 'en' else FALLBACK_NO_MATCH
-            return {'reply': fallback, 'engine': 'KNIGHT KB', 'sources': [], 'images': kb_images}
+            return {'reply': fallback, 'engine': 'KNIGHT KB', 'sources': [], 'images': kb_images,
+                    'answered': False}
 
     system_prompt = _KNIGHT_SYSTEM_TEMPLATE.format(
         context=_build_context(items, with_images=show_images),
         language_rule=_LANGUAGE_RULES.get(language, _LANGUAGE_RULES['auto']),
     )
     reply, engine_name = chat(system_prompt, history, question, engine=engine, user=user)
-    return {'reply': reply, 'engine': engine_name, 'sources': [], 'images': kb_images}
+    return {'reply': reply, 'engine': engine_name, 'sources': [], 'images': kb_images, 'answered': True}

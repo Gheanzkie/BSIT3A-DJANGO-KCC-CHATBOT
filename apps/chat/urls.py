@@ -12,6 +12,8 @@ urlpatterns = [
     path('send/', views.chat_send, name='send'),
     path('leave/', views.chat_leave, name='leave'),
     path('history/', views.chat_history, name='history'),
+    # Live updates: new messages (e.g. admin reply on a report) without refresh.
+    path('poll/', views.chat_poll, name='poll'),
     # Registered users: flag a KNIGHT reply (admin answers inside the chat).
     path('report/', views.chat_report, name='report'),
     # Old links select the conversation then bounce to the root URL.

@@ -14,6 +14,7 @@ urlpatterns = [
     path('message-reports/<int:pk>/reply/', views.message_report_reply, name='message_report_reply'),
     path('activity/', views.activity_list, name='activity'),
     path('announcements/', views.announcement_list, name='announcements'),
+    path('announcements/latest/', views.announcement_latest, name='announcement_latest'),
     path('announcements/<int:pk>/update/', views.announcement_update, name='announcement_update'),
     path('announcements/<int:pk>/edit/', views.announcement_edit, name='announcement_edit'),
     path('tickets/<int:pk>/update/', views.ticket_update, name='ticket_update'),

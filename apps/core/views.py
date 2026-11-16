@@ -489,18 +489,39 @@ def message_report_list(request):
 @user_passes_test(_is_superuser, login_url='login')
 def message_report_reply(request, pk):
     from apps.chat.models import Conversation, Message, MessageReport
+    from apps.chat.services import ai
 
     report = get_object_or_404(MessageReport, pk=pk)
     reply = (request.POST.get('admin_reply') or '').strip()
-    if not reply:
-        messages.error(request, 'Write a reply before sending.')
+    upload = request.FILES.get('attachment')
+
+    # Optional photo on the reply — same validation/limits as chat uploads.
+    attachments = []
+    if upload is not None:
+        try:
+            ai.validate_image(upload)
+        except ai.ImageRejected as exc:
+            messages.error(request, str(exc))
+            return redirect('message_reports')
+        try:
+            rel = ai.store_image(upload, 'chat_uploads')
+            attachments = [{'type': 'image', 'url': ai.image_url(rel), 'name': upload.name}]
+        except (OSError, ValueError):
+            messages.error(request, 'Could not save the photo. Please try again.')
+            return redirect('message_reports')
+
+    if not reply and not attachments:
+        messages.error(request, 'Write a reply or attach a photo before sending.')
         return redirect('message_reports')
 
     report.admin_reply = reply[:4000]
+    report.admin_attachments = attachments
     report.replied_by = request.user
     report.replied_at = timezone.now()
     report.status = MessageReport.STATUS_RESOLVED
-    report.save(update_fields=['admin_reply', 'replied_by', 'replied_at', 'status'])
+    report.save(update_fields=[
+        'admin_reply', 'admin_attachments', 'replied_by', 'replied_at', 'status',
+    ])
 
     # The reply is posted straight into the user's own chat thread, so they see
     # it the next time they open the session (no separate notification system).
@@ -513,11 +534,24 @@ def message_report_reply(request, pk):
     Message.objects.create(
         conversation=conversation,
         role=Message.ROLE_ASSISTANT,
-        content=report.admin_reply,
+        content=report.admin_reply or '(photo)',
         engine='From admin',
+        attachments=attachments,
     )
     conversation.save()  # bump updated_at so it shows as the latest session
     messages.success(request, f'Reply sent to {report.user.username}.')
     return redirect('message_reports')
+
+
+@require_http_methods(['GET'])
+def announcement_latest(request):
+    """Tiny polling endpoint so the sidebar announcements update live."""
+    qs = Announcement.objects.filter(is_active=True)
+    latest_id = qs.order_by('-created_at').values_list('id', flat=True).first() or 0
+    return JsonResponse({
+        'ok': True,
+        'latest_id': latest_id,
+        'count': qs.count(),
+    })
 
 

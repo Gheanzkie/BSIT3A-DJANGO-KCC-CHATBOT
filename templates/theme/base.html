@@ -365,8 +365,14 @@
         padding: 16px; background-size: 55%;
       }
 
-      /* ---------- FULLSCREEN LIGHTBOX (scrollable + pannable) ---------- */
-      .kcc-lightbox {
+      /* Live "new announcement" dot on the sidebar button */
+      [data-kcc-panel="announcements"].kcc-has-new { position: relative; }
+      [data-kcc-panel="announcements"].kcc-has-new::after {
+        content: ''; position: absolute; top: 6px; right: 10px;
+        width: 8px; height: 8px; border-radius: 50%; background: #ef4444;
+        box-shadow: 0 0 0 2px rgba(2,6,23,0.6);
+      }
+      /* ---------- FULLSCREEN LIGHTBOX (scrollable + pannable) ---------- */      .kcc-lightbox {
         display: none; position: fixed; inset: 0; z-index: 2000;
         background: rgba(2,6,23,0.96);
         overscroll-behavior: contain;
@@ -397,11 +403,13 @@
         cursor: zoom-out;
       }
       .kcc-lb-close {
-        position: absolute; top: 14px; right: 18px; z-index: 3;
-        width: 44px; height: 44px; border: 0; border-radius: 50%;
-        background: rgba(255,255,255,0.14); color: #fff;
-        font-size: 1.7rem; line-height: 1; display: flex; align-items: center; justify-content: center;
+        position: absolute; top: 14px; right: 18px; z-index: 20;
+        width: 52px; height: 52px; border: 0; border-radius: 50%;
+        background: rgba(255,255,255,0.18); color: #fff;
+        font-size: 2rem; line-height: 1; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.45);
       }
+      .kcc-lb-close:hover { background: rgba(255,255,255,0.30); }
       .kcc-lb-prev, .kcc-lb-next {
         position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
         width: 54px; height: 54px; border: 0; border-radius: 50%;
@@ -753,13 +761,9 @@
           panel.classList.add('kcc-floatpanel-side');
         }
 
-        function openPanel(kind, anchor) {
-          titleEl.textContent = TITLES[kind] || '';
+        function loadInto(kind) {
           panelBody.innerHTML = '<div class="text-secondary" style="font-size:0.85rem;">Loading...</div>';
-          panel.hidden = false;
-          bar.style.display = 'none';
-          placePanel(anchor);
-          fetch(URLS[kind], { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+          return fetch(URLS[kind], { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function (r) { return r.text(); })
             .then(function (html) {
               var doc = new DOMParser().parseFromString(html, 'text/html');
@@ -771,8 +775,25 @@
             });
         }
 
+        function openPanel(kind, anchor) {
+          titleEl.textContent = TITLES[kind] || '';
+          panel.setAttribute('data-kind', kind);
+          panel.hidden = false;
+          bar.style.display = 'none';
+          placePanel(anchor);
+          loadInto(kind);
+        }
+
+        // Live refresh the panel if it is currently showing announcements.
+        window.kccReloadAnnouncements = function () {
+          if (panel.hidden || panel.getAttribute('data-kind') !== 'announcements') { return; }
+          loadInto('announcements');
+        };
+
+        var annBtn = document.querySelector('[data-kcc-panel="announcements"]');
         document.querySelectorAll('[data-kcc-panel]').forEach(function (btn) {
           btn.addEventListener('click', function () {
+            if (btn === annBtn) { btn.classList.remove('kcc-has-new'); }
             openPanel(btn.getAttribute('data-kcc-panel'), btn);
           });
         });
@@ -780,6 +801,30 @@
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape' && !panel.hidden) { closePanel(); }
         });
+
+        // ---- Live announcements: poll, refresh open panel or show a dot ----
+        var annSig = null;
+        function pollAnnouncements() {
+          if (document.hidden) { return; }
+          fetch("/announcements/latest/", { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (!d || !d.ok) { return; }
+              var sig = d.latest_id + ':' + d.count;
+              if (annSig === null) { annSig = sig; return; }
+              if (sig !== annSig) {
+                annSig = sig;
+                if (!panel.hidden && panel.getAttribute('data-kind') === 'announcements') {
+                  loadInto('announcements');
+                } else if (annBtn) {
+                  annBtn.classList.add('kcc-has-new');
+                }
+              }
+            })
+            .catch(function () {});
+        }
+        setInterval(pollAnnouncements, 10000);
+        document.addEventListener('visibilitychange', function () { if (!document.hidden) { pollAnnouncements(); } });
       })();
     </script>
     {% endif %}
@@ -947,6 +992,11 @@
           if (inst) { inst.to(idx); }
         }
 
+        /* Public API: let other pages (chat photo viewer) reuse this one overlay
+           instead of defining their own #kccLightbox (duplicate-id bug). */
+        window.kccShowImage = function (list, i) { open(list, i, null); };
+        window.kccHideImage = close;
+
         /* Delegated: catches images on the full page and inside the panel. */
         document.addEventListener('click', function (e) {
           var target = e.target;
@@ -980,6 +1030,21 @@
         lb.querySelector('.kcc-lb-close').addEventListener('click', close);
         lb.querySelector('.kcc-lb-prev').addEventListener('click', function (e) { e.stopPropagation(); step(-1); });
         lb.querySelector('.kcc-lb-next').addEventListener('click', function (e) { e.stopPropagation(); step(1); });
+
+        /* Swipe down anywhere (while not zoomed) to dismiss — the most natural
+           "back to minimize" gesture on phones. */
+        var touchStartY = null;
+        lb.addEventListener('touchstart', function (e) {
+          if (stage.classList.contains('zoomed') || !e.touches || !e.touches.length) { touchStartY = null; return; }
+          touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        lb.addEventListener('touchend', function (e) {
+          if (touchStartY === null) { return; }
+          var dy = (e.changedTouches && e.changedTouches.length)
+            ? e.changedTouches[0].clientY - touchStartY : 0;
+          touchStartY = null;
+          if (dy > 90) { close(); }
+        }, { passive: true });
 
         /* Drag-to-pan while zoomed. */
         stage.addEventListener('pointerdown', function (e) {
